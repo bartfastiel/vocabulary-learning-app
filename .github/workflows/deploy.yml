@@ -1,0 +1,49 @@
+name: Deploy Vokabeltrainer to AWS S3
+
+on:
+  push:
+    branches:
+      - main  # oder 'master', je nach deinem Branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Sync to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws s3 sync . s3://${{ secrets.S3_BUCKET }} \
+            --region $AWS_REGION \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --delete
+
+      - name: Set index.html as website root (optional)
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws s3 website s3://${{ secrets.S3_BUCKET }} \
+            --index-document index.html \
+            --region $AWS_REGION
+
+      - name: Invalidate CloudFront cache (optional)
+        if: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
+            --paths "/*"
