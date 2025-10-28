@@ -23,5 +23,10 @@ jobs:
           aws s3 sync . s3://$S3_BUCKET \
             --region $AWS_REGION \
             --delete \
-            --exclude ".git/*" \
-            --exclude ".github/*"
+            --exclude "*" \
+            --include "index.html" \
+            --include "vocab.json" \
+            --include "buzz.mp3" \
+            --include "ding.mp3" \
+            --include "audio/*" \
+            --include "img/*"
