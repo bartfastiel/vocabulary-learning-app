@@ -8,7 +8,6 @@
     body {
       font-family: "Segoe UI", sans-serif;
       background: linear-gradient(to right, #74ebd5, #acb6e5);
-      color: #333;
       margin: 0;
       padding: 2rem;
       display: flex;
@@ -39,7 +38,7 @@
     }
 
     .question {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       margin-bottom: 1rem;
     }
 
@@ -84,6 +83,13 @@
     #next-btn:hover {
       background-color: #26c6da;
     }
+
+    img.vocab-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -95,32 +101,31 @@
   <button id="next-btn">Nächste Frage</button>
 </div>
 
-<!-- 🎵 Audios für Feedback -->
 <audio id="sound-correct" src="ding.mp3" preload="auto"></audio>
 <audio id="sound-wrong" src="buzz.mp3" preload="auto"></audio>
 
 <script>
   const vocabulary = [
-    { de: "Haus", en: "house" },
-    { de: "Baum", en: "tree" },
-    { de: "Auto", en: "car" },
-    { de: "Wasser", en: "water" },
-    { de: "Hund", en: "dog" },
-    { de: "Katze", en: "cat" },
-    { de: "Buch", en: "book" },
-    { de: "Stuhl", en: "chair" },
-    { de: "Tisch", en: "table" },
-    { de: "Straße", en: "street" },
-    { de: "Fisch", en: "fish" },
-    { de: "Vogel", en: "bird" },
-    { de: "Blume", en: "flower" },
-    { de: "Himmel", en: "sky" },
-    { de: "Sonne", en: "sun" },
-    { de: "Mond", en: "moon" },
-    { de: "Schule", en: "school" },
-    { de: "Freund", en: "friend" },
-    { de: "Brot", en: "bread" },
-    { de: "Apfel", en: "apple" },
+    { de: "Haus", en: "house", img: "img/house.png" },
+    { de: "Baum", en: "tree", img: "img/tree.png" },
+    { de: "Auto", en: "car", img: "img/car.png" },
+    { de: "Wasser", en: "water", img: "img/water.png" },
+    { de: "Hund", en: "dog", img: "img/dog.png" },
+    { de: "Katze", en: "cat", img: "img/cat.png" },
+    { de: "Buch", en: "book", img: "img/book.png" },
+    { de: "Stuhl", en: "chair", img: "img/chair.png" },
+    { de: "Tisch", en: "table", img: "img/table.png" },
+    { de: "Straße", en: "street", img: "img/street.png" },
+    { de: "Fisch", en: "fish", img: "img/fish.png" },
+    { de: "Vogel", en: "bird", img: "img/bird.png" },
+    { de: "Blume", en: "flower", img: "img/flower.png" },
+    { de: "Himmel", en: "sky", img: "img/sky.png" },
+    { de: "Sonne", en: "sun", img: "img/sun.png" },
+    { de: "Mond", en: "moon", img: "img/moon.png" },
+    { de: "Schule", en: "school", img: "img/school.png" },
+    { de: "Freund", en: "friend", img: "img/friend.png" },
+    { de: "Brot", en: "bread", img: "img/bread.png" },
+    { de: "Apfel", en: "apple", img: "img/apple.png" },
   ];
 
   let currentIndex = 0;
@@ -146,7 +151,14 @@
     }
 
     const vocab = vocabulary[currentIndex];
-    document.getElementById("question").innerText = `Was heißt „${vocab.de}”?`;
+    const useImageMode = Math.random() < 0.5;
+
+    const questionDiv = document.getElementById("question");
+    if (useImageMode && vocab.img) {
+      questionDiv.innerHTML = `<img src="${vocab.img}" alt="${vocab.en}" class="vocab-image" />`;
+    } else {
+      questionDiv.textContent = `Was heißt „${vocab.de}”?`;
+    }
 
     const correct = vocab.en;
     const wrong = shuffle(vocabulary.filter(v => v.en !== correct)).slice(0, 3).map(v => v.en);
@@ -160,16 +172,11 @@
       btn.className = "option-btn";
       btn.innerText = opt;
       btn.onclick = () => {
-        const isCorrect = (opt === correct);
+        const isCorrect = opt === correct;
         btn.classList.add(isCorrect ? "correct" : "wrong");
-
-        // Ton abspielen
-        isCorrect ? soundCorrect.play() : soundWrong.play();
-
-        // Punkte anpassen
+        (isCorrect ? soundCorrect : soundWrong).play();
         points += isCorrect ? 1 : -1;
         updatePointsDisplay();
-
         Array.from(optionsDiv.children).forEach(b => b.disabled = true);
       };
       optionsDiv.appendChild(btn);
