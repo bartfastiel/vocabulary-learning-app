@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vokabeltrainer</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #74ebd5, #acb6e5);
+      color: #333;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 2.5rem;
+    }
+
+    #quiz-box {
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .question {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .options {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .option-btn {
+      background-color: #ffb347;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .option-btn:hover {
+      background-color: #ffcc80;
+    }
+
+    .correct {
+      background-color: #81c784 !important;
+    }
+
+    .wrong {
+      background-color: #e57373 !important;
+    }
+
+    #next-btn {
+      margin-top: 2rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      background-color: #4dd0e1;
+      cursor: pointer;
+    }
+
+    #next-btn:hover {
+      background-color: #26c6da;
+    }
+  </style>
+</head>
+<body>
+<h1>🎓 Vokabeltrainer</h1>
+<div id="quiz-box">
+  <div class="question" id="question">...</div>
+  <div class="options" id="options"></div>
+  <button id="next-btn">Nächste Frage</button>
+</div>
+
+<script>
+  const vocabulary = [
+    { de: "Haus", en: "house" },
+    { de: "Baum", en: "tree" },
+    { de: "Auto", en: "car" },
+    { de: "Wasser", en: "water" },
+    { de: "Hund", en: "dog" },
+    { de: "Katze", en: "cat" },
+    { de: "Buch", en: "book" },
+    { de: "Stuhl", en: "chair" },
+    { de: "Tisch", en: "table" },
+    { de: "Straße", en: "street" },
+    { de: "Fisch", en: "fish" },
+    { de: "Vogel", en: "bird" },
+    { de: "Blume", en: "flower" },
+    { de: "Himmel", en: "sky" },
+    { de: "Sonne", en: "sun" },
+    { de: "Mond", en: "moon" },
+    { de: "Schule", en: "school" },
+    { de: "Freund", en: "friend" },
+    { de: "Brot", en: "bread" },
+    { de: "Apfel", en: "apple" },
+  ];
+
+  let currentIndex = 0;
+
+  function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+  }
+
+  function nextQuestion() {
+    if (currentIndex >= vocabulary.length) {
+      alert("Du hast alle Vokabeln geschafft!");
+      location.reload();
+      return;
+    }
+
+    const vocab = vocabulary[currentIndex];
+    document.getElementById("question").innerText = `Was heißt „${vocab.de}”?`;
+
+    const correct = vocab.en;
+    const wrong = shuffle(vocabulary.filter(v => v.en !== correct)).slice(0, 3).map(v => v.en);
+    const options = shuffle([correct, ...wrong]);
+
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.innerText = opt;
+      btn.onclick = () => {
+        if (opt === correct) {
+          btn.classList.add("correct");
+        } else {
+          btn.classList.add("wrong");
+        }
+        Array.from(optionsDiv.children).forEach(b => b.disabled = true);
+      };
+      optionsDiv.appendChild(btn);
+    });
+  }
+
+  document.getElementById("next-btn").addEventListener("click", () => {
+    currentIndex++;
+    nextQuestion();
+  });
+
+  // Start
+  shuffle(vocabulary);
+  nextQuestion();
+</script>
+</body>
+</html>
