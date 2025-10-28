@@ -111,6 +111,20 @@
     #replay-btn:hover {
       background: #64b5f6;
     }
+
+    .feedback {
+      margin-top: 1rem;
+      font-size: 1rem;
+    }
+
+    .feedback .wrong-text {
+      color: #d32f2f;
+    }
+
+    .feedback .correct-text {
+      color: #2e7d32;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -119,6 +133,7 @@
 <div id="quiz-box">
   <div class="question" id="question">Lade Vokabeln...</div>
   <div class="options" id="options"></div>
+  <div id="feedback" class="feedback"></div>
   <button id="next-btn" disabled>Nächste Frage</button>
 </div>
 
@@ -134,6 +149,7 @@
   const soundCorrect = document.getElementById("sound-correct");
   const soundWrong = document.getElementById("sound-wrong");
   const pointsDisplay = document.getElementById("points");
+  const feedbackDiv = document.getElementById("feedback");
 
   function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
@@ -141,6 +157,18 @@
 
   function updatePointsDisplay() {
     pointsDisplay.textContent = points;
+  }
+
+  function showFeedback(isCorrect, correct, userInput) {
+    if (isCorrect) {
+      feedbackDiv.innerHTML = `<span class="correct-text">✅ Richtig!</span>`;
+    } else {
+      feedbackDiv.innerHTML = `
+          <span class="wrong-text">❌ Falsch.</span><br>
+          <span>Du hast geschrieben: <b>${userInput}</b></span><br>
+          <span class="correct-text">Richtige Antwort: <b>${correct}</b></span>
+        `;
+    }
   }
 
   function playRandomVoice(word) {
@@ -152,6 +180,8 @@
   }
 
   function nextQuestion() {
+    feedbackDiv.innerHTML = "";
+
     if (currentIndex >= vocabulary.length) {
       alert("Du hast alle Vokabeln geschafft!\nEndstand: " + points + " Punkte");
       location.reload();
@@ -172,7 +202,6 @@
     const wrong = shuffle(vocabulary.filter(v => v.en.toLowerCase() !== correct)).slice(0, 3).map(v => v.en.toLowerCase());
     const allOptions = shuffle([correct, ...wrong]);
 
-    // Anzeige
     if (mode === "image" || mode === "image_input") {
       questionDiv.innerHTML = `<img src="img/${vocab.en.toLowerCase()}.png" alt="${vocab.en}" class="vocab-image" />`;
     } else if (mode === "text" || mode === "text_input") {
@@ -208,6 +237,7 @@
         updatePointsDisplay();
         input.disabled = true;
         checkBtn.disabled = true;
+        showFeedback(isCorrect, correct, value);
       };
       optionsDiv.appendChild(checkBtn);
     } else {
@@ -222,6 +252,7 @@
           points += isCorrect ? 1 : -1;
           updatePointsDisplay();
           Array.from(optionsDiv.children).forEach(b => b.disabled = true);
+          showFeedback(isCorrect, correct, opt);
         };
         optionsDiv.appendChild(btn);
       });
@@ -233,7 +264,6 @@
     nextQuestion();
   });
 
-  // Vokabeln laden
   fetch("vocab.json")
           .then(res => res.json())
           .then(data => {
