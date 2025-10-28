@@ -204,9 +204,6 @@
     const vocab = vocabulary[currentIndex];
     const correct = vocab.en.toLowerCase();
 
-    // immer aussprechen
-    playRandomVoice(vocab.en);
-
     const modes = ["text", "image", "audio", "text_input", "image_input", "audio_input"];
     const allowed = modes.filter(m => !(m.includes("image") && !vocab.allowImage));
     const mode = allowed[Math.floor(Math.random() * allowed.length)];
@@ -244,7 +241,6 @@
       document.body.addEventListener("keydown", function initType(e) {
         if (!input.disabled && /^[a-zA-Z]$/.test(e.key)) {
           input.focus();
-          input.value = e.key.toLowerCase();
           document.body.removeEventListener("keydown", initType);
         }
       });
@@ -259,6 +255,7 @@
         input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
         (isCorrect ? soundCorrect : soundWrong).play();
         points += isCorrect ? 1 : -1;
+        playRandomVoice(vocab.en);
         updatePoints();
         updateStreak(isCorrect);
         input.disabled = true;
@@ -275,6 +272,7 @@
           b.classList.add(isCorrect ? "correct" : "wrong");
           (isCorrect ? soundCorrect : soundWrong).play();
           points += isCorrect ? 1 : -1;
+          playRandomVoice(vocab.en);
           updatePoints();
           updateStreak(isCorrect);
           Array.from(optionsDiv.children).forEach(btn => btn.disabled = true);
