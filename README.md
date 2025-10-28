@@ -6,3 +6,4 @@
 * [ding.mp3](ding.mp3) by timgormly -- https://freesound.org/s/181859/ -- License: Creative Commons 0
 
 * images in img are generated using DALL·E by OpenAI
+* audio files in audio are generated using OpenAI's text-to-speech model

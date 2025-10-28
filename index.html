@@ -90,6 +90,19 @@
       border-radius: 12px;
       margin-bottom: 1rem;
     }
+
+    #replay-btn {
+      background: #90caf9;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      margin-top: 0.5rem;
+      cursor: pointer;
+    }
+
+    #replay-btn:hover {
+      background: #64b5f6;
+    }
   </style>
 </head>
 <body>
@@ -130,6 +143,7 @@
 
   let currentIndex = 0;
   let points = 0;
+  let currentAudio = null;
 
   const soundCorrect = document.getElementById("sound-correct");
   const soundWrong = document.getElementById("sound-wrong");
@@ -143,6 +157,14 @@
     pointsDisplay.textContent = points;
   }
 
+  function playRandomVoice(word) {
+    const voices = ["alloy", "coral", "nova"];
+    const pick = voices[Math.floor(Math.random() * voices.length)];
+    const audio = new Audio(`audio/${word}_${pick}.mp3`);
+    audio.play();
+    return audio;
+  }
+
   function nextQuestion() {
     if (currentIndex >= vocabulary.length) {
       alert("Du hast alle Vokabeln geschafft!\nEndstand: " + points + " Punkte");
@@ -151,13 +173,26 @@
     }
 
     const vocab = vocabulary[currentIndex];
-    const useImageMode = Math.random() < 0.5;
-
+    const mode = Math.random();
     const questionDiv = document.getElementById("question");
-    if (useImageMode && vocab.img) {
+
+    if (mode < 0.33 && vocab.img) {
+      // Bild-Modus
       questionDiv.innerHTML = `<img src="${vocab.img}" alt="${vocab.en}" class="vocab-image" />`;
-    } else {
+    } else if (mode < 0.66) {
+      // Text-Modus
       questionDiv.textContent = `Was heißt „${vocab.de}”?`;
+    } else {
+      // Audio-Modus
+      questionDiv.innerHTML = `
+          <p>🔈 Höre das Wort – was bedeutet es?</p>
+          <button id="replay-btn">🔁 Erneut anhören</button>
+        `;
+      currentAudio = playRandomVoice(vocab.en);
+      setTimeout(() => {
+        const btn = document.getElementById("replay-btn");
+        if (btn) btn.onclick = () => playRandomVoice(vocab.en);
+      }, 100);
     }
 
     const correct = vocab.en;
