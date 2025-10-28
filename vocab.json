@@ -45,5 +45,16 @@
   { "de": "Tafel", "en": "board", "allowImage": false },
   { "de": "Tür", "en": "door", "allowImage": true },
   { "de": "Uhr", "en": "clock", "allowImage": false },
-  { "de": "Verschieden", "en": "different", "allowImage": false }
+  { "de": "Verschieden", "en": "different", "allowImage": false },
+  { "en": "on holiday", "de": "im Urlaub", "allowImage": false },
+  { "en":  "picture" , "de": "Bild", "allowImage": true  },
+  {"en": "day" , "de": "Tag", "allowImage": false  },
+  {"en": "who" , "de": "wer", "allowImage": false  },
+  {"en": "student" , "de": "Schüler", "allowImage": true  },
+  {"en": "fine" , "de": "gut", "allowImage": false  },
+  {"en": "boring" , "de": "langweilig", "allowImage": false  },
+  {"en": "horrible" , "de": "schrecklich", "allowImage": false  },
+  {"en": "welcome" , "de": "willkommen", "allowImage": false  },
+  {"en": "What about you?" , "de": "Was ist mit dir?", "allowImage": false  },
+  {"en": "Good morning" , "de": "Guten Morgen", "allowImage": false  }
 ]

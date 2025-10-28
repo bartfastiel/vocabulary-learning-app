@@ -20,12 +20,12 @@
 
     h1 {
       font-size: 2rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
 
     #score, #streak-box {
       font-size: 1rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
       background-color: #ffffff88;
       padding: 0.4rem 1rem;
       border-radius: 12px;
@@ -39,7 +39,6 @@
       max-width: 90vw;
       width: 400px;
       max-height: 90vh;
-      overflow: hidden;
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -66,15 +65,12 @@
       cursor: pointer;
     }
 
-    .option-btn:hover {
-      background-color: #ffcc80;
-    }
-
+    .option-btn:hover { background-color: #ffcc80; }
     .correct { background-color: #81c784 !important; }
     .wrong   { background-color: #e57373 !important; }
 
     #next-btn {
-      margin-top: 1.5rem;
+      margin-top: 1rem;
       padding: 0.6rem 1.2rem;
       font-size: 1rem;
       border: none;
@@ -83,8 +79,6 @@
       cursor: pointer;
       display: none;
     }
-
-    #next-btn:hover { background-color: #26c6da; }
 
     img.vocab-image {
       max-width: 100%;
@@ -110,23 +104,11 @@
       cursor: pointer;
     }
 
-    .feedback {
-      font-size: 0.95rem;
-      margin-top: 0.8rem;
-    }
-
-    .wrong-text  { color: #d32f2f; }
-    .correct-text { color: #2e7d32; font-weight: bold; }
-
     #ship { font-size: 2rem; margin-top: 0.3rem; }
-
     .streak-10 #ship { transform: scale(1.3); }
     .streak-15 #ship { transform: scale(1.6) rotate(15deg); }
     .streak-20 #ship { transform: scale(2) rotate(360deg); }
-    .streak-broken #ship {
-      animation: shake 0.5s;
-      color: #e53935;
-    }
+    .streak-broken #ship { animation: shake 0.5s; color: #e53935; }
 
     @keyframes shake {
       0% { transform: translateX(0); }
@@ -141,7 +123,7 @@
 <h1>🎓 Vokabeltrainer</h1>
 <div id="score">Punkte: <span id="points">0</span></div>
 <div id="streak-box">
-  Streak: <span id="streak">0</span>
+  Streak: <span id="streak">0</span> | Rekord: <span id="streak-record">0</span>
   <div id="ship">🚀</div>
 </div>
 
@@ -162,34 +144,38 @@
   const questionDiv = document.getElementById("question");
   const optionsDiv = document.getElementById("options");
   const feedbackDiv = document.getElementById("feedback");
-  const streakEl = document.getElementById("streak");
   const pointsDisplay = document.getElementById("points");
   const nextBtn = document.getElementById("next-btn");
-  const ship = document.getElementById("ship");
+  const streakEl = document.getElementById("streak");
+  const streakRecordEl = document.getElementById("streak-record");
   const soundCorrect = document.getElementById("sound-correct");
   const soundWrong = document.getElementById("sound-wrong");
 
   document.addEventListener("contextmenu", e => e.preventDefault());
 
+  let streakRecord = parseInt(localStorage.getItem("streakRecord") || "0");
+  streakRecordEl.textContent = streakRecord;
+
   function shuffle(arr) {
     return arr.sort(() => Math.random() - 0.5);
   }
 
-  function updatePointsDisplay() {
-    pointsDisplay.textContent = points;
-  }
+  function updatePoints() { pointsDisplay.textContent = points; }
 
   function updateStreak(isCorrect) {
     if (isCorrect) {
       streak++;
+      if (streak > streakRecord) {
+        streakRecord = streak;
+        localStorage.setItem("streakRecord", streakRecord);
+        streakRecordEl.textContent = streakRecord;
+      }
       streakEl.textContent = streak;
       document.body.classList.remove("streak-broken");
       if (streak >= 20) document.body.classList.add("streak-20");
       else if (streak >= 15) document.body.classList.add("streak-15");
       else if (streak >= 10) document.body.classList.add("streak-10");
     } else {
-      if (streak >= 5)
-        feedbackDiv.innerHTML += `<br><span class="wrong-text">💥 Streak gebrochen (${streak})</span>`;
       streak = 0;
       streakEl.textContent = 0;
       document.body.classList.remove("streak-10", "streak-15", "streak-20");
@@ -216,11 +202,15 @@
     }
 
     const vocab = vocabulary[currentIndex];
+    const correct = vocab.en.toLowerCase();
+
+    // immer aussprechen
+    playRandomVoice(vocab.en);
+
     const modes = ["text", "image", "audio", "text_input", "image_input", "audio_input"];
     const allowed = modes.filter(m => !(m.includes("image") && !vocab.allowImage));
     const mode = allowed[Math.floor(Math.random() * allowed.length)];
 
-    const correct = vocab.en.toLowerCase();
     const wrong = shuffle(vocabulary.filter(v => v.en.toLowerCase() !== correct))
             .slice(0, 3).map(v => v.en.toLowerCase());
     const options = shuffle([correct, ...wrong]);
@@ -244,10 +234,21 @@
       const input = document.createElement("input");
       input.type = "text";
       input.autofocus = true;
+
       const btn = document.createElement("button");
-      btn.textContent = "Antwort prüfen";
+      btn.textContent = "Nächste Frage";
       btn.className = "option-btn";
       optionsDiv.append(input, btn);
+
+      // Fokus mit erstem Buchstaben übernehmen
+      document.body.addEventListener("keydown", function initType(e) {
+        if (!input.disabled && /^[a-zA-Z]$/.test(e.key)) {
+          input.focus();
+          input.value = e.key.toLowerCase();
+          document.body.removeEventListener("keydown", initType);
+        }
+      });
+
       input.addEventListener("keydown", e => {
         if (e.key === "Enter" && !btn.disabled) btn.click();
       });
@@ -258,13 +259,10 @@
         input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
         (isCorrect ? soundCorrect : soundWrong).play();
         points += isCorrect ? 1 : -1;
-        updatePointsDisplay();
+        updatePoints();
         updateStreak(isCorrect);
-        feedbackDiv.innerHTML = isCorrect
-                ? `<span class="correct-text">✅ Richtig!</span>`
-                : `<span class="wrong-text">❌ Deine Eingabe: <b>${user}</b><br>Korrekt: <b>${correct}</b></span>`;
-        btn.disabled = true;
         input.disabled = true;
+        btn.disabled = true;
         nextBtn.style.display = "inline-block";
       };
     } else {
@@ -277,11 +275,8 @@
           b.classList.add(isCorrect ? "correct" : "wrong");
           (isCorrect ? soundCorrect : soundWrong).play();
           points += isCorrect ? 1 : -1;
-          updatePointsDisplay();
+          updatePoints();
           updateStreak(isCorrect);
-          feedbackDiv.innerHTML = isCorrect
-                  ? `<span class="correct-text">✅ Richtig!</span>`
-                  : `<span class="wrong-text">❌ Deine Auswahl: <b>${opt}</b><br>Korrekt: <b>${correct}</b></span>`;
           Array.from(optionsDiv.children).forEach(btn => btn.disabled = true);
           nextBtn.style.display = "inline-block";
         };
@@ -290,13 +285,13 @@
     }
   }
 
-  document.getElementById("next-btn").onclick = () => {
+  nextBtn.onclick = () => {
     currentIndex++;
     nextQuestion();
   };
 
   fetch("vocab.json")
-          .then(res => res.json())
+          .then(r => r.json())
           .then(data => {
             vocabulary = shuffle(data);
             nextBtn.disabled = false;
