@@ -17,8 +17,15 @@
     }
 
     h1 {
-      color: #333;
       font-size: 2.5rem;
+    }
+
+    #score {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      background-color: #ffffff88;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
     }
 
     #quiz-box {
@@ -81,11 +88,16 @@
 </head>
 <body>
 <h1>🎓 Vokabeltrainer</h1>
+<div id="score">Punkte: <span id="points">0</span></div>
 <div id="quiz-box">
   <div class="question" id="question">...</div>
   <div class="options" id="options"></div>
   <button id="next-btn">Nächste Frage</button>
 </div>
+
+<!-- 🎵 Audios für Feedback -->
+<audio id="sound-correct" src="ding.mp3" preload="auto"></audio>
+<audio id="sound-wrong" src="buzz.mp3" preload="auto"></audio>
 
 <script>
   const vocabulary = [
@@ -112,14 +124,23 @@
   ];
 
   let currentIndex = 0;
+  let points = 0;
+
+  const soundCorrect = document.getElementById("sound-correct");
+  const soundWrong = document.getElementById("sound-wrong");
+  const pointsDisplay = document.getElementById("points");
 
   function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
   }
 
+  function updatePointsDisplay() {
+    pointsDisplay.textContent = points;
+  }
+
   function nextQuestion() {
     if (currentIndex >= vocabulary.length) {
-      alert("Du hast alle Vokabeln geschafft!");
+      alert("Du hast alle Vokabeln geschafft!\nEndstand: " + points + " Punkte");
       location.reload();
       return;
     }
@@ -139,11 +160,16 @@
       btn.className = "option-btn";
       btn.innerText = opt;
       btn.onclick = () => {
-        if (opt === correct) {
-          btn.classList.add("correct");
-        } else {
-          btn.classList.add("wrong");
-        }
+        const isCorrect = (opt === correct);
+        btn.classList.add(isCorrect ? "correct" : "wrong");
+
+        // Ton abspielen
+        isCorrect ? soundCorrect.play() : soundWrong.play();
+
+        // Punkte anpassen
+        points += isCorrect ? 1 : -1;
+        updatePointsDisplay();
+
         Array.from(optionsDiv.children).forEach(b => b.disabled = true);
       };
       optionsDiv.appendChild(btn);
