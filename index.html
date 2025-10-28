@@ -109,38 +109,16 @@
 <h1>🎓 Vokabeltrainer</h1>
 <div id="score">Punkte: <span id="points">0</span></div>
 <div id="quiz-box">
-  <div class="question" id="question">...</div>
+  <div class="question" id="question">Lade Vokabeln...</div>
   <div class="options" id="options"></div>
-  <button id="next-btn">Nächste Frage</button>
+  <button id="next-btn" disabled>Nächste Frage</button>
 </div>
 
 <audio id="sound-correct" src="ding.mp3" preload="auto"></audio>
 <audio id="sound-wrong" src="buzz.mp3" preload="auto"></audio>
 
 <script>
-  const vocabulary = [
-    { de: "Haus", en: "house", img: "img/house.png" },
-    { de: "Baum", en: "tree", img: "img/tree.png" },
-    { de: "Auto", en: "car", img: "img/car.png" },
-    { de: "Wasser", en: "water", img: "img/water.png" },
-    { de: "Hund", en: "dog", img: "img/dog.png" },
-    { de: "Katze", en: "cat", img: "img/cat.png" },
-    { de: "Buch", en: "book", img: "img/book.png" },
-    { de: "Stuhl", en: "chair", img: "img/chair.png" },
-    { de: "Tisch", en: "table", img: "img/table.png" },
-    { de: "Straße", en: "street", img: "img/street.png" },
-    { de: "Fisch", en: "fish", img: "img/fish.png" },
-    { de: "Vogel", en: "bird", img: "img/bird.png" },
-    { de: "Blume", en: "flower", img: "img/flower.png" },
-    { de: "Himmel", en: "sky", img: "img/sky.png" },
-    { de: "Sonne", en: "sun", img: "img/sun.png" },
-    { de: "Mond", en: "moon", img: "img/moon.png" },
-    { de: "Schule", en: "school", img: "img/school.png" },
-    { de: "Freund", en: "friend", img: "img/friend.png" },
-    { de: "Brot", en: "bread", img: "img/bread.png" },
-    { de: "Apfel", en: "apple", img: "img/apple.png" },
-  ];
-
+  let vocabulary = [];
   let currentIndex = 0;
   let points = 0;
   let currentAudio = null;
@@ -160,7 +138,7 @@
   function playRandomVoice(word) {
     const voices = ["alloy", "coral", "nova"];
     const pick = voices[Math.floor(Math.random() * voices.length)];
-    const audio = new Audio(`audio/${word}_${pick}.mp3`);
+    const audio = new Audio(`audio/${word.toLowerCase()}_${pick}.mp3`);
     audio.play();
     return audio;
   }
@@ -173,17 +151,28 @@
     }
 
     const vocab = vocabulary[currentIndex];
-    const mode = Math.random();
-    const questionDiv = document.getElementById("question");
+    const modeRoll = Math.random();
+    const allowImage = vocab.allowImage === true;
+    let mode = "text"; // fallback
 
-    if (mode < 0.33 && vocab.img) {
-      // Bild-Modus
-      questionDiv.innerHTML = `<img src="${vocab.img}" alt="${vocab.en}" class="vocab-image" />`;
-    } else if (mode < 0.66) {
-      // Text-Modus
-      questionDiv.textContent = `Was heißt „${vocab.de}”?`;
+    if (modeRoll < 0.33 && allowImage) {
+      mode = "image";
+    } else if (modeRoll < 0.66) {
+      mode = "text";
     } else {
-      // Audio-Modus
+      mode = "audio";
+    }
+
+    const questionDiv = document.getElementById("question");
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    if (mode === "image") {
+      const path = `img/${vocab.en.toLowerCase()}.png`;
+      questionDiv.innerHTML = `<img src="${path}" alt="${vocab.en}" class="vocab-image" />`;
+    } else if (mode === "text") {
+      questionDiv.textContent = `Was heißt „${vocab.de}”?`;
+    } else if (mode === "audio") {
       questionDiv.innerHTML = `
           <p>🔈 Höre das Wort – was bedeutet es?</p>
           <button id="replay-btn">🔁 Erneut anhören</button>
@@ -195,12 +184,9 @@
       }, 100);
     }
 
-    const correct = vocab.en;
-    const wrong = shuffle(vocabulary.filter(v => v.en !== correct)).slice(0, 3).map(v => v.en);
+    const correct = vocab.en.toLowerCase();
+    const wrong = shuffle(vocabulary.filter(v => v.en.toLowerCase() !== correct)).slice(0, 3).map(v => v.en.toLowerCase());
     const options = shuffle([correct, ...wrong]);
-
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
 
     options.forEach(opt => {
       const btn = document.createElement("button");
@@ -223,9 +209,18 @@
     nextQuestion();
   });
 
-  // Start
-  shuffle(vocabulary);
-  nextQuestion();
+  // 🚀 Initialisierung: Vokabeln laden
+  fetch('vocab.json')
+          .then(res => res.json())
+          .then(data => {
+            vocabulary = shuffle(data);
+            document.getElementById("next-btn").disabled = false;
+            nextQuestion();
+          })
+          .catch(err => {
+            console.error("Fehler beim Laden von vocab.json:", err);
+            document.getElementById("question").textContent = "❌ Fehler beim Laden der Vokabeln!";
+          });
 </script>
 </body>
 </html>

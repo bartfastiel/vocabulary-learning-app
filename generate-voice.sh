@@ -1,52 +1,50 @@
 #!/bin/bash
 
-# OpenAI API-Key laden
+# API-Key sicher laden
 source ./env.sh
 
 MODEL="gpt-4o-mini-tts"
 FORMAT="mp3"
-
-mkdir -p audio
-mkdir -p log/tts_requests
-mkdir -p log/tts_responses
-
-VOCABS=(
-  house tree car water dog cat book chair table street
-  fish bird flower sky sun moon school friend bread apple
-)
-
 VOICES=(alloy coral nova)
 
-for word in "${VOCABS[@]}"; do
-  for voice in "${VOICES[@]}"; do
-    OUT_FILE="audio/${word}_${voice}.${FORMAT}"
+mkdir -p audio log/tts_requests log/tts_responses
 
-    # Überspringen, wenn Datei existiert
+# Lesen der Vokabeln aus vocab.json
+VOCAB_LIST=$(jq -r '.[].en' vocab.json)
+
+for word in $VOCAB_LIST; do
+  WORD_LOWER=$(echo "$word" | tr '[:upper:]' '[:lower:]')
+
+  for voice in "${VOICES[@]}"; do
+    OUT_FILE="audio/${WORD_LOWER}_${voice}.${FORMAT}"
+
+    # 🔁 Überspringe bereits vorhandene Dateien
     if [[ -f "$OUT_FILE" ]]; then
-      echo "⏩ Audio existiert bereits: $OUT_FILE"
+      echo "⏩ Überspringe $OUT_FILE (bereits vorhanden)"
       continue
     fi
 
-    echo "🎤 Erzeuge Sprachdatei: $word | Stimme=$voice"
+    echo "🎤 Generiere TTS für '$word' mit Stimme '$voice'..."
 
-    REQ_FILE="log/tts_requests/${word}_${voice}.json"
+    REQUEST_FILE="log/tts_requests/${WORD_LOWER}_${voice}.json"
     echo "{
       \"model\": \"$MODEL\",
       \"voice\": \"$voice\",
       \"input\": \"$word\",
       \"response_format\": \"$FORMAT\"
-    }" > "$REQ_FILE"
+    }" > "$REQUEST_FILE"
 
     curl -s https://api.openai.com/v1/audio/speech \
       -H "Authorization: Bearer $API_KEY" \
       -H "Content-Type: application/json" \
-      -d @"$REQ_FILE" \
+      -d @"$REQUEST_FILE" \
       --output "$OUT_FILE"
 
-    # Prüfen auf leere Datei
+    # Prüfe, ob Datei leer (Fehlermeldung oder Timeout)
     if [[ ! -s "$OUT_FILE" ]]; then
-      echo "⚠️ Fehler bei $word mit $voice"
+      echo "⚠️ Fehler: Keine Ausgabe für $word ($voice)"
       echo "$word $voice" >> log/tts_errors.txt
+      rm -f "$OUT_FILE"
     else
       echo "✅ Gespeichert: $OUT_FILE"
     fi
@@ -55,4 +53,4 @@ for word in "${VOCABS[@]}"; do
   done
 done
 
-echo "🏁 Alle sauberen Wort-Audios unter ./audio/"
+echo "🏁 Fertig. Alle Audios liegen unter ./audio/"

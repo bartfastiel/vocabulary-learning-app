@@ -1,28 +1,25 @@
 #!/bin/bash
 
-# API-Key sicher in env.sh ausgelagert
+# OpenAI API Key laden
 source ./env.sh
 
-# Modell und Bildgröße
 MODEL="dall-e-3"
 SIZE="1024x1024"
 
-# Verzeichnisse
 mkdir -p img
-mkdir -p log/requests
-mkdir -p log/responses
+mkdir -p log/image_requests
+mkdir -p log/image_responses
 
-VOCABS=(
-  house tree car water dog cat book chair table street
-  fish bird flower sky sun moon school friend bread apple
-)
+# Alle Vokabeln mit allowImage=true extrahieren
+mapfile -t IMAGE_WORDS < <(jq -r '.[] | select(.allowImage == true) | .en' vocab.json)
 
-for word in "${VOCABS[@]}"; do
-  IMAGE_PATH="img/${word}.png"
+for word in "${IMAGE_WORDS[@]}"; do
+  WORD_LOWER=$(echo "$word" | tr '[:upper:]' '[:lower:]')
+  OUT_FILE="img/${WORD_LOWER}.png"
 
-  # ❎ Überspringen, wenn Bild schon existiert
-  if [[ -f "$IMAGE_PATH" ]]; then
-    echo "⏩ Bild für '$word' existiert bereits – übersprungen."
+  # Skip, wenn Bild bereits vorhanden
+  if [[ -f "$OUT_FILE" ]]; then
+    echo "⏩ Bild existiert bereits: $OUT_FILE"
     continue
   fi
 
@@ -30,8 +27,8 @@ for word in "${VOCABS[@]}"; do
 
   PROMPT="Male ein Bild von '$word'. Hebe es deutlich hervor. Es soll groß mittig, deutlich gezeigt werden für ein Vokabelprogramm. Zeige es in seinem üblichen Kontext."
 
-  REQUEST_FILE="log/requests/${word}.json"
-  RESPONSE_FILE="log/responses/${word}.json"
+  REQUEST_FILE="log/image_requests/${WORD_LOWER}.json"
+  RESPONSE_FILE="log/image_responses/${WORD_LOWER}.json"
 
   echo "{
     \"model\": \"$MODEL\",
@@ -49,14 +46,15 @@ for word in "${VOCABS[@]}"; do
   IMAGE_URL=$(jq -r '.data[0].url // empty' "$RESPONSE_FILE")
 
   if [[ -n "$IMAGE_URL" ]]; then
-    curl -sL "$IMAGE_URL" -o "$IMAGE_PATH"
-    echo "✅ Gespeichert: $IMAGE_PATH"
+    curl -sL "$IMAGE_URL" -o "$OUT_FILE"
+    echo "✅ Gespeichert: $OUT_FILE"
   else
     echo "⚠️ Fehler: Keine Bild-URL für $word"
-    echo "$word" >> log/errors.txt
+    echo "$word" >> log/image_errors.txt
+    rm -f "$OUT_FILE"
   fi
 
   sleep 1
 done
 
-echo "🏁 Fertig. Alle neuen Bilder unter ./img/"
+echo "🏁 Alle neuen Bilder gespeichert in ./img/"
