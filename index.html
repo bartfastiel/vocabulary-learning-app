@@ -5,25 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Vokabeltrainer</title>
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
       font-family: "Segoe UI", sans-serif;
       background: linear-gradient(to right, #74ebd5, #acb6e5);
-      margin: 0;
-      padding: 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
     }
 
     h1 {
-      font-size: 2.5rem;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
     }
 
-    #score {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
+    #score, #streak-box {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
       background-color: #ffffff88;
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 1rem;
       border-radius: 12px;
     }
 
@@ -31,20 +35,25 @@
       background-color: white;
       border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      padding: 2rem;
-      max-width: 500px;
-      width: 100%;
+      padding: 1.5rem;
+      max-width: 90vw;
+      width: 400px;
+      max-height: 90vh;
+      overflow: hidden;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .question {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       margin-bottom: 1rem;
     }
 
     .options {
       display: grid;
-      gap: 0.75rem;
+      gap: 0.6rem;
       margin-top: 1rem;
     }
 
@@ -52,37 +61,30 @@
       background-color: #ffb347;
       border: none;
       border-radius: 8px;
-      padding: 1rem;
-      font-size: 1.1rem;
+      padding: 0.9rem;
+      font-size: 1.05rem;
       cursor: pointer;
-      transition: 0.3s;
     }
 
     .option-btn:hover {
       background-color: #ffcc80;
     }
 
-    .correct {
-      background-color: #81c784 !important;
-    }
-
-    .wrong {
-      background-color: #e57373 !important;
-    }
+    .correct { background-color: #81c784 !important; }
+    .wrong   { background-color: #e57373 !important; }
 
     #next-btn {
-      margin-top: 2rem;
-      padding: 0.75rem 1.5rem;
+      margin-top: 1.5rem;
+      padding: 0.6rem 1.2rem;
       font-size: 1rem;
       border: none;
       border-radius: 6px;
       background-color: #4dd0e1;
       cursor: pointer;
+      display: none;
     }
 
-    #next-btn:hover {
-      background-color: #26c6da;
-    }
+    #next-btn:hover { background-color: #26c6da; }
 
     img.vocab-image {
       max-width: 100%;
@@ -92,10 +94,10 @@
     }
 
     input[type="text"] {
-      padding: 0.8rem;
+      padding: 0.7rem;
       border-radius: 8px;
       border: 1px solid #ccc;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       text-align: center;
     }
 
@@ -103,71 +105,95 @@
       background: #90caf9;
       border: none;
       border-radius: 6px;
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 1rem;
       margin-top: 0.5rem;
       cursor: pointer;
     }
 
-    #replay-btn:hover {
-      background: #64b5f6;
-    }
-
     .feedback {
-      margin-top: 1rem;
-      font-size: 1rem;
+      font-size: 0.95rem;
+      margin-top: 0.8rem;
     }
 
-    .feedback .wrong-text {
-      color: #d32f2f;
+    .wrong-text  { color: #d32f2f; }
+    .correct-text { color: #2e7d32; font-weight: bold; }
+
+    #ship { font-size: 2rem; margin-top: 0.3rem; }
+
+    .streak-10 #ship { transform: scale(1.3); }
+    .streak-15 #ship { transform: scale(1.6) rotate(15deg); }
+    .streak-20 #ship { transform: scale(2) rotate(360deg); }
+    .streak-broken #ship {
+      animation: shake 0.5s;
+      color: #e53935;
     }
 
-    .feedback .correct-text {
-      color: #2e7d32;
-      font-weight: bold;
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
     }
   </style>
 </head>
 <body>
 <h1>🎓 Vokabeltrainer</h1>
 <div id="score">Punkte: <span id="points">0</span></div>
+<div id="streak-box">
+  Streak: <span id="streak">0</span>
+  <div id="ship">🚀</div>
+</div>
+
 <div id="quiz-box">
   <div class="question" id="question">Lade Vokabeln...</div>
   <div class="options" id="options"></div>
   <div id="feedback" class="feedback"></div>
-  <button id="next-btn" disabled>Nächste Frage</button>
+  <button id="next-btn">Nächste Frage</button>
 </div>
 
 <audio id="sound-correct" src="ding.mp3" preload="auto"></audio>
 <audio id="sound-wrong" src="buzz.mp3" preload="auto"></audio>
 
 <script>
-  let vocabulary = [];
-  let currentIndex = 0;
-  let points = 0;
+  let vocabulary = [], currentIndex = 0, points = 0, streak = 0;
   let currentAudio = null;
 
+  const questionDiv = document.getElementById("question");
+  const optionsDiv = document.getElementById("options");
+  const feedbackDiv = document.getElementById("feedback");
+  const streakEl = document.getElementById("streak");
+  const pointsDisplay = document.getElementById("points");
+  const nextBtn = document.getElementById("next-btn");
+  const ship = document.getElementById("ship");
   const soundCorrect = document.getElementById("sound-correct");
   const soundWrong = document.getElementById("sound-wrong");
-  const pointsDisplay = document.getElementById("points");
-  const feedbackDiv = document.getElementById("feedback");
 
-  function shuffle(array) {
-    return array.sort(() => Math.random() - 0.5);
+  document.addEventListener("contextmenu", e => e.preventDefault());
+
+  function shuffle(arr) {
+    return arr.sort(() => Math.random() - 0.5);
   }
 
   function updatePointsDisplay() {
     pointsDisplay.textContent = points;
   }
 
-  function showFeedback(isCorrect, correct, userInput) {
+  function updateStreak(isCorrect) {
     if (isCorrect) {
-      feedbackDiv.innerHTML = `<span class="correct-text">✅ Richtig!</span>`;
+      streak++;
+      streakEl.textContent = streak;
+      document.body.classList.remove("streak-broken");
+      if (streak >= 20) document.body.classList.add("streak-20");
+      else if (streak >= 15) document.body.classList.add("streak-15");
+      else if (streak >= 10) document.body.classList.add("streak-10");
     } else {
-      feedbackDiv.innerHTML = `
-          <span class="wrong-text">❌ Falsch.</span><br>
-          <span>Du hast geschrieben: <b>${userInput}</b></span><br>
-          <span class="correct-text">Richtige Antwort: <b>${correct}</b></span>
-        `;
+      if (streak >= 5)
+        feedbackDiv.innerHTML += `<br><span class="wrong-text">💥 Streak gebrochen (${streak})</span>`;
+      streak = 0;
+      streakEl.textContent = 0;
+      document.body.classList.remove("streak-10", "streak-15", "streak-20");
+      document.body.classList.add("streak-broken");
     }
   }
 
@@ -181,98 +207,103 @@
 
   function nextQuestion() {
     feedbackDiv.innerHTML = "";
+    nextBtn.style.display = "none";
 
     if (currentIndex >= vocabulary.length) {
-      alert("Du hast alle Vokabeln geschafft!\nEndstand: " + points + " Punkte");
+      alert(`Alle Vokabeln geschafft!\nEndstand: ${points} Punkte`);
       location.reload();
       return;
     }
 
     const vocab = vocabulary[currentIndex];
-    const possibleModes = ["text", "image", "audio", "text_input", "image_input", "audio_input"];
-    const allowedModes = possibleModes.filter(m => !(m.includes("image") && !vocab.allowImage));
-    const mode = allowedModes[Math.floor(Math.random() * allowedModes.length)];
-
-    const questionDiv = document.getElementById("question");
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
-    questionDiv.innerHTML = "";
+    const modes = ["text", "image", "audio", "text_input", "image_input", "audio_input"];
+    const allowed = modes.filter(m => !(m.includes("image") && !vocab.allowImage));
+    const mode = allowed[Math.floor(Math.random() * allowed.length)];
 
     const correct = vocab.en.toLowerCase();
-    const wrong = shuffle(vocabulary.filter(v => v.en.toLowerCase() !== correct)).slice(0, 3).map(v => v.en.toLowerCase());
-    const allOptions = shuffle([correct, ...wrong]);
+    const wrong = shuffle(vocabulary.filter(v => v.en.toLowerCase() !== correct))
+            .slice(0, 3).map(v => v.en.toLowerCase());
+    const options = shuffle([correct, ...wrong]);
 
-    if (mode === "image" || mode === "image_input") {
-      questionDiv.innerHTML = `<img src="img/${vocab.en.toLowerCase()}.png" alt="${vocab.en}" class="vocab-image" />`;
-    } else if (mode === "text" || mode === "text_input") {
-      questionDiv.textContent = `Was heißt „${vocab.de}”?`;
-    } else if (mode === "audio" || mode === "audio_input") {
-      questionDiv.innerHTML = `
-          <p>🔈 Höre das Wort – was bedeutet es?</p>
-          <button id="replay-btn">🔁 Erneut anhören</button>
-        `;
+    questionDiv.innerHTML = "";
+    optionsDiv.innerHTML = "";
+
+    if (mode.includes("image"))
+      questionDiv.innerHTML = `<img src="img/${correct}.png" class="vocab-image" alt="">`;
+    else if (mode.includes("text"))
+      questionDiv.textContent = `Wie heißt „${vocab.de}” auf Englisch?`;
+    else if (mode.includes("audio")) {
+      questionDiv.innerHTML = `<p>🔈 Höre das Wort</p><button id="replay-btn">🔁 Anhören</button>`;
       currentAudio = playRandomVoice(vocab.en);
       setTimeout(() => {
-        const btn = document.getElementById("replay-btn");
-        if (btn) btn.onclick = () => playRandomVoice(vocab.en);
+        document.getElementById("replay-btn").onclick = () => playRandomVoice(vocab.en);
       }, 100);
     }
 
     if (mode.endsWith("_input")) {
       const input = document.createElement("input");
       input.type = "text";
-      input.placeholder = "Englisches Wort eingeben";
       input.autofocus = true;
-      optionsDiv.appendChild(input);
+      const btn = document.createElement("button");
+      btn.textContent = "Antwort prüfen";
+      btn.className = "option-btn";
+      optionsDiv.append(input, btn);
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter" && !btn.disabled) btn.click();
+      });
 
-      const checkBtn = document.createElement("button");
-      checkBtn.textContent = "Antwort prüfen";
-      checkBtn.className = "option-btn";
-      checkBtn.onclick = () => {
-        const value = input.value.trim().toLowerCase();
-        const isCorrect = value === correct;
+      btn.onclick = () => {
+        const user = input.value.trim().toLowerCase();
+        const isCorrect = user === correct;
         input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
         (isCorrect ? soundCorrect : soundWrong).play();
         points += isCorrect ? 1 : -1;
         updatePointsDisplay();
+        updateStreak(isCorrect);
+        feedbackDiv.innerHTML = isCorrect
+                ? `<span class="correct-text">✅ Richtig!</span>`
+                : `<span class="wrong-text">❌ Deine Eingabe: <b>${user}</b><br>Korrekt: <b>${correct}</b></span>`;
+        btn.disabled = true;
         input.disabled = true;
-        checkBtn.disabled = true;
-        showFeedback(isCorrect, correct, value);
+        nextBtn.style.display = "inline-block";
       };
-      optionsDiv.appendChild(checkBtn);
     } else {
-      allOptions.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.innerText = opt;
-        btn.onclick = () => {
+      options.forEach(opt => {
+        const b = document.createElement("button");
+        b.className = "option-btn";
+        b.textContent = opt;
+        b.onclick = () => {
           const isCorrect = opt === correct;
-          btn.classList.add(isCorrect ? "correct" : "wrong");
+          b.classList.add(isCorrect ? "correct" : "wrong");
           (isCorrect ? soundCorrect : soundWrong).play();
           points += isCorrect ? 1 : -1;
           updatePointsDisplay();
-          Array.from(optionsDiv.children).forEach(b => b.disabled = true);
-          showFeedback(isCorrect, correct, opt);
+          updateStreak(isCorrect);
+          feedbackDiv.innerHTML = isCorrect
+                  ? `<span class="correct-text">✅ Richtig!</span>`
+                  : `<span class="wrong-text">❌ Deine Auswahl: <b>${opt}</b><br>Korrekt: <b>${correct}</b></span>`;
+          Array.from(optionsDiv.children).forEach(btn => btn.disabled = true);
+          nextBtn.style.display = "inline-block";
         };
-        optionsDiv.appendChild(btn);
+        optionsDiv.appendChild(b);
       });
     }
   }
 
-  document.getElementById("next-btn").addEventListener("click", () => {
+  document.getElementById("next-btn").onclick = () => {
     currentIndex++;
     nextQuestion();
-  });
+  };
 
   fetch("vocab.json")
           .then(res => res.json())
           .then(data => {
             vocabulary = shuffle(data);
-            document.getElementById("next-btn").disabled = false;
+            nextBtn.disabled = false;
             nextQuestion();
           })
           .catch(err => {
-            document.getElementById("question").textContent = "Fehler beim Laden von vocab.json";
+            questionDiv.textContent = "❌ Fehler beim Laden von vocab.json";
             console.error(err);
           });
 </script>
