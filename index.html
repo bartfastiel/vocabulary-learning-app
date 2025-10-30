@@ -18,10 +18,7 @@
       justify-content: center;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.4rem;
-    }
+    h1 { font-size: 2rem; margin-bottom: 0.4rem; }
 
     #score, #streak-box {
       font-size: 1rem;
@@ -31,11 +28,7 @@
       border-radius: 12px;
     }
 
-    #treasure {
-      margin-left: 10px;
-      cursor: pointer;
-      display: none;
-    }
+    #treasure { margin-left: 10px; cursor: pointer; display: none; }
 
     #quiz-box {
       background-color: white;
@@ -51,16 +44,9 @@
       justify-content: space-between;
     }
 
-    .question {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
-    }
+    .question { font-size: 1.3rem; margin-bottom: 1rem; }
 
-    .options {
-      display: grid;
-      gap: 0.6rem;
-      margin-top: 1rem;
-    }
+    .options { display: grid; gap: 0.6rem; margin-top: 1rem; }
 
     .option-btn {
       background-color: #ffb347;
@@ -70,7 +56,6 @@
       font-size: 1.05rem;
       cursor: pointer;
     }
-
     .option-btn:hover { background-color: #ffcc80; }
     .correct { background-color: #81c784 !important; }
     .wrong   { background-color: #e57373 !important; }
@@ -136,19 +121,8 @@
       flex-direction: column;
       color: white;
       z-index: 999;
-    }
-
-    #game-stats {
-      position: absolute;
-      top: 10px; left: 10px;
-      font-size: 1.1rem;
-    }
-
-    #game-canvas {
-      background: #001;
-      border: 2px solid #0ff;
-      border-radius: 12px;
-      touch-action: none;
+      padding: 12px;
+      box-sizing: border-box;
     }
 
     #close-game {
@@ -159,6 +133,60 @@
       border-radius: 6px;
       padding: 0.4rem 1rem;
       cursor: pointer;
+    }
+
+    #hud {
+      width: min(92vw, 440px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    #game-stats { font-size: 1.1rem; }
+
+    .bar-title {
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      opacity: 0.9;
+    }
+
+    .bar {
+      position: relative;
+      width: 100%;
+      height: 16px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid #0ff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+    }
+
+    #shots-fill { background: linear-gradient(90deg, #00e5ff, #00bcd4); }
+
+    #hm-bar {
+      display: flex;
+      gap: 0;
+      padding: 0;
+      border-color: #9ccc65;
+    }
+    #hits-fill { background: #8bc34a; }
+    #misses-fill { background: #f44336; }
+
+    #game-canvas {
+      background: #001;
+      border: 2px solid #0ff;
+      border-radius: 12px;
+      touch-action: none;
+      width: min(92vw, 440px);
+      height: calc(min(92vw, 440px) * 1.5);
+      max-height: 80vh;
     }
   </style>
 </head>
@@ -184,9 +212,29 @@
 
 <!-- ====== SPIEL-OVERLAY ====== -->
 <div id="game-overlay">
-  <div id="game-stats">💰 Coins: <span id="game-coins">0</span></div>
-  <canvas id="game-canvas" width="400" height="600"></canvas>
   <button id="close-game">Zurück</button>
+  <div id="hud">
+    <div id="game-stats">💰 Coins: <span id="game-coins">0</span></div>
+
+    <div class="bar-title">
+      <span>Schüsse</span>
+      <span id="shots-count">0/30</span>
+    </div>
+    <div id="shots-bar" class="bar">
+      <div id="shots-fill" class="bar-fill"></div>
+    </div>
+
+    <div class="bar-title">
+      <span>Treffer / Misses</span>
+      <span id="hm-count">0 | 0</span>
+    </div>
+    <div id="hm-bar" class="bar">
+      <div id="hits-fill" class="bar-fill"></div>
+      <div id="misses-fill" class="bar-fill"></div>
+    </div>
+  </div>
+
+  <canvas id="game-canvas" width="400" height="600"></canvas>
 </div>
 
 <audio id="sound-correct" src="ding.mp3" preload="auto"></audio>
@@ -208,19 +256,21 @@
   const soundWrong = document.getElementById("sound-wrong");
   const treasureEl = document.getElementById("treasure");
 
-  // --- LocalStorage laden ---
-  let streakRecord = parseInt(localStorage.getItem("streakRecord") || "0");
-  streakRecordEl.textContent = streakRecord;
-  points = parseInt(localStorage.getItem("points") || "0");
-  updatePoints();
-
   document.addEventListener("contextmenu", e => e.preventDefault());
 
+  let streakRecord = parseInt(localStorage.getItem("streakRecord") || "0");
+  streakRecordEl.textContent = streakRecord;
+
   function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
-  function updatePoints() { pointsDisplay.textContent = points; localStorage.setItem("points", points); checkTreasure(); }
+
+  function updatePoints() {
+    pointsDisplay.textContent = points;
+    localStorage.setItem("points", points);
+    checkTreasure();
+  }
 
   function checkTreasure() {
-    treasureEl.style.display = points >= 5 ? "inline" : "none";
+    treasureEl.style.display = points < 5 ? "none" : "inline";
   }
 
   function updateStreak(isCorrect) {
@@ -251,6 +301,10 @@
     audio.play();
     return audio;
   }
+
+  // Punkte & Streak laden
+  points = parseInt(localStorage.getItem("points") || "0");
+  updatePoints();
 
   function nextQuestion() {
     feedbackDiv.innerHTML = "";
@@ -295,7 +349,7 @@
         if(!input.disabled && /^[a-zA-Z]$/.test(e.key)){ input.focus(); document.body.removeEventListener("keydown",initType); }
       });
 
-      input.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!btn.disabled)btn.click(); });
+      input.addEventListener("keydown",e=>{ if (e.key==="Enter" && !btn.disabled) btn.click(); });
 
       btn.onclick=()=>{
         const user=input.value.trim().toLowerCase();
@@ -334,48 +388,68 @@
   }).catch(err=>{ questionDiv.textContent="❌ Fehler beim Laden von vocab.json"; console.error(err); });
 
   // === SPIEL-LOGIK ===
-  const overlay=document.getElementById("game-overlay");
-  const canvas=document.getElementById("game-canvas");
-  const ctx=canvas.getContext("2d");
-  const closeGame=document.getElementById("close-game");
-  const gameCoinsEl=document.getElementById("game-coins");
+  const overlay = document.getElementById("game-overlay");
+  const canvas  = document.getElementById("game-canvas");
+  const ctx = canvas.getContext("2d");
+  const closeGame = document.getElementById("close-game");
+  const gameCoinsEl = document.getElementById("game-coins");
+
+  const shotsBar = document.getElementById("shots-bar");
+  const shotsFill = document.getElementById("shots-fill");
+  const shotsCountEl = document.getElementById("shots-count");
+
+  const hmCountEl = document.getElementById("hm-count");
+  const hitsFill = document.getElementById("hits-fill");
+  const missesFill = document.getElementById("misses-fill");
 
   let rocket={x:200,y:550,w:40,h:40};
   let bullets=[], coins=[];
-  let leftPressed=false, rightPressed=false, spacePressed=false;
-  let lastShot=0, coinSpawn=0;
+  let leftPressed=false, rightPressed=false;
+  let spaceDown=false; // nur 1 Schuss pro Tastendruck
+  let lastSpawn=0;
+
+  const maxShots=30;
+  let shotsFired=0, hits=0, misses=0;
+
   let gameCoins=parseInt(localStorage.getItem("gameCoins")||"0");
   gameCoinsEl.textContent=gameCoins;
 
   treasureEl.onclick=()=>{
-    if(points>=5){
-      points-=5; updatePoints();
-      startGame();
-    }
+    if(points < 5) return;
+    points -= 5; updatePoints();
+    startGame();
   };
 
   function startGame(){
     overlay.style.display="flex";
-    bullets=[]; coins=[]; rocket.x=200;
-    lastShot=0; coinSpawn=0;
+    bullets=[]; coins=[];
+    rocket.x=canvas.width/2 - rocket.w/2;
+    shotsFired=0; hits=0; misses=0;
+    updateShotUI(); updateHM();
     requestAnimationFrame(loop);
   }
 
   closeGame.onclick=()=>{ overlay.style.display="none"; };
 
-  // --- Steuerung ---
+  // --- Tastatur ---
   document.addEventListener("keydown",e=>{
     if(e.key==="ArrowLeft"||e.key==="a") leftPressed=true;
     if(e.key==="ArrowRight"||e.key==="d") rightPressed=true;
-    if(e.key===" "){ spacePressed=true; e.preventDefault(); }
+
+    if(e.key===" " && !spaceDown){
+      spaceDown=true;
+      e.preventDefault();
+      shoot();
+    }
   });
+
   document.addEventListener("keyup",e=>{
     if(e.key==="ArrowLeft"||e.key==="a") leftPressed=false;
     if(e.key==="ArrowRight"||e.key==="d") rightPressed=false;
-    if(e.key===" ") spacePressed=false;
+    if(e.key===" ") spaceDown=false;
   });
 
-  // Touch-Steuerung
+  // --- Touch ---
   let touchX=null;
   canvas.addEventListener("touchstart",e=>{
     touchX=e.touches[0].clientX;
@@ -386,69 +460,105 @@
     rocket.x += (x-touchX)*0.2;
     touchX=x;
   });
-  canvas.addEventListener("touchend",()=>{touchX=null;});
+  canvas.addEventListener("touchend",()=>{ touchX=null; });
 
-  // Maus-Klick schießt
-  canvas.addEventListener("click",shoot);
+  // --- Maus ---
+  canvas.addEventListener("click", shoot);
+
+  function flashBar(el){
+    const prev = el.style.boxShadow;
+    el.style.boxShadow = "0 0 14px 3px rgba(244,67,54,0.9)";
+    setTimeout(()=> el.style.boxShadow = prev, 200);
+  }
+
+  function updateShotUI(){
+    shotsCountEl.textContent = `${shotsFired}/${maxShots}`;
+    const pct = (shotsFired / maxShots) * 100;
+    shotsFill.style.width = `${pct}%`;
+  }
+
+  function updateHM(){
+    hmCountEl.textContent = `${hits} | ${misses}`;
+    const resolved = hits + misses;
+    const hp = resolved < 1 ? 0 : (hits / resolved) * 100;
+    const mp = resolved < 1 ? 0 : (misses / resolved) * 100;
+    hitsFill.style.width = `${hp}%`;
+    missesFill.style.width = `${mp}%`;
+  }
 
   function shoot(){
-    const now=performance.now();
-    if(now-lastShot>300){
-      bullets.push({x:rocket.x+rocket.w/2-2,y:rocket.y-10});
-      lastShot=now;
+    if(shotsFired < maxShots){
+      bullets.push({x:rocket.x+rocket.w/2-2, y:rocket.y-10});
+      shotsFired++;
+      updateShotUI();
+    } else {
+      flashBar(shotsBar);
     }
   }
 
   function loop(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    // Rakete bewegen
+    // Bewegung
     if(leftPressed) rocket.x -= 5;
     if(rightPressed) rocket.x += 5;
-    if(spacePressed) shoot();
+    rocket.x = Math.max(0, Math.min(canvas.width-rocket.w, rocket.x));
 
-    rocket.x=Math.max(0,Math.min(canvas.width-rocket.w,rocket.x));
-
-    // Rakete zeichnen
+    // Rakete
     ctx.fillStyle="#0ff";
-    ctx.fillRect(rocket.x,rocket.y,rocket.w,rocket.h);
+    ctx.fillRect(rocket.x, rocket.y, rocket.w, rocket.h);
 
-    // Schüsse
-    bullets.forEach(b=>b.y-=8);
-    bullets=bullets.filter(b=>b.y>-10);
+    // Schüsse updaten + zeichnen; Misses zählen wenn offscreen
     ctx.fillStyle="#fff";
-    bullets.forEach(b=>ctx.fillRect(b.x,b.y,4,10));
+    for(let i=bullets.length-1;i>=0;i--){
+      const b=bullets[i];
+      b.y -= 8;
+      if(b.y < -10){
+        bullets.splice(i,1);
+        misses++;
+        updateHM();
+        continue;
+      }
+      ctx.fillRect(b.x,b.y,4,10);
+    }
 
     // Münzen spawnen
     const now=performance.now();
-    if(now-coinSpawn>1000){
-      coins.push({x:Math.random()*(canvas.width-20),y:-20});
-      coinSpawn=now;
+    if(now - lastSpawn > 1000){
+      coins.push({x:Math.random()*(canvas.width-20), y:-20});
+      lastSpawn = now;
     }
 
     // Münzen bewegen + zeichnen
     ctx.fillStyle="gold";
     coins.forEach(c=>{
-      c.y+=3;
+      c.y += 3;
       ctx.beginPath();
       ctx.arc(c.x+10,c.y+10,10,0,Math.PI*2);
       ctx.fill();
     });
 
-    // Kollisionen
+    // Kollisionen Schuss<->Münze
     for(let i=coins.length-1;i>=0;i--){
+      const c=coins[i];
       for(let j=bullets.length-1;j>=0;j--){
-        const c=coins[i], b=bullets[j];
-        if(b.x>c.x && b.x<c.x+20 && b.y>c.y && b.y<c.y+20){
-          coins.splice(i,1); bullets.splice(j,1);
-          gameCoins++; gameCoinsEl.textContent=gameCoins;
-          localStorage.setItem("gameCoins",gameCoins);
+        const b=bullets[j];
+        const hit = (b.x > c.x) && (b.x < c.x+20) && (b.y > c.y) && (b.y < c.y+20);
+        if(hit){
+          coins.splice(i,1);
+          bullets.splice(j,1);
+          hits++;
+          gameCoins++;
+          gameCoinsEl.textContent = gameCoins;
+          localStorage.setItem("gameCoins", gameCoins);
+          updateHM();
           break;
         }
       }
     }
 
-    coins=coins.filter(c=>c.y<canvas.height+20);
+    // Münzen bereinigen
+    coins = coins.filter(c=> c.y < canvas.height + 20);
 
     if(overlay.style.display==="flex") requestAnimationFrame(loop);
   }
