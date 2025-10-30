@@ -161,23 +161,14 @@
       border: 1px solid #0ff;
       border-radius: 8px;
       overflow: hidden;
-    }
-
-    .bar-fill {
-      height: 100%;
-      width: 0%;
-    }
-
-    #shots-fill { background: linear-gradient(90deg, #00e5ff, #00bcd4); }
-
-    #hm-bar {
       display: flex;
-      gap: 0;
-      padding: 0;
-      border-color: #9ccc65;
+      flex-direction: row;
     }
-    #hits-fill { background: #8bc34a; }
-    #misses-fill { background: #f44336; }
+
+    /* Kombinierter Balken: Treffer (grün), Misses (rot), Offen (neutral) */
+    #combo-hits { background: #8bc34a; height: 100%; width: 0%; }
+    #combo-misses { background: #f44336; height: 100%; width: 0%; }
+    #combo-remaining { background: rgba(255,255,255,0.25); height: 100%; width: 100%; }
 
     #game-canvas {
       background: #001;
@@ -213,24 +204,18 @@
 <!-- ====== SPIEL-OVERLAY ====== -->
 <div id="game-overlay">
   <button id="close-game">Zurück</button>
+
   <div id="hud">
     <div id="game-stats">💰 Coins: <span id="game-coins">0</span></div>
 
     <div class="bar-title">
-      <span>Schüsse</span>
-      <span id="shots-count">0/30</span>
+      <span>Treffer / Misses / Offen</span>
+      <span id="combo-count">0 | 0 | 30</span>
     </div>
-    <div id="shots-bar" class="bar">
-      <div id="shots-fill" class="bar-fill"></div>
-    </div>
-
-    <div class="bar-title">
-      <span>Treffer / Misses</span>
-      <span id="hm-count">0 | 0</span>
-    </div>
-    <div id="hm-bar" class="bar">
-      <div id="hits-fill" class="bar-fill"></div>
-      <div id="misses-fill" class="bar-fill"></div>
+    <div id="combo-bar" class="bar">
+      <div id="combo-hits"></div>
+      <div id="combo-misses"></div>
+      <div id="combo-remaining"></div>
     </div>
   </div>
 
@@ -394,13 +379,11 @@
   const closeGame = document.getElementById("close-game");
   const gameCoinsEl = document.getElementById("game-coins");
 
-  const shotsBar = document.getElementById("shots-bar");
-  const shotsFill = document.getElementById("shots-fill");
-  const shotsCountEl = document.getElementById("shots-count");
-
-  const hmCountEl = document.getElementById("hm-count");
-  const hitsFill = document.getElementById("hits-fill");
-  const missesFill = document.getElementById("misses-fill");
+  // Kombinierter Balken
+  const comboCountEl = document.getElementById("combo-count");
+  const comboHits = document.getElementById("combo-hits");
+  const comboMisses = document.getElementById("combo-misses");
+  const comboRemaining = document.getElementById("combo-remaining");
 
   let rocket={x:200,y:550,w:40,h:40};
   let bullets=[], coins=[];
@@ -425,11 +408,25 @@
     bullets=[]; coins=[];
     rocket.x=canvas.width/2 - rocket.w/2;
     shotsFired=0; hits=0; misses=0;
-    updateShotUI(); updateHM();
+    updateComboBar();
     requestAnimationFrame(loop);
   }
 
   closeGame.onclick=()=>{ overlay.style.display="none"; };
+
+  // --- Hilfsfunktionen für Koordinaten & Begrenzung ---
+  function clamp(x, min, max){ return x < min ? min : (x > max ? max : x); }
+
+  function toCanvasX(clientX){
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    return (clientX - rect.left) * scaleX;
+  }
+
+  function placeRocketAtClientX(clientX){
+    const x = toCanvasX(clientX) - rocket.w/2;
+    rocket.x = clamp(x, 0, canvas.width - rocket.w);
+  }
 
   // --- Tastatur ---
   document.addEventListener("keydown",e=>{
@@ -452,18 +449,25 @@
   // --- Touch ---
   let touchX=null;
   canvas.addEventListener("touchstart",e=>{
-    touchX=e.touches[0].clientX;
+    const t = e.touches[0];
+    placeRocketAtClientX(t.clientX); // Sofort zur Finger-Position springen
     shoot();
-  });
+    touchX = t.clientX;
+  }, {passive:true});
+
   canvas.addEventListener("touchmove",e=>{
-    let x=e.touches[0].clientX;
-    rocket.x += (x-touchX)*0.2;
-    touchX=x;
-  });
-  canvas.addEventListener("touchend",()=>{ touchX=null; });
+    const t = e.touches[0];
+    placeRocketAtClientX(t.clientX); // Rakete direkt unter dem Finger halten
+    touchX = t.clientX;
+  }, {passive:true});
+
+  canvas.addEventListener("touchend",()=>{ touchX=null; }, {passive:true});
 
   // --- Maus ---
-  canvas.addEventListener("click", shoot);
+  canvas.addEventListener("click",e=>{
+    placeRocketAtClientX(e.clientX); // Bei Klick zur Mausposition springen
+    shoot();
+  });
 
   function flashBar(el){
     const prev = el.style.boxShadow;
@@ -471,28 +475,25 @@
     setTimeout(()=> el.style.boxShadow = prev, 200);
   }
 
-  function updateShotUI(){
-    shotsCountEl.textContent = `${shotsFired}/${maxShots}`;
-    const pct = (shotsFired / maxShots) * 100;
-    shotsFill.style.width = `${pct}%`;
-  }
-
-  function updateHM(){
-    hmCountEl.textContent = `${hits} | ${misses}`;
-    const resolved = hits + misses;
-    const hp = resolved < 1 ? 0 : (hits / resolved) * 100;
-    const mp = resolved < 1 ? 0 : (misses / resolved) * 100;
-    hitsFill.style.width = `${hp}%`;
-    missesFill.style.width = `${mp}%`;
+  function updateComboBar(){
+    const remaining = maxShots - shotsFired;
+    comboCountEl.textContent = `${hits} | ${misses} | ${remaining}`;
+    // Prozente über maxShots (Summe = 100%)
+    const hp = (hits / maxShots) * 100;
+    const mp = (misses / maxShots) * 100;
+    const rp = (remaining / maxShots) * 100;
+    comboHits.style.width = `${hp}%`;
+    comboMisses.style.width = `${mp}%`;
+    comboRemaining.style.width = `${rp}%`;
   }
 
   function shoot(){
     if(shotsFired < maxShots){
       bullets.push({x:rocket.x+rocket.w/2-2, y:rocket.y-10});
       shotsFired++;
-      updateShotUI();
+      updateComboBar();
     } else {
-      flashBar(shotsBar);
+      flashBar(document.getElementById("combo-bar"));
     }
   }
 
@@ -502,7 +503,7 @@
     // Bewegung
     if(leftPressed) rocket.x -= 5;
     if(rightPressed) rocket.x += 5;
-    rocket.x = Math.max(0, Math.min(canvas.width-rocket.w, rocket.x));
+    rocket.x = clamp(rocket.x, 0, canvas.width - rocket.w);
 
     // Rakete
     ctx.fillStyle="#0ff";
@@ -516,7 +517,7 @@
       if(b.y < -10){
         bullets.splice(i,1);
         misses++;
-        updateHM();
+        updateComboBar();
         continue;
       }
       ctx.fillRect(b.x,b.y,4,10);
@@ -551,7 +552,7 @@
           gameCoins++;
           gameCoinsEl.textContent = gameCoins;
           localStorage.setItem("gameCoins", gameCoins);
-          updateHM();
+          updateComboBar();
           break;
         }
       }
