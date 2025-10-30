@@ -497,6 +497,53 @@
     }
   }
 
+  // Rakete zeichnen (statt blauem Block)
+  function drawRocket(ctx, x, y) {
+    ctx.save();
+    ctx.translate(x + rocket.w / 2, y + rocket.h / 2);
+    ctx.scale(1.2, 1.2);
+
+    // Rumpf
+    ctx.fillStyle = "#cfd8dc";
+    ctx.beginPath();
+    ctx.moveTo(0, -20);
+    ctx.lineTo(10, 10);
+    ctx.lineTo(-10, 10);
+    ctx.closePath();
+    ctx.fill();
+
+    // Flügel
+    ctx.fillStyle = "#607d8b";
+    ctx.beginPath();
+    ctx.moveTo(-10, 10);
+    ctx.lineTo(-18, 18);
+    ctx.lineTo(-10, 10);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(10, 10);
+    ctx.lineTo(18, 18);
+    ctx.lineTo(10, 10);
+    ctx.fill();
+
+    // Flamme (klein animiert)
+    const flame = Math.random() * 5 + 5;
+    ctx.fillStyle = "#ff9800";
+    ctx.beginPath();
+    ctx.moveTo(-4, 10);
+    ctx.lineTo(0, 10 + flame);
+    ctx.lineTo(4, 10);
+    ctx.closePath();
+    ctx.fill();
+
+    // Fenster
+    ctx.fillStyle = "#2196f3";
+    ctx.beginPath();
+    ctx.arc(0, -5, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
   function loop(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
@@ -507,7 +554,7 @@
 
     // Rakete
     ctx.fillStyle="#0ff";
-    ctx.fillRect(rocket.x, rocket.y, rocket.w, rocket.h);
+    drawRocket(ctx, rocket.x, rocket.y);
 
     // Schüsse updaten + zeichnen; Misses zählen wenn offscreen
     ctx.fillStyle="#fff";
