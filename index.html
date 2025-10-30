@@ -184,9 +184,9 @@
   }
 
   function playRandomVoice(word) {
-    const voices = ["alloy", "coral", "nova"];
+    const voices = ["alloy", "ash", "coral", "nova", "onyx"];
     const pick = voices[Math.floor(Math.random() * voices.length)];
-    const audio = new Audio(`audio/${word.toLowerCase()}_${pick}.mp3`);
+    const audio = new Audio(`audio/${word.toLowerCase().replaceAll(/[^a-z0-9]/g, "_")}_${pick}.mp3`);
     audio.play();
     return audio;
   }

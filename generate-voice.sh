@@ -5,7 +5,7 @@ source ./env.sh
 
 MODEL="gpt-4o-mini-tts"
 FORMAT="mp3"
-VOICES=(alloy coral nova)
+VOICES=(alloy ash coral nova onyx)
 
 mkdir -p audio log/tts_requests log/tts_responses
 
@@ -13,7 +13,12 @@ mkdir -p audio log/tts_requests log/tts_responses
 VOCAB_LIST=$(jq -r '.[].en' vocab.json)
 
 for word in $VOCAB_LIST; do
-  WORD_LOWER=$(echo "$word" | tr '[:upper:]' '[:lower:]')
+  # replace \r and \n
+  word=$(echo "$word" | tr -d '\r\n')
+
+  # replace all special characters in word to make it filename-safe
+  echo "🔤 Verarbeite Wort: >$word<"
+  WORD_LOWER=$(printf "%s" "$word" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_')
 
   for voice in "${VOICES[@]}"; do
     OUT_FILE="audio/${WORD_LOWER}_${voice}.${FORMAT}"
