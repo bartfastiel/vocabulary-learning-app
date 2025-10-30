@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vokabeltrainer</title>
+  <title>Vokabeltrainer + Raketen-Spiel</title>
   <style>
     html, body {
       margin: 0;
@@ -29,6 +29,12 @@
       background-color: #ffffff88;
       padding: 0.4rem 1rem;
       border-radius: 12px;
+    }
+
+    #treasure {
+      margin-left: 10px;
+      cursor: pointer;
+      display: none;
     }
 
     #quiz-box {
@@ -117,14 +123,53 @@
       75% { transform: translateX(-5px); }
       100% { transform: translateX(0); }
     }
+
+    /* === SPIEL === */
+    #game-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at top, #0f2027, #203a43, #2c5364);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      z-index: 999;
+    }
+
+    #game-stats {
+      position: absolute;
+      top: 10px; left: 10px;
+      font-size: 1.1rem;
+    }
+
+    #game-canvas {
+      background: #001;
+      border: 2px solid #0ff;
+      border-radius: 12px;
+      touch-action: none;
+    }
+
+    #close-game {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: #4dd0e1;
+      border: none;
+      border-radius: 6px;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 <h1>🎓 Vokabeltrainer</h1>
+
 <div id="score">
   Punkte: <span id="points">0</span>
-  <span id="treasure" style="display:none; cursor:pointer; margin-left:10px;">🪙</span>
+  <span id="treasure">🪙</span>
 </div>
+
 <div id="streak-box">
   Streak: <span id="streak">0</span> | Rekord: <span id="streak-record">0</span>
   <div id="ship">🚀</div>
@@ -137,19 +182,18 @@
   <button id="next-btn">Nächste Frage</button>
 </div>
 
-<div id="game-overlay" style="display:none;
-  position:fixed; top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.8); justify-content:center; align-items:center; flex-direction:column; color:white;">
-  <h2>🎯 Finde die Schatzkiste!</h2>
-  <div id="game-area" style="position:relative; width:300px; height:300px; background:#222; border-radius:12px;">
-  </div>
-  <button id="close-game" style="margin-top:1rem; padding:0.5rem 1rem;">Zurück</button>
+<!-- ====== SPIEL-OVERLAY ====== -->
+<div id="game-overlay">
+  <div id="game-stats">💰 Coins: <span id="game-coins">0</span></div>
+  <canvas id="game-canvas" width="400" height="600"></canvas>
+  <button id="close-game">Zurück</button>
 </div>
 
 <audio id="sound-correct" src="ding.mp3" preload="auto"></audio>
 <audio id="sound-wrong" src="buzz.mp3" preload="auto"></audio>
 
 <script>
+  // === VOKABELTRAINER ===
   let vocabulary = [], currentIndex = 0, points = 0, streak = 0;
   let currentAudio = null;
 
@@ -162,73 +206,22 @@
   const streakRecordEl = document.getElementById("streak-record");
   const soundCorrect = document.getElementById("sound-correct");
   const soundWrong = document.getElementById("sound-wrong");
-
   const treasureEl = document.getElementById("treasure");
-  const overlay = document.getElementById("game-overlay");
-  const gameArea = document.getElementById("game-area");
-  const closeGame = document.getElementById("close-game");
 
-  // Punkte aus Local Storage laden
+  // --- LocalStorage laden ---
+  let streakRecord = parseInt(localStorage.getItem("streakRecord") || "0");
+  streakRecordEl.textContent = streakRecord;
   points = parseInt(localStorage.getItem("points") || "0");
   updatePoints();
 
-  // Wenn genug Punkte da sind, Schatz anzeigen
-  function checkTreasure() {
-    if (points >= 5) treasureEl.style.display = "inline";
-    else treasureEl.style.display = "none";
-  }
-
-  // Punkte speichern
-  function savePoints() {
-    localStorage.setItem("points", points);
-    checkTreasure();
-  }
-
-  checkTreasure();
-
-  // Schatz-Icon klickbar machen
-  treasureEl.onclick = () => {
-    overlay.style.display = "flex";
-    startMiniGame();
-  };
-
-  // Mini-Spiel: Klick auf Schatzkiste
-  function startMiniGame() {
-    gameArea.innerHTML = "";
-    const chest = document.createElement("div");
-    chest.textContent = "💰";
-    chest.style.position = "absolute";
-    chest.style.fontSize = "2rem";
-    chest.style.cursor = "pointer";
-    chest.style.left = Math.random() * 250 + "px";
-    chest.style.top = Math.random() * 250 + "px";
-
-    chest.onclick = () => {
-      alert("🎉 Du hast den Schatz gefunden!");
-      points -= 5;
-      savePoints();
-      updatePoints();
-      overlay.style.display = "none";
-    };
-
-    gameArea.appendChild(chest);
-  }
-
-  // Overlay schließen
-  closeGame.onclick = () => {
-    overlay.style.display = "none";
-  };
-
   document.addEventListener("contextmenu", e => e.preventDefault());
 
-  let streakRecord = parseInt(localStorage.getItem("streakRecord") || "0");
-  streakRecordEl.textContent = streakRecord;
+  function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+  function updatePoints() { pointsDisplay.textContent = points; localStorage.setItem("points", points); checkTreasure(); }
 
-  function shuffle(arr) {
-    return arr.sort(() => Math.random() - 0.5);
+  function checkTreasure() {
+    treasureEl.style.display = points >= 5 ? "inline" : "none";
   }
-
-  function updatePoints() { pointsDisplay.textContent = points; }
 
   function updateStreak(isCorrect) {
     if (isCorrect) {
@@ -246,15 +239,15 @@
     } else {
       streak = 0;
       streakEl.textContent = 0;
-      document.body.classList.remove("streak-10", "streak-15", "streak-20");
+      document.body.classList.remove("streak-10","streak-15","streak-20");
       document.body.classList.add("streak-broken");
     }
   }
 
   function playRandomVoice(word) {
     const voices = ["alloy", "ash", "coral", "nova", "onyx"];
-    const pick = voices[Math.floor(Math.random() * voices.length)];
-    const audio = new Audio(`audio/${word.toLowerCase().replaceAll(/[^a-z0-9]/g, "_")}_${pick}.mp3`);
+    const pick = voices[Math.floor(Math.random()*voices.length)];
+    const audio = new Audio(`audio/${word.toLowerCase().replaceAll(/[^a-z0-9]/g,"_")}_${pick}.mp3`);
     audio.play();
     return audio;
   }
@@ -272,103 +265,193 @@
     const vocab = vocabulary[currentIndex];
     const correct = vocab.en.toLowerCase();
 
-    const modes = ["text", "image", "audio", "text_input", "image_input", "audio_input"];
+    const modes = ["text","image","audio","text_input","image_input","audio_input"];
     const allowed = modes.filter(m => !(m.includes("image") && !vocab.allowImage));
-    const mode = allowed[Math.floor(Math.random() * allowed.length)];
+    const mode = allowed[Math.floor(Math.random()*allowed.length)];
 
-    const wrong = shuffle(vocabulary.filter(v => v.en.toLowerCase() !== correct))
-            .slice(0, 3).map(v => v.en.toLowerCase());
-    const options = shuffle([correct, ...wrong]);
+    const wrong = shuffle(vocabulary.filter(v=>v.en.toLowerCase()!==correct)).slice(0,3).map(v=>v.en.toLowerCase());
+    const options = shuffle([correct,...wrong]);
 
-    questionDiv.innerHTML = "";
-    optionsDiv.innerHTML = "";
+    questionDiv.innerHTML=""; optionsDiv.innerHTML="";
 
     if (mode.includes("image"))
       questionDiv.innerHTML = `<img src="img/${correct}.png" class="vocab-image" alt="">`;
     else if (mode.includes("text"))
       questionDiv.textContent = `Wie heißt „${vocab.de}” auf Englisch?`;
     else if (mode.includes("audio")) {
-      questionDiv.innerHTML = `<p>🔈 Höre das Wort</p><button id="replay-btn">🔁 Anhören</button>`;
+      questionDiv.innerHTML=`<p>🔈 Höre das Wort</p><button id="replay-btn">🔁 Anhören</button>`;
       currentAudio = playRandomVoice(vocab.en);
-      setTimeout(() => {
-        document.getElementById("replay-btn").onclick = () => playRandomVoice(vocab.en);
-      }, 100);
+      setTimeout(()=>{ document.getElementById("replay-btn").onclick=()=>playRandomVoice(vocab.en); },100);
     }
 
     if (mode.endsWith("_input")) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.autofocus = true;
+      const input=document.createElement("input");
+      input.type="text"; input.autofocus=true;
+      const btn=document.createElement("button");
+      btn.textContent="Nächste Frage"; btn.className="option-btn";
+      optionsDiv.append(input,btn);
 
-      const btn = document.createElement("button");
-      btn.textContent = "Nächste Frage";
-      btn.className = "option-btn";
-      optionsDiv.append(input, btn);
-
-      // Fokus mit erstem Buchstaben übernehmen
-      document.body.addEventListener("keydown", function initType(e) {
-        if (!input.disabled && /^[a-zA-Z]$/.test(e.key)) {
-          input.focus();
-          document.body.removeEventListener("keydown", initType);
-        }
+      document.body.addEventListener("keydown",function initType(e){
+        if(!input.disabled && /^[a-zA-Z]$/.test(e.key)){ input.focus(); document.body.removeEventListener("keydown",initType); }
       });
 
-      input.addEventListener("keydown", e => {
-        if (e.key === "Enter" && !btn.disabled) btn.click();
-      });
+      input.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!btn.disabled)btn.click(); });
 
-      btn.onclick = () => {
-        const user = input.value.trim().toLowerCase();
-        const isCorrect = user === correct;
-        input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
-        (isCorrect ? soundCorrect : soundWrong).play();
+      btn.onclick=()=>{
+        const user=input.value.trim().toLowerCase();
+        const isCorrect=user===correct;
+        input.style.backgroundColor=isCorrect?"#81c784":"#e57373";
+        (isCorrect?soundCorrect:soundWrong).play();
         points += isCorrect ? 1 : -1;
-        savePoints();
+        updatePoints(); updateStreak(isCorrect);
         playRandomVoice(vocab.en);
-        updatePoints();
-        updateStreak(isCorrect);
-        input.disabled = true;
-        btn.disabled = true;
-        nextBtn.style.display = "inline-block";
+        input.disabled=true; btn.disabled=true;
+        nextBtn.style.display="inline-block";
       };
     } else {
-      options.forEach(opt => {
-        const b = document.createElement("button");
-        b.className = "option-btn";
-        b.textContent = opt;
-        b.onclick = () => {
-          const isCorrect = opt === correct;
-          b.classList.add(isCorrect ? "correct" : "wrong");
-          (isCorrect ? soundCorrect : soundWrong).play();
+      options.forEach(opt=>{
+        const b=document.createElement("button");
+        b.className="option-btn"; b.textContent=opt;
+        b.onclick=()=>{
+          const isCorrect=opt===correct;
+          b.classList.add(isCorrect?"correct":"wrong");
+          (isCorrect?soundCorrect:soundWrong).play();
           points += isCorrect ? 1 : -1;
-          savePoints();
+          updatePoints(); updateStreak(isCorrect);
           playRandomVoice(vocab.en);
-          updatePoints();
-          updateStreak(isCorrect);
-          Array.from(optionsDiv.children).forEach(btn => btn.disabled = true);
-          nextBtn.style.display = "inline-block";
+          Array.from(optionsDiv.children).forEach(btn=>btn.disabled=true);
+          nextBtn.style.display="inline-block";
         };
         optionsDiv.appendChild(b);
       });
     }
   }
 
-  nextBtn.onclick = () => {
-    currentIndex++;
-    nextQuestion();
+  nextBtn.onclick=()=>{ currentIndex++; nextQuestion(); };
+
+  fetch("vocab.json").then(r=>r.json()).then(data=>{
+    vocabulary=shuffle(data); nextBtn.disabled=false; nextQuestion();
+  }).catch(err=>{ questionDiv.textContent="❌ Fehler beim Laden von vocab.json"; console.error(err); });
+
+  // === SPIEL-LOGIK ===
+  const overlay=document.getElementById("game-overlay");
+  const canvas=document.getElementById("game-canvas");
+  const ctx=canvas.getContext("2d");
+  const closeGame=document.getElementById("close-game");
+  const gameCoinsEl=document.getElementById("game-coins");
+
+  let rocket={x:200,y:550,w:40,h:40};
+  let bullets=[], coins=[];
+  let leftPressed=false, rightPressed=false, spacePressed=false;
+  let lastShot=0, coinSpawn=0;
+  let gameCoins=parseInt(localStorage.getItem("gameCoins")||"0");
+  gameCoinsEl.textContent=gameCoins;
+
+  treasureEl.onclick=()=>{
+    if(points>=5){
+      points-=5; updatePoints();
+      startGame();
+    }
   };
 
-  fetch("vocab.json")
-          .then(r => r.json())
-          .then(data => {
-            vocabulary = shuffle(data);
-            nextBtn.disabled = false;
-            nextQuestion();
-          })
-          .catch(err => {
-            questionDiv.textContent = "❌ Fehler beim Laden von vocab.json";
-            console.error(err);
-          });
+  function startGame(){
+    overlay.style.display="flex";
+    bullets=[]; coins=[]; rocket.x=200;
+    lastShot=0; coinSpawn=0;
+    requestAnimationFrame(loop);
+  }
+
+  closeGame.onclick=()=>{ overlay.style.display="none"; };
+
+  // --- Steuerung ---
+  document.addEventListener("keydown",e=>{
+    if(e.key==="ArrowLeft"||e.key==="a") leftPressed=true;
+    if(e.key==="ArrowRight"||e.key==="d") rightPressed=true;
+    if(e.key===" "){ spacePressed=true; e.preventDefault(); }
+  });
+  document.addEventListener("keyup",e=>{
+    if(e.key==="ArrowLeft"||e.key==="a") leftPressed=false;
+    if(e.key==="ArrowRight"||e.key==="d") rightPressed=false;
+    if(e.key===" ") spacePressed=false;
+  });
+
+  // Touch-Steuerung
+  let touchX=null;
+  canvas.addEventListener("touchstart",e=>{
+    touchX=e.touches[0].clientX;
+    shoot();
+  });
+  canvas.addEventListener("touchmove",e=>{
+    let x=e.touches[0].clientX;
+    rocket.x += (x-touchX)*0.2;
+    touchX=x;
+  });
+  canvas.addEventListener("touchend",()=>{touchX=null;});
+
+  // Maus-Klick schießt
+  canvas.addEventListener("click",shoot);
+
+  function shoot(){
+    const now=performance.now();
+    if(now-lastShot>300){
+      bullets.push({x:rocket.x+rocket.w/2-2,y:rocket.y-10});
+      lastShot=now;
+    }
+  }
+
+  function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Rakete bewegen
+    if(leftPressed) rocket.x -= 5;
+    if(rightPressed) rocket.x += 5;
+    if(spacePressed) shoot();
+
+    rocket.x=Math.max(0,Math.min(canvas.width-rocket.w,rocket.x));
+
+    // Rakete zeichnen
+    ctx.fillStyle="#0ff";
+    ctx.fillRect(rocket.x,rocket.y,rocket.w,rocket.h);
+
+    // Schüsse
+    bullets.forEach(b=>b.y-=8);
+    bullets=bullets.filter(b=>b.y>-10);
+    ctx.fillStyle="#fff";
+    bullets.forEach(b=>ctx.fillRect(b.x,b.y,4,10));
+
+    // Münzen spawnen
+    const now=performance.now();
+    if(now-coinSpawn>1000){
+      coins.push({x:Math.random()*(canvas.width-20),y:-20});
+      coinSpawn=now;
+    }
+
+    // Münzen bewegen + zeichnen
+    ctx.fillStyle="gold";
+    coins.forEach(c=>{
+      c.y+=3;
+      ctx.beginPath();
+      ctx.arc(c.x+10,c.y+10,10,0,Math.PI*2);
+      ctx.fill();
+    });
+
+    // Kollisionen
+    for(let i=coins.length-1;i>=0;i--){
+      for(let j=bullets.length-1;j>=0;j--){
+        const c=coins[i], b=bullets[j];
+        if(b.x>c.x && b.x<c.x+20 && b.y>c.y && b.y<c.y+20){
+          coins.splice(i,1); bullets.splice(j,1);
+          gameCoins++; gameCoinsEl.textContent=gameCoins;
+          localStorage.setItem("gameCoins",gameCoins);
+          break;
+        }
+      }
+    }
+
+    coins=coins.filter(c=>c.y<canvas.height+20);
+
+    if(overlay.style.display==="flex") requestAnimationFrame(loop);
+  }
 </script>
 </body>
 </html>
