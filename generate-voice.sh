@@ -9,14 +9,8 @@ VOICES=(alloy ash coral nova onyx)
 
 mkdir -p audio log/tts_requests log/tts_responses
 
-# Lesen der Vokabeln aus vocab.json
-VOCAB_LIST=$(jq -r '.[].en' vocab.json)
-
-for word in $VOCAB_LIST; do
-  # replace \r and \n
+jq -r '.[].en' vocab.json | while IFS= read -r word; do
   word=$(echo "$word" | tr -d '\r\n')
-
-  # replace all special characters in word to make it filename-safe
   echo "🔤 Verarbeite Wort: >$word<"
   WORD_LOWER=$(printf "%s" "$word" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_')
 
