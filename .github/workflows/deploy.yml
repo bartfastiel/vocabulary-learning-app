@@ -28,10 +28,9 @@ jobs:
             --delete \
             --exclude "*" \
             --include "index.html" \
-            --include "vocab.json" \
-            --include "buzz.mp3" \
-            --include "ding.mp3" \
-            --include "audio/*" \
-            --include "img/*" \
+            --include "assets/*" \
+            --include "core/*" \
+            --include "game/*" \
+            --include "vocab/*" \
             --size-only \
             --no-progress

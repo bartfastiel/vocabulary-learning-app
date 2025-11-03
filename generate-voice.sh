@@ -15,7 +15,7 @@ jq -r '.[].en' vocab.json | while IFS= read -r word; do
   WORD_LOWER=$(printf "%s" "$word" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_')
 
   for voice in "${VOICES[@]}"; do
-    OUT_FILE="audio/${WORD_LOWER}_${voice}.${FORMAT}"
+    OUT_FILE="assets/audio/voice/${WORD_LOWER}_${voice}.${FORMAT}"
 
     # 🔁 Überspringe bereits vorhandene Dateien
     if [[ -f "$OUT_FILE" ]]; then
