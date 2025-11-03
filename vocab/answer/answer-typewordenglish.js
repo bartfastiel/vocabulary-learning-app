@@ -51,16 +51,25 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
           margin-top: 0.8rem;
         }
         button:hover { background-color: #ffcc80; }
+        .correct-answer {
+          margin-top: 0.6rem;
+          color: #333;
+          font-style: italic;
+          font-size: 1rem;
+          opacity: 0.8;
+        }
       </style>
 
       <div class="container">
         <input type="text" id="input" placeholder="Antwort eingeben" />
         <button id="submit">Abschicken</button>
+        <div id="feedback"></div>
       </div>
     `;
 
         const input = this.shadowRoot.getElementById("input");
         const button = this.shadowRoot.getElementById("submit");
+        const feedback = this.shadowRoot.getElementById("feedback");
 
         document.body.addEventListener("keydown", function initType(e) {
             if (!input.disabled && /^[a-zA-Z]$/.test(e.key)) {
@@ -84,6 +93,12 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
                 this.updatePoints(isCorrect ? +1 : -1);
                 this.updateStreak(isCorrect);
                 input.disabled = true;
+
+                // show correct answer if user was wrong
+                if (!isCorrect) {
+                    feedback.innerHTML = `<div class="correct-answer">Richtig wäre: <b>${this.word.en}</b></div>`;
+                }
+
                 button.innerHTML = "Nächste Frage";
             } else {
                 this.dispatchEvent(new CustomEvent("answered", {
