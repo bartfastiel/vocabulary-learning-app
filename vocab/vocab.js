@@ -24,45 +24,45 @@ import "./answer/answer-chooseimage.js";
 // === CONSTANTS ===
 // All available question–answer combinations
 const MODES = [
-    // // === Text-based (German → English) ===
-    // {
-    //     question: "vocab-question-wordgerman",
-    //     answer: "vocab-answer-choosewordenglish",
-    // },
-    // {
-    //     question: "vocab-question-wordgerman",
-    //     answer: "vocab-answer-typewordenglish",
-    // },
-    //
-    // // === Text-based (English → German) ===
-    // {
-    //     question: "vocab-question-wordenglish",
-    //     answer: "vocab-answer-choosewordgerman",
-    // },
-    //
-    // // === Audio question → English answers ===
-    // {
-    //     question: "vocab-question-voiceenglish",
-    //     answer: "vocab-answer-choosewordenglish",
-    // },
-    // {
-    //     question: "vocab-question-voiceenglish",
-    //     answer: "vocab-answer-typewordenglish",
-    // },
-    // {
-    //     question: "vocab-question-voiceenglish",
-    //     answer: "vocab-answer-choosevoiceenglish",
-    // },
-    //
-    // // === Image question → English answers ===
-    // {
-    //     question: "vocab-question-image",
-    //     answer: "vocab-answer-choosewordenglish",
-    // },
-    // {
-    //     question: "vocab-question-image",
-    //     answer: "vocab-answer-typewordenglish",
-    // },
+    // === Text-based (German → English) ===
+    {
+        question: "vocab-question-wordgerman",
+        answer: "vocab-answer-choosewordenglish",
+    },
+    {
+        question: "vocab-question-wordgerman",
+        answer: "vocab-answer-typewordenglish",
+    },
+
+    // === Text-based (English → German) ===
+    {
+        question: "vocab-question-wordenglish",
+        answer: "vocab-answer-choosewordgerman",
+    },
+
+    // === Audio question → English answers ===
+    {
+        question: "vocab-question-voiceenglish",
+        answer: "vocab-answer-choosewordenglish",
+    },
+    {
+        question: "vocab-question-voiceenglish",
+        answer: "vocab-answer-typewordenglish",
+    },
+    {
+        question: "vocab-question-voiceenglish",
+        answer: "vocab-answer-choosevoiceenglish",
+    },
+
+    // === Image question → English answers ===
+    {
+        question: "vocab-question-image",
+        answer: "vocab-answer-choosewordenglish",
+    },
+    {
+        question: "vocab-question-image",
+        answer: "vocab-answer-typewordenglish",
+    },
 
     // === Audio question → Image answers ===
     {
@@ -146,7 +146,11 @@ class VocabTrainer extends HTMLElement {
         }
 
         const word = this.vocab[this.index];
-        const mode = MODES[Math.floor(Math.random() * MODES.length)];
+        const availableModes = MODES.filter(mode => {
+            if (word.allowImage) return true;
+            return mode.question !== "vocab-question-image" && mode.answer !== "vocab-answer-chooseimage";
+        });
+        const mode = availableModes[Math.floor(Math.random() * availableModes.length)];
 
         const qEl = document.createElement(mode.question);
         const aEl = document.createElement(mode.answer);
