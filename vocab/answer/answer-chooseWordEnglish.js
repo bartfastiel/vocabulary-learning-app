@@ -59,17 +59,21 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
           cursor: pointer;
           display: none;
         }
-        .feedback { margin-top: 0.6rem; }
       </style>
 
       <div class="options"></div>
-      <div class="feedback" id="feedback"></div>
       <button id="next-btn">Nächste Frage</button>
     `;
 
         const optionsDiv = this.shadowRoot.querySelector(".options");
-        const feedbackDiv = this.shadowRoot.querySelector("#feedback");
         const nextBtn = this.shadowRoot.querySelector("#next-btn");
+
+        nextBtn.onclick = () => {
+            this.dispatchEvent(new CustomEvent("answered", {
+                bubbles: true,
+                detail: {correct: true} // correctness is handled by updatePoints already
+            }));
+        };
 
         // build option buttons
         options.forEach(opt => {
@@ -99,13 +103,6 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
             };
             optionsDiv.appendChild(b);
         });
-
-        nextBtn.onclick = () => {
-            this.dispatchEvent(new CustomEvent("answered", {
-                bubbles: true,
-                detail: {correct: true} // correctness is handled by updatePoints already
-            }));
-        };
     }
 }
 

@@ -54,7 +54,7 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
 
       <div class="container">
         <input type="text" id="input" placeholder="Antwort eingeben" />
-        <button id="submit">Nächste Frage</button>
+        <button id="submit">Abschicken</button>
       </div>
     `;
 
@@ -74,18 +74,28 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
             if (e.key === "Enter" && !button.disabled) button.click();
         });
 
+        let answered = false;
         button.onclick = () => {
-            const user = input.value.trim().toLowerCase();
-            const isCorrect = user === correct;
+            if (!answered) {
+                answered = true;
+                const user = input.value.trim().toLowerCase();
+                const isCorrect = user === correct;
 
-            input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
-            (isCorrect ? this.soundCorrect : this.soundWrong).play();
+                input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
+                (isCorrect ? this.soundCorrect : this.soundWrong).play();
 
-            this.updatePoints(isCorrect ? +1 : -1);
-            this.updateStreak(isCorrect);
+                this.updatePoints(isCorrect ? +1 : -1);
+                this.updateStreak(isCorrect);
 
-            input.disabled = true;
-            button.disabled = true;
+                input.disabled = true;
+                button.innerHTML = "Nächste Frage";
+            } else {
+                // Dispatch answered event to proceed to next question
+                this.dispatchEvent(new CustomEvent("answered", {
+                    bubbles: true,
+                    detail: { correct: true } // correctness is handled by updatePoints already
+                }));
+            }
         };
     }
 }

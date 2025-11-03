@@ -58,12 +58,31 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
         }
         .correct { background-color: #81c784 !important; }
         .wrong { background-color: #e57373 !important; }
+        #next-btn {
+          margin-top: 1rem;
+          padding: 0.6rem 1.2rem;
+          font-size: 1rem;
+          border: none;
+          border-radius: 6px;
+          background-color: #4dd0e1;
+          cursor: pointer;
+          display: none;
+        }
       </style>
 
       <div class="options"></div>
+      <button id="next-btn">Nächste Frage</button>
     `;
 
         const optionsDiv = this.shadowRoot.querySelector(".options");
+        const nextBtn = this.shadowRoot.querySelector("#next-btn");
+
+        nextBtn.onclick = () => {
+            this.dispatchEvent(new CustomEvent("answered", {
+                bubbles: true,
+                detail: {correct: true} // correctness is handled by updatePoints already
+            }));
+        };
 
         options.forEach(opt => {
             const listenBtn = document.createElement("button");
@@ -82,6 +101,20 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
                 this.updatePoints(isCorrect ? +1 : -1);
                 this.updateStreak(isCorrect);
                 Array.from(optionsDiv.querySelectorAll("button")).forEach(b => (b.disabled = true));
+
+                // if wrong, highlight correct answer
+                if (!isCorrect) {
+                    Array.from(optionsDiv.querySelectorAll(".choose-btn")).forEach(b => {
+                        if (b.textContent === "Antwort wählen" && b !== chooseBtn) {
+                            const correspondingOpt = options[Array.from(optionsDiv.children).indexOf(b) / 2];
+                            if (correspondingOpt === correct) {
+                                b.classList.add("correct");
+                            }
+                        }
+                    });
+                }
+
+                nextBtn.style.display = "inline-block";
             };
 
             optionsDiv.appendChild(listenBtn);

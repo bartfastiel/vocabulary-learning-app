@@ -54,6 +54,14 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
     `;
 
         const optionsDiv = this.shadowRoot.querySelector(".options");
+        const nextBtn = this.shadowRoot.querySelector("#next-btn");
+
+        nextBtn.onclick = () => {
+            this.dispatchEvent(new CustomEvent("answered", {
+                bubbles: true,
+                detail: {correct: true} // correctness is handled by updatePoints already
+            }));
+        };
 
         options.forEach(opt => {
             const btn = document.createElement("button");
@@ -70,6 +78,17 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
 
                 // disable further clicks
                 Array.from(optionsDiv.children).forEach(b => (b.disabled = true));
+
+                // highlight correct answer if wrong
+                if (!isCorrect) {
+                    Array.from(optionsDiv.children).forEach(b => {
+                        if (b.textContent === correct) {
+                            b.classList.add("correct");
+                        }
+                    });
+                }
+
+                nextBtn.style.display = "inline-block";
             };
             optionsDiv.appendChild(btn);
         });
