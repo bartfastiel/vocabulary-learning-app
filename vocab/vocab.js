@@ -19,7 +19,6 @@ import "./answer/answer-choosewordenglish.js";
 import "./answer/answer-choosewordgerman.js";
 import "./answer/answer-choosevoiceenglish.js";
 import "./answer/answer-typewordenglish.js";
-import "./answer/answer-typewordgerman.js";
 
 // === CONSTANTS ===
 // All available question–answer combinations
@@ -38,10 +37,6 @@ const MODES = [
     {
         question: "vocab-question-wordenglish",
         answer: "vocab-answer-choosewordgerman",
-    },
-    {
-        question: "vocab-question-wordenglish",
-        answer: "vocab-answer-typewordgerman",
     },
 
     // === Audio question → English answers ===
