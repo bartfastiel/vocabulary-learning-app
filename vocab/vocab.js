@@ -5,16 +5,73 @@
 // No mode-specific behavior — just flow control.
 //
 
-import "./question/question-wordGerman.js";
+// --- imports (all lowercase names and explicit paths) ---
+import "./points.js";
 
-import "./answer/answer-chooseWordEnglish.js";
+// Question types
+import "./question/question-wordgerman.js";
+import "./question/question-wordenglish.js";
+import "./question/question-voiceenglish.js";
+import "./question/question-image.js";
 
-import {playVoice} from "../core/audio.js";
+// Answer types
+import "./answer/answer-choosewordenglish.js";
+import "./answer/answer-choosewordgerman.js";
+import "./answer/answer-choosevoiceenglish.js";
+import "./answer/answer-typewordenglish.js";
+import "./answer/answer-typewordgerman.js";
 
 // === CONSTANTS ===
 // All available question–answer combinations
 const MODES = [
-    {question: "vocab-question-wordgerman", answer: "vocab-answer-chooseWordEnglish"},
+    // === Text-based (German → English) ===
+    {
+        question: "vocab-question-wordgerman",
+        answer: "vocab-answer-choosewordenglish",
+    },
+    {
+        question: "vocab-question-wordgerman",
+        answer: "vocab-answer-typewordenglish",
+    },
+
+    // === Text-based (English → German) ===
+    {
+        question: "vocab-question-wordenglish",
+        answer: "vocab-answer-choosewordgerman",
+    },
+    {
+        question: "vocab-question-wordenglish",
+        answer: "vocab-answer-typewordgerman",
+    },
+
+    // === Audio question → English answers ===
+    {
+        question: "vocab-question-voiceenglish",
+        answer: "vocab-answer-choosewordenglish",
+    },
+    {
+        question: "vocab-question-voiceenglish",
+        answer: "vocab-answer-typewordenglish",
+    },
+    {
+        question: "vocab-question-voiceenglish",
+        answer: "vocab-answer-choosevoiceenglish",
+    },
+
+    // === Image question → English answers ===
+    {
+        question: "vocab-question-image",
+        answer: "vocab-answer-choosewordenglish",
+    },
+    {
+        question: "vocab-question-image",
+        answer: "vocab-answer-typewordenglish",
+    },
+
+    // === Future slots (planned / optional) ===
+    // { question: "vocab-question-descriptionenglish", answer: "vocab-answer-choosewordenglish" },
+    // { question: "vocab-question-wordgerman", answer: "vocab-answer-fillmissinglettersenglish" },
+    // { question: "vocab-question-wordenglish", answer: "vocab-answer-chooseimage" },
 ];
 
 // === HELPERS ===
