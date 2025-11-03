@@ -1,10 +1,8 @@
 // vocab/answer/answer-choosevoiceenglish.js
 //
-// Answer mode: plays four spoken English words,
-// and the user chooses the correct one by sound.
-//
-// Uses the same option button look & logic as other modes,
-// but each button plays its corresponding audio on click.
+// Answer mode: two-column layout:
+// Left: "🔈 Anhören" buttons (play audio)
+// Right: "Antwort wählen" buttons (select the correct word)
 //
 
 import { playVoice } from "../../core/audio.js";
@@ -39,18 +37,25 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
       <style>
         .options {
           display: grid;
-          gap: 0.6rem;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.6rem 1rem;
           margin-top: 1rem;
+          align-items: center;
         }
-        .option-btn {
+        .listen-btn,
+        .choose-btn {
           background-color: #ffb347;
           border: none;
           border-radius: 8px;
-          padding: 0.9rem;
-          font-size: 1.05rem;
+          padding: 0.8rem;
+          font-size: 1rem;
           cursor: pointer;
+          transition: background-color 0.2s;
         }
-        .option-btn:hover { background-color: #ffcc80; }
+        .listen-btn:hover,
+        .choose-btn:hover {
+          background-color: #ffcc80;
+        }
         .correct { background-color: #81c784 !important; }
         .wrong { background-color: #e57373 !important; }
       </style>
@@ -61,31 +66,26 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
         const optionsDiv = this.shadowRoot.querySelector(".options");
 
         options.forEach(opt => {
-            const btn = document.createElement("button");
-            btn.className = "option-btn";
-            btn.textContent = "🔈 Anhören";
+            const listenBtn = document.createElement("button");
+            listenBtn.className = "listen-btn";
+            listenBtn.textContent = "🔈 Anhören";
+            listenBtn.onclick = () => playVoice(opt);
 
-            btn.onclick = () => {
-                // Play sound for this specific option
-                playVoice(opt);
+            const chooseBtn = document.createElement("button");
+            chooseBtn.className = "choose-btn";
+            chooseBtn.textContent = "Antwort wählen";
 
-                // Evaluate correctness after a second click
-                if (btn.dataset.clicked) {
-                    const isCorrect = opt === correct;
-                    btn.classList.add(isCorrect ? "correct" : "wrong");
-
-                    (isCorrect ? this.soundCorrect : this.soundWrong).play();
-                    this.updatePoints(isCorrect ? +1 : -1);
-                    this.updateStreak(isCorrect);
-
-                    Array.from(optionsDiv.children).forEach(b => (b.disabled = true));
-                } else {
-                    // mark for next click
-                    btn.dataset.clicked = "true";
-                }
+            chooseBtn.onclick = () => {
+                const isCorrect = opt === correct;
+                chooseBtn.classList.add(isCorrect ? "correct" : "wrong");
+                (isCorrect ? this.soundCorrect : this.soundWrong).play();
+                this.updatePoints(isCorrect ? +1 : -1);
+                this.updateStreak(isCorrect);
+                Array.from(optionsDiv.querySelectorAll("button")).forEach(b => (b.disabled = true));
             };
 
-            optionsDiv.appendChild(btn);
+            optionsDiv.appendChild(listenBtn);
+            optionsDiv.appendChild(chooseBtn);
         });
     }
 
