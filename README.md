@@ -35,14 +35,14 @@ vocab-trainer/
 │   ├── points.js            # manages localStorage: points, streak, highscore
 │   │
 │   ├── question/
-│   │   ├── question-wordGerman.js
+│   │   ├── question-wordgerman.js
 │   │   ├── question-wordEnglish.js
 │   │   ├── question-image.js
 │   │   ├── question-voiceEnglish.js
 │   │   └── question-descriptionEnglish.js
 │   │
 │   └── answer/
-│       ├── answer-chooseWordEnglish.js
+│       ├── answer-choosewordenglish.js
 │       ├── answer-chooseWordGerman.js
 │       ├── answer-chooseImage.js
 │       ├── answer-chooseVoiceEnglish.js
@@ -115,7 +115,7 @@ Each defines one prompt type and encapsulates its visual and logical behavior.
 
 | Component                        | Responsibility                                 |
 | -------------------------------- | ---------------------------------------------- |
-| `question-wordGerman.js`         | Shows the German word as text.                 |
+| `question-wordgerman.js`         | Shows the German word as text.                 |
 | `question-wordEnglish.js`        | Shows the English word (for reverse learning). |
 | `question-image.js`              | Displays an image as the prompt.               |
 | `question-voiceEnglish.js`       | Plays an English voice clip.                   |
@@ -129,7 +129,7 @@ Each defines an input or response method, encapsulated and self-contained.
 
 | Component                             | Responsibility                                   |
 | ------------------------------------- | ------------------------------------------------ |
-| `answer-chooseWordEnglish.js`         | Multiple-choice with English text answers.       |
+| `answer-choosewordenglish.js`         | Multiple-choice with English text answers.       |
 | `answer-chooseWordGerman.js`          | Reverse mode: choose German translation.         |
 | `answer-chooseImage.js`               | Multiple-choice with images.                     |
 | `answer-chooseVoiceEnglish.js`        | Choose between voice clips.                      |
