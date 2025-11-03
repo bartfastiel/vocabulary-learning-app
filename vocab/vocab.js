@@ -19,48 +19,61 @@ import "./answer/answer-choosewordenglish.js";
 import "./answer/answer-choosewordgerman.js";
 import "./answer/answer-choosevoiceenglish.js";
 import "./answer/answer-typewordenglish.js";
+import "./answer/answer-chooseimage.js";
 
 // === CONSTANTS ===
 // All available question–answer combinations
 const MODES = [
-    // === Text-based (German → English) ===
+    // // === Text-based (German → English) ===
+    // {
+    //     question: "vocab-question-wordgerman",
+    //     answer: "vocab-answer-choosewordenglish",
+    // },
+    // {
+    //     question: "vocab-question-wordgerman",
+    //     answer: "vocab-answer-typewordenglish",
+    // },
+    //
+    // // === Text-based (English → German) ===
+    // {
+    //     question: "vocab-question-wordenglish",
+    //     answer: "vocab-answer-choosewordgerman",
+    // },
+    //
+    // // === Audio question → English answers ===
+    // {
+    //     question: "vocab-question-voiceenglish",
+    //     answer: "vocab-answer-choosewordenglish",
+    // },
+    // {
+    //     question: "vocab-question-voiceenglish",
+    //     answer: "vocab-answer-typewordenglish",
+    // },
+    // {
+    //     question: "vocab-question-voiceenglish",
+    //     answer: "vocab-answer-choosevoiceenglish",
+    // },
+    //
+    // // === Image question → English answers ===
+    // {
+    //     question: "vocab-question-image",
+    //     answer: "vocab-answer-choosewordenglish",
+    // },
+    // {
+    //     question: "vocab-question-image",
+    //     answer: "vocab-answer-typewordenglish",
+    // },
+
+    // === Audio question → Image answers ===
     {
-        question: "vocab-question-wordgerman",
-        answer: "vocab-answer-choosewordenglish",
-    },
-    {
-        question: "vocab-question-wordgerman",
-        answer: "vocab-answer-typewordenglish",
+        question: "vocab-question-voiceenglish",
+        answer: "vocab-answer-chooseimage",
     },
 
-    // === Text-based (English → German) ===
+    // === Text question → Image answers ===
     {
         question: "vocab-question-wordenglish",
-        answer: "vocab-answer-choosewordgerman",
-    },
-
-    // === Audio question → English answers ===
-    {
-        question: "vocab-question-voiceenglish",
-        answer: "vocab-answer-choosewordenglish",
-    },
-    {
-        question: "vocab-question-voiceenglish",
-        answer: "vocab-answer-typewordenglish",
-    },
-    {
-        question: "vocab-question-voiceenglish",
-        answer: "vocab-answer-choosevoiceenglish",
-    },
-
-    // === Image question → English answers ===
-    {
-        question: "vocab-question-image",
-        answer: "vocab-answer-choosewordenglish",
-    },
-    {
-        question: "vocab-question-image",
-        answer: "vocab-answer-typewordenglish",
+        answer: "vocab-answer-chooseimage",
     },
 
     // === Future slots (planned / optional) ===
