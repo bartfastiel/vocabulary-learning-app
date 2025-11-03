@@ -13,19 +13,26 @@ mkdir -p log/image_responses
 # Alle Vokabeln mit allowImage=true extrahieren
 mapfile -t IMAGE_WORDS < <(jq -r '.[] | select(.allowImage == true) | .en' vocab.json)
 
+# sammle alle erwarteten Dateinamen
+ALL_FILES=()
+
 for word in "${IMAGE_WORDS[@]}"; do
-  WORD_LOWER=$(echo "$word" | tr '[:upper:]' '[:lower:]')
+  word=$(echo "$word" | tr -d '\r\n')
+  WORD_LOWER=$(printf "%s" "$word" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_')
   OUT_FILE="img/${WORD_LOWER}.png"
+  ALL_FILES+=("$OUT_FILE")
 
   # Skip, wenn Bild bereits vorhanden
   if [[ -f "$OUT_FILE" ]]; then
-    echo "⏩ Bild existiert bereits: $OUT_FILE"
     continue
   fi
 
-  echo "🎨 Erzeuge Bild für: $word"
+  # lese de und en aus json
+  word_de_and_en="en: $word, de: $(jq -r --arg en "$word" '.[] | select(.en == $en) | .de' vocab.json)"
+  # ersetze sonderzeichen
+  word_de_and_en=$(echo "$word_de_and_en" | sed 's/"/\\"/g' | sed "s/'/\\'/g" | tr -d '\n' | tr -d '\r')
 
-  PROMPT="Male ein Bild von '$word'. Hebe es deutlich hervor. Es soll groß mittig, deutlich gezeigt werden für ein Vokabelprogramm. Zeige es in seinem üblichen Kontext."
+  PROMPT="Male ein Bild von '$word_de_and_en'. Hebe es deutlich hervor. Es soll groß mittig, deutlich gezeigt werden für ein Vokabelprogramm. Zeige es in seinem üblichen Kontext."
 
   REQUEST_FILE="log/image_requests/${WORD_LOWER}.json"
   RESPONSE_FILE="log/image_responses/${WORD_LOWER}.json"
@@ -37,24 +44,15 @@ for word in "${IMAGE_WORDS[@]}"; do
     \"size\": \"$SIZE\"
   }" > "$REQUEST_FILE"
 
-  curl -s https://api.openai.com/v1/images/generations \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $API_KEY" \
-    -d @"$REQUEST_FILE" \
-    -o "$RESPONSE_FILE"
-
-  IMAGE_URL=$(jq -r '.data[0].url // empty' "$RESPONSE_FILE")
-
-  if [[ -n "$IMAGE_URL" ]]; then
-    curl -sL "$IMAGE_URL" -o "$OUT_FILE"
-    echo "✅ Gespeichert: $OUT_FILE"
-  else
-    echo "⚠️ Fehler: Keine Bild-URL für $word"
-    echo "$word" >> log/image_errors.txt
-    rm -f "$OUT_FILE"
-  fi
-
-  sleep 1
+  echo $PROMPT
+  echo
 done
 
 echo "🏁 Alle neuen Bilder gespeichert in ./img/"
+
+echo "These files are no longer needed and can be deleted to save space:"
+for file in img/*; do
+  if [[ ! " ${ALL_FILES[*]} " =~ " ${file} " ]]; then
+    echo "$file"
+  fi
+done
