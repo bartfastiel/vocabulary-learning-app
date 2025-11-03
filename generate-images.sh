@@ -11,7 +11,7 @@ mkdir -p log/image_requests
 mkdir -p log/image_responses
 
 # Alle Vokabeln mit allowImage=true extrahieren
-mapfile -t IMAGE_WORDS < <(jq -r '.[] | select(.allowImage == true) | .en' vocab.json)
+mapfile -t IMAGE_WORDS < <(jq -r '.[] | select(.allowImage == true) | .en' vocab/vocab.json | sort)
 
 # sammle alle erwarteten Dateinamen
 ALL_FILES=()
@@ -19,7 +19,7 @@ ALL_FILES=()
 for word in "${IMAGE_WORDS[@]}"; do
   word=$(echo "$word" | tr -d '\r\n')
   WORD_LOWER=$(printf "%s" "$word" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_')
-  OUT_FILE="img/${WORD_LOWER}.png"
+  OUT_FILE="assets/img/${WORD_LOWER}.png"
   ALL_FILES+=("$OUT_FILE")
 
   # Skip, wenn Bild bereits vorhanden
@@ -28,7 +28,7 @@ for word in "${IMAGE_WORDS[@]}"; do
   fi
 
   # lese de und en aus json
-  word_de_and_en="en: $word, de: $(jq -r --arg en "$word" '.[] | select(.en == $en) | .de' vocab.json)"
+  word_de_and_en="en: $word, de: $(jq -r --arg en "$word" '.[] | select(.en == $en) | .de' vocab/vocab.json)"
   # ersetze sonderzeichen
   word_de_and_en=$(echo "$word_de_and_en" | sed 's/"/\\"/g' | sed "s/'/\\'/g" | tr -d '\n' | tr -d '\r')
 
