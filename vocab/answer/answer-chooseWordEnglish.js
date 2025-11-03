@@ -86,9 +86,16 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
 
                 // disable all
                 Array.from(optionsDiv.children).forEach(btn => (btn.disabled = true));
-                nextBtn.style.display = "inline-block";
 
-                // identical to original flow — wait for “next” click
+                // use green dotted border for the correct answer if wrong
+                if (!isCorrect) {
+                    const correctBtn = Array.from(optionsDiv.children).find(btn => btn.textContent === correct);
+                    if (correctBtn) {
+                        correctBtn.style.border = "5px dotted green";
+                    }
+                }
+
+                nextBtn.style.display = "inline-block";
             };
             optionsDiv.appendChild(b);
         });
