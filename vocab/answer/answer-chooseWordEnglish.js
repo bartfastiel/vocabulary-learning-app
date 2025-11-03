@@ -1,6 +1,7 @@
 // vocab/answer/answer-chooseWordEnglish.js
 
 import {playVoice} from "../../core/audio.js";
+import "./elements/next-button.js"
 
 class VocabAnswerChooseWordEnglish extends HTMLElement {
     constructor() {
@@ -49,33 +50,22 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
         .option-btn:hover { background-color: #ffcc80; }
         .correct { background-color: #81c784 !important; }
         .wrong { background-color: #e57373 !important; }
-        #next-btn {
-          margin-top: 1rem;
-          padding: 0.6rem 1.2rem;
-          font-size: 1rem;
-          border: none;
-          border-radius: 6px;
-          background-color: #4dd0e1;
-          cursor: pointer;
-          display: none;
-        }
       </style>
 
       <div class="options"></div>
-      <button id="next-btn">Nächste Frage</button>
+      <next-button>Nächste Frage</next-button>
     `;
 
         const optionsDiv = this.shadowRoot.querySelector(".options");
-        const nextBtn = this.shadowRoot.querySelector("#next-btn");
+        const nextBtn = this.shadowRoot.querySelector("next-button");
 
-        nextBtn.onclick = () => {
+        nextBtn.addEventListener("next", () => {
             this.dispatchEvent(new CustomEvent("answered", {
                 bubbles: true,
-                detail: {correct: true} // correctness is handled by updatePoints already
+                detail: {correct: true}
             }));
-        };
+        });
 
-        // build option buttons
         options.forEach(opt => {
             const b = document.createElement("button");
             b.className = "option-btn";
@@ -99,7 +89,7 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
                     }
                 }
 
-                nextBtn.style.display = "inline-block";
+                nextBtn.show();
             };
             optionsDiv.appendChild(b);
         });

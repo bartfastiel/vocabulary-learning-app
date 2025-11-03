@@ -1,8 +1,9 @@
 // vocab/answer/answer-choosewordgerman.js
 //
 // Reverse-mode answer component: choose the correct German word
-// for a given English question. Behavior identical to choosewordenglish.
-//
+// for a given English question.
+
+import "./elements/next-button.js";
 
 class VocabAnswerChooseWordGerman extends HTMLElement {
     constructor() {
@@ -20,11 +21,14 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
         this.render();
     }
 
+    shuffle(arr) {
+        return arr.sort(() => Math.random() - 0.5);
+    }
+
     render() {
         const correct = this.word.de.toLowerCase();
         const wrong = this.shuffle(
-            this.vocabulary
-                .filter(v => v.de.toLowerCase() !== correct)
+            this.vocabulary.filter(v => v.de.toLowerCase() !== correct)
                 .slice(0, 3)
                 .map(v => v.de.toLowerCase())
         );
@@ -51,17 +55,18 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
       </style>
 
       <div class="options"></div>
+      <next-button>Nächste Frage</next-button>
     `;
 
         const optionsDiv = this.shadowRoot.querySelector(".options");
-        const nextBtn = this.shadowRoot.querySelector("#next-btn");
+        const nextBtn = this.shadowRoot.querySelector("next-button");
 
-        nextBtn.onclick = () => {
+        nextBtn.addEventListener("next", () => {
             this.dispatchEvent(new CustomEvent("answered", {
                 bubbles: true,
-                detail: {correct: true} // correctness is handled by updatePoints already
+                detail: { correct: true }
             }));
-        };
+        });
 
         options.forEach(opt => {
             const btn = document.createElement("button");
@@ -70,32 +75,21 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
             btn.onclick = () => {
                 const isCorrect = opt === correct;
                 btn.classList.add(isCorrect ? "correct" : "wrong");
-
                 (isCorrect ? this.soundCorrect : this.soundWrong).play();
-
                 this.updatePoints(isCorrect ? +1 : -1);
                 this.updateStreak(isCorrect);
 
-                // disable further clicks
                 Array.from(optionsDiv.children).forEach(b => (b.disabled = true));
 
-                // highlight correct answer if wrong
                 if (!isCorrect) {
-                    Array.from(optionsDiv.children).forEach(b => {
-                        if (b.textContent === correct) {
-                            b.classList.add("correct");
-                        }
-                    });
+                    const correctBtn = Array.from(optionsDiv.children).find(b => b.textContent === correct);
+                    if (correctBtn) correctBtn.classList.add("correct");
                 }
 
-                nextBtn.style.display = "inline-block";
+                nextBtn.show();
             };
             optionsDiv.appendChild(btn);
         });
-    }
-
-    shuffle(arr) {
-        return arr.sort(() => Math.random() - 0.5);
     }
 }
 

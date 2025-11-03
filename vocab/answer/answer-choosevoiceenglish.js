@@ -3,9 +3,9 @@
 // Answer mode: two-column layout:
 // Left: "🔈 Anhören" buttons (play audio)
 // Right: "Antwort wählen" buttons (select the correct word)
-//
 
 import { playVoice } from "../../core/audio.js";
+import "./elements/next-button.js";
 
 class VocabAnswerChooseVoiceEnglish extends HTMLElement {
     constructor() {
@@ -23,11 +23,14 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
         this.render();
     }
 
+    shuffle(arr) {
+        return arr.sort(() => Math.random() - 0.5);
+    }
+
     render() {
         const correct = this.word.en.toLowerCase();
         const wrong = this.shuffle(
-            this.vocabulary
-                .filter(v => v.en.toLowerCase() !== correct)
+            this.vocabulary.filter(v => v.en.toLowerCase() !== correct)
                 .slice(0, 3)
                 .map(v => v.en.toLowerCase())
         );
@@ -53,36 +56,24 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
           transition: background-color 0.2s;
         }
         .listen-btn:hover,
-        .choose-btn:hover {
-          background-color: #ffcc80;
-        }
+        .choose-btn:hover { background-color: #ffcc80; }
         .correct { background-color: #81c784 !important; }
         .wrong { background-color: #e57373 !important; }
-        #next-btn {
-          margin-top: 1rem;
-          padding: 0.6rem 1.2rem;
-          font-size: 1rem;
-          border: none;
-          border-radius: 6px;
-          background-color: #4dd0e1;
-          cursor: pointer;
-          display: none;
-        }
       </style>
 
       <div class="options"></div>
-      <button id="next-btn">Nächste Frage</button>
+      <next-button>Nächste Frage</next-button>
     `;
 
         const optionsDiv = this.shadowRoot.querySelector(".options");
-        const nextBtn = this.shadowRoot.querySelector("#next-btn");
+        const nextBtn = this.shadowRoot.querySelector("next-button");
 
-        nextBtn.onclick = () => {
+        nextBtn.addEventListener("next", () => {
             this.dispatchEvent(new CustomEvent("answered", {
                 bubbles: true,
-                detail: {correct: true} // correctness is handled by updatePoints already
+                detail: { correct: true }
             }));
-        };
+        });
 
         options.forEach(opt => {
             const listenBtn = document.createElement("button");
@@ -100,30 +91,27 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
                 (isCorrect ? this.soundCorrect : this.soundWrong).play();
                 this.updatePoints(isCorrect ? +1 : -1);
                 this.updateStreak(isCorrect);
+
                 Array.from(optionsDiv.querySelectorAll("button")).forEach(b => (b.disabled = true));
 
-                // if wrong, highlight correct answer
+                // Highlight correct answer if wrong
                 if (!isCorrect) {
-                    Array.from(optionsDiv.querySelectorAll(".choose-btn")).forEach(b => {
-                        if (b.textContent === "Antwort wählen" && b !== chooseBtn) {
-                            const correspondingOpt = options[Array.from(optionsDiv.children).indexOf(b) / 2];
-                            if (correspondingOpt === correct) {
-                                b.classList.add("correct");
-                            }
+                    const pairs = Array.from(optionsDiv.children);
+                    for (let i = 0; i < pairs.length; i += 2) {
+                        const maybeCorrect = options[i / 2];
+                        if (maybeCorrect === correct) {
+                            const correctChooseBtn = pairs[i + 1];
+                            if (correctChooseBtn) correctChooseBtn.classList.add("correct");
                         }
-                    });
+                    }
                 }
 
-                nextBtn.style.display = "inline-block";
+                nextBtn.show();
             };
 
             optionsDiv.appendChild(listenBtn);
             optionsDiv.appendChild(chooseBtn);
         });
-    }
-
-    shuffle(arr) {
-        return arr.sort(() => Math.random() - 0.5);
     }
 }
 

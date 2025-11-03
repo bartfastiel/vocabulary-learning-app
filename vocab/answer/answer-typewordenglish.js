@@ -1,8 +1,9 @@
 // vocab/answer/answer-typewordenglish.js
 //
 // Answer mode where the user types the English translation
-// for a shown German word. Fully mirrors the original text_input behavior.
-//
+// for a shown German word.
+
+import "./elements/next-button.js";
 
 class VocabAnswerTypeWordEnglish extends HTMLElement {
     constructor() {
@@ -61,7 +62,6 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
         const input = this.shadowRoot.getElementById("input");
         const button = this.shadowRoot.getElementById("submit");
 
-        // Auto-focus when key pressed
         document.body.addEventListener("keydown", function initType(e) {
             if (!input.disabled && /^[a-zA-Z]$/.test(e.key)) {
                 input.focus();
@@ -69,7 +69,6 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
             }
         });
 
-        // Enter key submits
         input.addEventListener("keydown", e => {
             if (e.key === "Enter" && !button.disabled) button.click();
         });
@@ -80,20 +79,16 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
                 answered = true;
                 const user = input.value.trim().toLowerCase();
                 const isCorrect = user === correct;
-
                 input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
                 (isCorrect ? this.soundCorrect : this.soundWrong).play();
-
                 this.updatePoints(isCorrect ? +1 : -1);
                 this.updateStreak(isCorrect);
-
                 input.disabled = true;
                 button.innerHTML = "Nächste Frage";
             } else {
-                // Dispatch answered event to proceed to next question
                 this.dispatchEvent(new CustomEvent("answered", {
                     bubbles: true,
-                    detail: { correct: true } // correctness is handled by updatePoints already
+                    detail: { correct: true }
                 }));
             }
         };
