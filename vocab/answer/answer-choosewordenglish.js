@@ -26,10 +26,10 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
     }
 
     render() {
-        const correct = this.word.en.toLowerCase();
-        const wrong = this.shuffle(this.vocabulary.filter(v => v.en.toLowerCase() !== correct))
+        let correct = this.word.en;
+        const wrong = this.shuffle(this.vocabulary.filter(v => v.en !== correct))
             .slice(0, 3)
-            .map(v => v.en.toLowerCase());
+            .map(v => v.en);
         const options = this.shuffle([correct, ...wrong]);
 
         this.shadowRoot.innerHTML = `

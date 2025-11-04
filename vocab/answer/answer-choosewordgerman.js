@@ -26,11 +26,11 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
     }
 
     render() {
-        const correct = this.word.de.toLowerCase();
+        let correct = this.word.de;
         const wrong = this.shuffle(
-            this.vocabulary.filter(v => v.de.toLowerCase() !== correct)
+            this.vocabulary.filter(v => v.de !== correct)
                 .slice(0, 3)
-                .map(v => v.de.toLowerCase())
+                .map(v => v.de)
         );
         const options = this.shuffle([correct, ...wrong]);
 
