@@ -1149,7 +1149,7 @@
   {
     "de": "Hose",
     "en": "trousers",
-    "allowImage": false
+    "allowImage": true
   },
   {
     "de": "Laden, Geschäft",
