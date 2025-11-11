@@ -91,7 +91,8 @@ function shuffle(arr) {
 class VocabTrainer extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({mode: "open"});
+        this.attachShadow({ mode: "open" });
+        this.vocabSets = [];
         this.vocab = [];
         this.index = 0;
     }
@@ -103,10 +104,41 @@ class VocabTrainer extends HTMLElement {
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
+          justify-content: flex-start;
           font-family: "Segoe UI", sans-serif;
+          width: 100%;
         }
+
+        #set-bar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          display: flex;
+          justify-content: center;
+          gap: 0.5rem;
+          background: rgba(255, 255, 255, 0.8);
+          padding: 0.4rem;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+          z-index: 10;
+        }
+
+        .set-btn {
+          background: #4dd0e1;
+          border: none;
+          border-radius: 8px;
+          padding: 0.4rem 0.9rem;
+          font-size: 0.95rem;
+          cursor: pointer;
+        }
+
+        .set-btn.active {
+          background: #26c6da;
+          font-weight: bold;
+        }
+
         #quiz-box {
+          margin-top: 3.2rem;
           background-color: white;
           border-radius: 16px;
           box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -119,28 +151,59 @@ class VocabTrainer extends HTMLElement {
           justify-content: space-between;
         }
       </style>
+
+      <div id="set-bar"></div>
       <div id="quiz-box">
         <div id="question"></div>
         <div id="answer"></div>
       </div>
     `;
 
-        fetch("vocab/vocab.json")
-            .then(r => r.json())
-            .then(data => {
-                this.vocab = shuffle(data);
-                this.nextRound();
-            })
-            .catch(err => {
-                this.shadowRoot.querySelector("#question").textContent =
-                    "❌ Fehler beim Laden von vocab.json";
-                console.error(err);
-            });
+        this.loadSets();
+    }
+
+    async loadSets() {
+        try {
+            const data = await fetch("vocab/vocab.json").then(r => r.json());
+            this.vocabSets = data;
+            this.renderSetButtons();
+            if (this.vocabSets.length > 0) {
+                this.loadSet(0);
+            }
+        } catch (err) {
+            this.shadowRoot.querySelector("#question").textContent =
+                "❌ Fehler beim Laden von vocab.json";
+            console.error(err);
+        }
+    }
+
+    renderSetButtons() {
+        const bar = this.shadowRoot.querySelector("#set-bar");
+        bar.innerHTML = "";
+        this.vocabSets.forEach((set, i) => {
+            const btn = document.createElement("button");
+            btn.textContent = set.name;
+            btn.className = "set-btn";
+            btn.onclick = () => this.loadSet(i);
+            bar.appendChild(btn);
+        });
+    }
+
+    loadSet(index) {
+        const bar = this.shadowRoot.querySelector("#set-bar");
+        bar.querySelectorAll(".set-btn").forEach((b, i) => {
+            b.classList.toggle("active", i === index);
+        });
+
+        this.currentSet = this.vocabSets[index];
+        this.vocab = shuffle([...this.currentSet.words]);
+        this.index = 0;
+        this.nextRound();
     }
 
     nextRound() {
         if (this.index >= this.vocab.length) {
-            alert("Alle Vokabeln geschafft!");
+            alert(`Alle Vokabeln aus „${this.currentSet.name}“ geschafft!`);
             this.index = 0;
             this.vocab = shuffle(this.vocab);
         }
@@ -148,7 +211,8 @@ class VocabTrainer extends HTMLElement {
         const word = this.vocab[this.index];
         const availableModes = MODES.filter(mode => {
             if (word.allowImage) return true;
-            return mode.question !== "vocab-question-image" && mode.answer !== "vocab-answer-chooseimage";
+            return mode.question !== "vocab-question-image" &&
+                mode.answer !== "vocab-answer-chooseimage";
         });
         const mode = availableModes[Math.floor(Math.random() * availableModes.length)];
 
