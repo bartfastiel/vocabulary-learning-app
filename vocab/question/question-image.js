@@ -33,6 +33,7 @@ class VocabQuestionImage extends HTMLElement {
           height: auto;
           border-radius: 12px;
           margin-bottom: 1rem;
+          max-height: 50vh;
         }
       </style>
 
