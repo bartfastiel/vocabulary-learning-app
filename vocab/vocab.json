@@ -1401,5 +1401,70 @@
         "allowImage": false
       }
     ]
+  },
+  {
+    "name": "Pets",
+    "words": [
+      {
+        "de": "Hamster",
+        "en": "hamster",
+        "allowImage": true
+      },
+      {
+        "de": "Fisch",
+        "en": "fish",
+        "allowImage": true
+      },
+      {
+        "de": "Henne",
+        "en": "hen",
+        "allowImage": true
+      },
+      {
+        "de": "Wellensittich",
+        "en": "budgie",
+        "allowImage": false
+      },
+      {
+        "de": "Spinne",
+        "en": "spider",
+        "allowImage": false
+      },
+      {
+        "de": "Maus",
+        "en": "mouse",
+        "allowImage": false
+      },
+      {
+        "de": "Hund",
+        "en": "dog",
+        "allowImage": false
+      },
+      {
+        "de": "Papagei",
+        "en": "parrot",
+        "allowImage": false
+      },
+      {
+        "de": "Hase",
+        "en": "rabbit",
+        "allowImage": false
+      },
+      {
+        "de": "Schildkröte",
+        "en": "turtle",
+        "allowImage": false
+      },
+      {
+        "de": "Katze",
+        "en": "cat",
+        "allowImage": false
+      },
+      {
+        "de": "Schlange",
+        "en": "snake",
+        "allowImage": false
+      }
+    ]
   }
 ]

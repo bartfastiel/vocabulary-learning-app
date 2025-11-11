@@ -7,10 +7,13 @@ MODEL="gpt-4o-mini-tts"
 FORMAT="mp3"
 VOICES=(alloy ash coral nova onyx)
 
-mkdir -p audio log/tts_requests log/tts_responses
+mkdir -p assets/audio/voice log/tts_requests log/tts_responses
 
-jq -r '.[].en' vocab.json | while IFS= read -r word; do
+# 🔍 Durchlaufe alle Sets und alle Wörter (neue JSON-Struktur!)
+jq -r '.[] | .words[]?.en' vocab/vocab.json | while IFS= read -r word; do
   word=$(echo "$word" | tr -d '\r\n')
+  [[ -z "$word" ]] && continue
+
   echo "🔤 Verarbeite Wort: >$word<"
   WORD_LOWER=$(printf "%s" "$word" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '_')
 
@@ -52,4 +55,4 @@ jq -r '.[].en' vocab.json | while IFS= read -r word; do
   done
 done
 
-echo "🏁 Fertig. Alle Audios liegen unter ./audio/"
+echo "🏁 Fertig. Alle Audios liegen unter ./assets/audio/voice/"
