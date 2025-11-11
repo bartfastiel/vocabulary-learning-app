@@ -1,18 +1,17 @@
 // core/app-shell.js
 //
-// Root-level component that reproduces the original HTML layout.
-// Hosts the vocab trainer and (when triggered) the rocket mini-game.
-// No logic related to scoring or vocab — only frame, layout, and toggling.
+// Layout: headline on top, below a two-column grid with equal-height
+// score and streak boxes.
 //
 
 import "../vocab/vocab.js";
 import "../game/rocket-game.js";
-import {PointsManager} from "../vocab/points.js";
+import { PointsManager } from "../vocab/points.js";
 
 class AppShell extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({mode: "open"});
+        this.attachShadow({ mode: "open" });
     }
 
     connectedCallback() {
@@ -31,17 +30,36 @@ class AppShell extends HTMLElement {
           justify-content: center;
         }
 
+        #quiz-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+
         h1 {
           font-size: 2rem;
-          margin-bottom: 0.4rem;
+          margin: 0 0 0.6rem 0;
+        }
+
+        .info-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.8rem;
+          width: 100%;
+          max-width: 420px;
         }
 
         #score, #streak-box {
-          font-size: 1rem;
-          margin-bottom: 0.4rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           background-color: #ffffff88;
-          padding: 0.4rem 1rem;
           border-radius: 12px;
+          padding: 0.6rem 1rem;
+          font-size: 1rem;
+          min-height: 2.5rem;
+          box-sizing: border-box;
         }
 
         #treasure {
@@ -50,26 +68,9 @@ class AppShell extends HTMLElement {
           display: none;
         }
 
-        #game-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 999;
-          display: none;
-        }
-
-        #quiz-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-        }
-
         #ship {
-          font-size: 2rem;
-          margin-top: 0.3rem;
+          font-size: 1.3rem;
+          margin-left: 0.5rem;
         }
 
         .streak-10 #ship { transform: scale(1.3); }
@@ -84,20 +85,32 @@ class AppShell extends HTMLElement {
           75% { transform: translateX(-5px); }
           100% { transform: translateX(0); }
         }
+
+        #game-container {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 999;
+          display: none;
+        }
       </style>
 
       <div id="quiz-container">
         <h1>🎓 Vokabeltrainer</h1>
 
-        <div id="score">
-          Punkte: <span id="points">0</span>
-          <span id="treasure">🪙</span>
-        </div>
+        <div class="info-grid">
+          <div id="score">
+            Punkte: <span id="points">0</span>
+            <span id="treasure">🪙</span>
+          </div>
 
-        <div id="streak-box">
-          Streak: <span id="streak">0</span> |
-          Rekord: <span id="streak-record">0</span>
-          <div id="ship">🚀</div>
+          <div id="streak-box">
+            Streak: <span id="streak">0</span>&nbsp;
+            Rekord: <span id="streak-record">0</span>
+            <span id="ship">🚀</span>
+          </div>
         </div>
 
         <vocab-trainer></vocab-trainer>
