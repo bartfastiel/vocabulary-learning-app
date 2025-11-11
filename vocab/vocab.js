@@ -164,7 +164,8 @@ class VocabTrainer extends HTMLElement {
 
     async loadSets() {
         try {
-            const data = await fetch("vocab/vocab.json").then(r => r.json());
+            const base = location.origin;
+            const data = await fetch(`${base}/vocab/vocab.json`).then(r => r.json());
             this.vocabSets = data;
             this.renderSetButtons();
             if (this.vocabSets.length > 0) {
