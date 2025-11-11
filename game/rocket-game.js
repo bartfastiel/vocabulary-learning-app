@@ -167,10 +167,17 @@ class RocketGame extends HTMLElement {
         });
 
         let touchX = null;
+        let hasShotThisTouch = false;
+
         canvas.addEventListener("touchstart", (e) => {
             const t = e.touches[0];
             placeRocketAtClientX(t.clientX);
-            shoot();
+
+            if (!hasShotThisTouch) {
+                shoot();
+                hasShotThisTouch = true;
+            }
+
             touchX = t.clientX;
         }, {passive: true});
 
@@ -182,6 +189,7 @@ class RocketGame extends HTMLElement {
 
         canvas.addEventListener("touchend", () => {
             touchX = null;
+            hasShotThisTouch = false; // wieder erlauben bei neuem Touch
         }, {passive: true});
 
         canvas.addEventListener("click", (e) => {
