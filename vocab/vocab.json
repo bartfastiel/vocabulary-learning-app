@@ -1423,47 +1423,47 @@
       {
         "de": "Wellensittich",
         "en": "budgie",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Spinne",
         "en": "spider",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Maus",
         "en": "mouse",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Hund",
         "en": "dog",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Papagei",
         "en": "parrot",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Hase",
         "en": "rabbit",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Schildkröte",
         "en": "turtle",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Katze",
         "en": "cat",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Schlange",
         "en": "snake",
-        "allowImage": false
+        "allowImage": true
       }
     ]
   }
