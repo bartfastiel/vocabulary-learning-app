@@ -164,17 +164,20 @@ class VocabTrainer extends HTMLElement {
 
     async loadSets() {
         try {
-            const base = location.origin;
-            const data = await fetch(`${base}/vocab/vocab.json`).then(r => r.json());
+            // Robust relativ zur Moduldatei (vocab/vocab.js) auflösen:
+            const url = new URL('./vocab.json', import.meta.url).href;
+
+            // Optional: no-cache, um Safari/S3-Caching-Fallen zu vermeiden
+            const res = await fetch(url, { cache: 'no-cache' });
+            const data = await res.json();
+
             this.vocabSets = data;
             this.renderSetButtons();
-            if (this.vocabSets.length > 0) {
-                this.loadSet(0);
-            }
+            if (this.vocabSets.length > 0) this.loadSet(0);
         } catch (err) {
             this.shadowRoot.querySelector("#question").textContent =
                 "❌ Fehler beim Laden von vocab.json";
-            console.error(err);
+            console.error("Fehler beim Laden von vocab.json:", err);
         }
     }
 
