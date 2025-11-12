@@ -60,6 +60,7 @@ class AppShell extends HTMLElement {
           font-size: 1rem;
           min-height: 2.5rem;
           box-sizing: border-box;
+          white-space: nowrap;
         }
 
         #treasure {
