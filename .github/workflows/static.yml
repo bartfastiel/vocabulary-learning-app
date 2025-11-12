@@ -33,6 +33,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Replace version number
+        run: |
+          VERSION=$(date -u +"%Y.%m.%d-%H%M%S")
+          echo "Replacing version placeholder in index.html with actual version: $VERSION"
+          sed -i "s/Entwicklungsversion/$VERSION/g" index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
