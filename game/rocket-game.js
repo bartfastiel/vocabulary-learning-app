@@ -179,22 +179,26 @@ class RocketGame extends HTMLElement {
             }
 
             touchX = t.clientX;
+            e.preventDefault();
         }, {passive: true});
 
         canvas.addEventListener("touchmove", (e) => {
             const t = e.touches[0];
             placeRocketAtClientX(t.clientX);
             touchX = t.clientX;
+            e.preventDefault();
         }, {passive: true});
 
         canvas.addEventListener("touchend", () => {
             touchX = null;
             hasShotThisTouch = false; // wieder erlauben bei neuem Touch
+            e.preventDefault();
         }, {passive: true});
 
         canvas.addEventListener("click", (e) => {
             placeRocketAtClientX(e.clientX);
             shoot();
+            e.preventDefault();
         });
 
         const flashBar = (el) => {
