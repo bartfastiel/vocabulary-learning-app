@@ -4,6 +4,7 @@
 // score and streak boxes.
 //
 
+import "./help-overlay.js";
 import "../vocab/vocab.js";
 import "../game/rocket-game.js";
 import { PointsManager } from "../vocab/points.js";
@@ -66,7 +67,15 @@ class AppShell extends HTMLElement {
         #treasure {
           margin-left: 10px;
           cursor: pointer;
-          display: none;
+          opacity: 1;
+          transition: opacity 0.2s, filter 0.2s;
+        }
+        
+        /* Neues Verhalten, wenn nicht genug Punkte */
+        #treasure.disabled {
+          cursor: default;
+          opacity: 0.3;
+          filter: grayscale(100%);
         }
 
         #ship {
@@ -96,7 +105,26 @@ class AppShell extends HTMLElement {
           z-index: 999;
           display: none;
         }
+        #info-btn {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          font-size: 1.2rem;
+          background: #26c6da;
+          color: white;
+          border: none;
+          padding: 0.4rem 0.7rem;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+        #info-btn:hover {
+          background: #00acc1;
+        }
+
       </style>
+
+      <button id="info-btn">ⓘ Hilfe</button>
+      <vocab-help></vocab-help>
 
       <div id="quiz-container">
         <h1>🎓 Vokabeltrainer</h1>
@@ -139,8 +167,9 @@ class AppShell extends HTMLElement {
         const setPoints = (value) => (pointsEl.textContent = value);
 
         treasureEl.addEventListener("click", () => {
+            if (treasureEl.classList.contains("disabled")) return;
+
             const currentPoints = getPoints();
-            if (currentPoints < 5) return;
 
             setPoints(currentPoints - 5);
 
@@ -150,10 +179,71 @@ class AppShell extends HTMLElement {
             gameContainer.innerHTML = "";
             gameContainer.append(game);
 
-            // Automatically close overlay when <rocket-game> is removed
             game.addEventListener("remove", () => {
                 gameContainer.style.display = "none";
             });
+        });
+
+        const help = this.shadowRoot.querySelector("vocab-help");
+        const infoBtn = this.shadowRoot.getElementById("info-btn");
+
+        infoBtn.onclick = () => this.startHelp(help);
+
+        if (!localStorage.getItem("vocabHelpSeen")) {
+            setTimeout(() => this.startHelp(help), 500);
+        }
+    }
+
+    async startHelp(help) {
+
+        // Warten bis vocab-trainer im Shadow DOM sichtbar ist
+        const trainer = await this.waitFor(() =>
+            this.shadowRoot.querySelector("vocab-trainer")
+        );
+        if (!trainer) return console.warn("Tutorial: Kein vocab-trainer gefunden");
+
+        // Warten bis ShadowRoot existiert
+        await this.waitFor(() => trainer.shadowRoot);
+
+        // jetzt im inneren Shadow warten:
+        await this.waitFor(() => trainer.shadowRoot.querySelector(".lesson-header"));
+        await this.waitFor(() => trainer.shadowRoot.querySelector("#question"));
+        await this.waitFor(() => trainer.shadowRoot.querySelector("#answer"));
+
+        help.start([
+            {
+                selector: () =>
+                    trainer.shadowRoot.querySelector(".lesson-header"),
+                text: "Hier kannst du die Lesson auswählen."
+            },
+            {
+                selector: () =>
+                    trainer.shadowRoot.querySelector("#question"),
+                text: "Hier steht die Aufgabe."
+            },
+            {
+                selector: () =>
+                    trainer.shadowRoot.querySelector("#answer"),
+                text: "Hier gibst du deine Antwort ein."
+            },
+            {
+                selector: () => this.shadowRoot.querySelector("#treasure"),
+                text: "Hier findest du den Taler. Sobald du 5 Punkte hast, kannst du damit das Spiel starten!"
+            },
+        ]);
+    }
+
+    waitFor(fn, interval = 50, timeout = 2000) {
+        return new Promise(resolve => {
+            const start = performance.now();
+            const tick = () => {
+                const result = fn();
+                console.log("waitFor tick:", result);
+                if (result) return resolve(result);
+                if (performance.now() - start > timeout) return resolve(null);
+                setTimeout(tick, interval);
+            };
+            tick();
         });
     }
 }

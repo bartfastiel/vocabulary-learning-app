@@ -57,6 +57,10 @@ export class PointsManager {
 
     // --- helpers ---
     checkTreasure() {
-        this.treasureEl.style.display = this.points < 5 ? "none" : "inline";
+        if (this.points < 5) {
+            this.treasureEl.classList.add("disabled");
+        } else {
+            this.treasureEl.classList.remove("disabled");
+        }
     }
 }
