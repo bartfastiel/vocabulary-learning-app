@@ -133,7 +133,7 @@ class RocketGame extends HTMLElement {
         gameCoinsEl.textContent = gameCoins;
 
         closeGame.onclick = () => {
-            this.remove(); // closes game overlay
+            this.dispatchEvent(new CustomEvent("close-game", { bubbles: true }));
         };
 
         const clamp = (x, min, max) => (x < min ? min : (x > max ? max : x));

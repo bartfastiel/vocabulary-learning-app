@@ -179,8 +179,10 @@ class AppShell extends HTMLElement {
             gameContainer.innerHTML = "";
             gameContainer.append(game);
 
-            game.addEventListener("remove", () => {
+            // Close overlay when rocket-game signals "close-game"
+            game.addEventListener("close-game", () => {
                 gameContainer.style.display = "none";
+                game.remove();
             });
         });
 
