@@ -1406,9 +1406,24 @@
     "name": "Pets",
     "words": [
       {
+        "de": "Haustier",
+        "en": "pet",
+        "allowImage": true
+      },
+      {
+        "de": "Tier",
+        "en": "animal",
+        "allowImage": false
+      },
+      {
         "de": "Hamster",
         "en": "hamster",
         "allowImage": true
+      },
+      {
+        "de": "Vogel",
+        "en": "bird",
+        "allowImage": false
       },
       {
         "de": "Fisch",
@@ -1464,6 +1479,26 @@
         "de": "Schlange",
         "en": "snake",
         "allowImage": true
+      },
+      {
+        "de": "Frettchen",
+        "en": "ferret",
+        "allowImage": false
+      },
+      {
+        "de": "Meerschweinchen",
+        "en": "guinea pig",
+        "allowImage": false
+      },
+      {
+        "de": "Pferd",
+        "en": "horse",
+        "allowImage": false
+      },
+      {
+        "de": "Mäuse",
+        "en": "mice",
+        "allowImage": false
       }
     ]
   }
