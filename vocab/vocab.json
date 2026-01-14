@@ -1413,7 +1413,7 @@
       {
         "de": "Tier",
         "en": "animal",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Hamster",
@@ -1423,7 +1423,7 @@
       {
         "de": "Vogel",
         "en": "bird",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Fisch",
@@ -1483,22 +1483,22 @@
       {
         "de": "Frettchen",
         "en": "ferret",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Meerschweinchen",
         "en": "guinea pig",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Pferd",
         "en": "horse",
-        "allowImage": false
+        "allowImage": true
       },
       {
         "de": "Mäuse",
         "en": "mice",
-        "allowImage": false
+        "allowImage": true
       }
     ]
   }

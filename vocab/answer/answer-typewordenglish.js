@@ -4,6 +4,7 @@
 // for a shown German word.
 
 import "./elements/next-button.js";
+import {playVoice} from "../../core/audio.js";
 
 class VocabAnswerTypeWordEnglish extends HTMLElement {
     constructor() {
@@ -100,6 +101,7 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
                 const isCorrect = user === correct;
                 input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
                 (isCorrect ? this.soundCorrect : this.soundWrong).play();
+                playVoice(this.word.en);
                 this.updatePoints(isCorrect ? +1 : -1);
                 this.updateStreak(isCorrect);
                 input.disabled = true;

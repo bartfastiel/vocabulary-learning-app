@@ -4,6 +4,7 @@
 // for a given English question.
 
 import "./elements/next-button.js";
+import {playVoice} from "../../core/audio.js";
 
 class VocabAnswerChooseWordGerman extends HTMLElement {
     constructor() {
@@ -76,6 +77,7 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
                 const isCorrect = opt === correct;
                 btn.classList.add(isCorrect ? "correct" : "wrong");
                 (isCorrect ? this.soundCorrect : this.soundWrong).play();
+                playVoice(this.word.en);
                 this.updatePoints(isCorrect ? +1 : -1);
                 this.updateStreak(isCorrect);
 
