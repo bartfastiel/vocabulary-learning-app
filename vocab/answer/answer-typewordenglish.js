@@ -61,7 +61,17 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
       </style>
 
       <div class="container">
-        <input type="text" id="input" placeholder="Antwort eingeben" />
+      <input
+        type="text"
+        id="input"
+        name="vocab-${crypto.randomUUID()}"
+        placeholder="Antwort eingeben"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        inputmode="text"
+      />
         <button id="submit">Abschicken</button>
         <div id="feedback"></div>
       </div>
