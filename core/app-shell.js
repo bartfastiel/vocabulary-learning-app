@@ -21,122 +21,152 @@ class AppShell extends HTMLElement {
         this.shadowRoot.innerHTML = `
       <style>
         html, :host, body {
-          margin: 0;
-          padding: 0;
-          height: 100%;
-          overflow: hidden;
+          margin: 0; padding: 0; height: 100%; overflow: hidden;
           font-family: "Segoe UI", sans-serif;
-          background: linear-gradient(to right, #74ebd5, #acb6e5);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
+          background: #0d0d2b;
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
         }
 
+        /* ── Animated background ── */
+        #bg {
+          position: fixed; inset: 0; z-index: 0;
+          background: linear-gradient(135deg, #0d0d2b 0%, #1a0533 50%, #0d1f3c 100%);
+          animation: bgShift 12s ease-in-out infinite alternate;
+        }
+        @keyframes bgShift {
+          0%   { background: linear-gradient(135deg, #0d0d2b, #1a0533, #0d1f3c); }
+          50%  { background: linear-gradient(135deg, #0f1f40, #200d40, #0d2b1f); }
+          100% { background: linear-gradient(135deg, #150d2b, #0d2040, #2b0d1a); }
+        }
+
+        .orb {
+          position: absolute; border-radius: 50%;
+          filter: blur(80px); opacity: 0.45;
+          animation: float 14s ease-in-out infinite;
+        }
+        .orb1 { width: 420px; height: 420px; background: #7c3aed; top: -120px; left: -100px; animation-duration: 16s; }
+        .orb2 { width: 350px; height: 350px; background: #06b6d4; bottom: -80px; right: -80px; animation-duration: 12s; animation-delay: -4s; }
+        .orb3 { width: 280px; height: 280px; background: #10b981; top: 40%; left: 60%; animation-duration: 18s; animation-delay: -8s; }
+        .orb4 { width: 200px; height: 200px; background: #f59e0b; top: 20%; right: 20%; animation-duration: 10s; animation-delay: -2s; }
+
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33%       { transform: translate(30px, -40px) scale(1.08); }
+          66%       { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* ── Layout ── */
         #quiz-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
+          position: relative; z-index: 1;
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
         }
 
         h1 {
-          font-size: 2rem;
-          margin: 0 0 0.6rem 0;
+          font-size: 2rem; margin: 0 0 0.6rem 0;
+          color: #fff;
+          text-shadow: 0 0 20px rgba(124,58,237,0.9), 0 0 40px rgba(6,182,212,0.6);
+          animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+        @keyframes titleGlow {
+          from { text-shadow: 0 0 16px rgba(124,58,237,0.8), 0 0 32px rgba(6,182,212,0.5); }
+          to   { text-shadow: 0 0 28px rgba(124,58,237,1),   0 0 56px rgba(6,182,212,0.9), 0 0 80px rgba(16,185,129,0.4); }
         }
 
         .info-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0.8rem;
-          width: 100%;
-          max-width: 420px;
+          display: grid; grid-template-columns: 1fr 1fr;
+          gap: 0.8rem; width: 100%; max-width: 420px;
         }
 
         #score, #streak-box {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: #ffffff88;
-          border-radius: 12px;
-          padding: 0.6rem 1rem;
-          font-size: 1rem;
-          min-height: 2.5rem;
-          box-sizing: border-box;
-          white-space: nowrap;
+          display: flex; align-items: center; justify-content: center;
+          background: rgba(255,255,255,0.08);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255,255,255,0.18);
+          border-radius: 14px;
+          padding: 0.6rem 1rem; font-size: 1rem;
+          min-height: 2.5rem; box-sizing: border-box;
+          white-space: nowrap; color: #fff;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
         }
 
         #treasure {
-          margin-left: 10px;
-          cursor: pointer;
-          opacity: 1;
-          transition: opacity 0.2s, filter 0.2s;
+          margin-left: 10px; cursor: pointer;
+          transition: transform 0.2s, filter 0.2s, opacity 0.2s;
+          animation: treasurePulse 2s ease-in-out infinite;
         }
-        
-        /* Neues Verhalten, wenn nicht genug Punkte */
+        @keyframes treasurePulse {
+          0%, 100% { filter: drop-shadow(0 0 4px #f59e0b); }
+          50%       { filter: drop-shadow(0 0 12px #f59e0b) drop-shadow(0 0 24px #fbbf24); }
+        }
         #treasure.disabled {
-          cursor: default;
-          opacity: 0.3;
-          filter: grayscale(100%);
+          cursor: default; opacity: 0.25;
+          filter: grayscale(100%); animation: none;
         }
+        #treasure:not(.disabled):hover { transform: scale(1.3); }
 
-        #ship {
-          font-size: 1.3rem;
-          margin-left: 0.5rem;
-        }
-
+        #ship { font-size: 1.3rem; margin-left: 0.5rem; }
         .streak-10 #ship { transform: scale(1.3); }
         .streak-15 #ship { transform: scale(1.6) rotate(15deg); }
         .streak-20 #ship { transform: scale(2) rotate(360deg); }
         .streak-broken #ship { animation: shake 0.5s; color: #e53935; }
 
         @keyframes shake {
-          0% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          50% { transform: translateX(5px); }
-          75% { transform: translateX(-5px); }
+          0%   { transform: translateX(0); }
+          25%  { transform: translateX(-5px); }
+          50%  { transform: translateX(5px); }
+          75%  { transform: translateX(-5px); }
           100% { transform: translateX(0); }
         }
 
-.top-right-btns {
-          position: absolute;
-          top: 10px; right: 12px;
+        /* ── Buttons ── */
+        .top-right-btns {
+          position: absolute; top: 10px; right: 12px; z-index: 2;
           display: flex; flex-direction: column; gap: 6px;
         }
         #info-btn, #edit-vocab-btn {
           font-size: 0.95rem;
-          background: #26c6da;
-          color: white;
-          border: none;
-          padding: 0.4rem 0.7rem;
-          border-radius: 8px;
-          cursor: pointer;
-          white-space: nowrap;
+          background: rgba(99,102,241,0.75);
+          backdrop-filter: blur(8px);
+          color: white; border: 1px solid rgba(255,255,255,0.25);
+          padding: 0.4rem 0.7rem; border-radius: 10px;
+          cursor: pointer; white-space: nowrap;
+          box-shadow: 0 0 12px rgba(99,102,241,0.5);
+          transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
         }
-        #info-btn:hover, #edit-vocab-btn:hover { background: #00acc1; }
+        #info-btn:hover, #edit-vocab-btn:hover {
+          background: rgba(99,102,241,1);
+          box-shadow: 0 0 20px rgba(99,102,241,0.9);
+          transform: translateY(-2px);
+        }
 
+        /* ── Avatar ── */
         #avatar-btn {
-          position: absolute;
-          top: 10px;
-          left: 12px;
-          width: 46px;
-          height: 46px;
-          border-radius: 50%;
-          overflow: hidden;
-          cursor: pointer;
-          border: 3px solid rgba(255,255,255,0.8);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          position: absolute; top: 10px; left: 12px; z-index: 2;
+          width: 46px; height: 46px; border-radius: 50%;
+          overflow: hidden; cursor: pointer;
+          border: 2px solid rgba(255,255,255,0.4);
+          box-shadow: 0 0 14px rgba(124,58,237,0.7), 0 0 28px rgba(6,182,212,0.4);
           transition: transform 0.2s, box-shadow 0.2s;
-          background: #e0f7fa;
+          background: #1e1b4b;
         }
         #avatar-btn:hover {
-          transform: scale(1.1);
-          box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+          transform: scale(1.12);
+          box-shadow: 0 0 22px rgba(124,58,237,1), 0 0 44px rgba(6,182,212,0.7);
         }
         #avatar-mini { width: 100%; height: 100%; }
         #avatar-mini svg { width: 100%; height: 100%; display: block; }
 
       </style>
+
+      <div id="bg">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+        <div class="orb orb4"></div>
+      </div>
 
       <div class="top-right-btns">
         <button id="info-btn">ⓘ Hilfe</button>

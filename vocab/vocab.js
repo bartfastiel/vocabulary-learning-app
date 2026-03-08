@@ -110,163 +110,102 @@ class VocabTrainer extends HTMLElement {
         }
 
         .lesson-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          position: relative;
-          background: radial-gradient(circle at 20% 30%, #4dd0e1 0%, #007ea7 100%);
-          color: #fff;
-          border-radius: 14px 14px 0 0;
-          padding: 0.9rem 1.2rem;
-          cursor: pointer;
-          user-select: none;
-          font-size: 1.1rem;
-          font-weight: 500;
-          width: 400px;
-          max-width: 90vw;
-          margin-top: 1.2rem; /* etwas Abstand nach oben */
-          box-shadow: 0 0 15px rgba(0, 200, 255, 0.25),
-                      inset 0 0 12px rgba(255, 255, 255, 0.1);
-          overflow: hidden;
-          transition: box-shadow 0.3s ease, transform 0.2s ease;
+          display: flex; align-items: center; justify-content: space-between;
+          position: relative; overflow: hidden;
+          background: linear-gradient(135deg, rgba(99,102,241,0.85) 0%, rgba(6,182,212,0.85) 100%);
+          backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.25);
+          color: #fff; border-radius: 16px 16px 0 0;
+          padding: 0.9rem 1.2rem; cursor: pointer; user-select: none;
+          font-size: 1.1rem; font-weight: 600;
+          width: 400px; max-width: 90vw; margin-top: 1.2rem;
+          box-shadow: 0 0 20px rgba(99,102,241,0.5), 0 0 40px rgba(6,182,212,0.2);
+          transition: box-shadow 0.3s, transform 0.2s;
         }
-        
-        .lesson-header::before {
-          content: "";
-          position: absolute;
-          top: -100%;
-          left: -100%;
-          width: 300%;
-          height: 300%;
-          background: conic-gradient(from 180deg at 50% 50%, 
-                      rgba(255, 255, 255, 0.15), 
-                      transparent 30%, 
-                      rgba(255, 255, 255, 0.15), 
-                      transparent 60%);
-          opacity: 0;
-          transition: opacity 0.5s ease, transform 0.8s ease;
-          z-index: 0;
+        .lesson-header::after {
+          content: ""; position: absolute; inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+          transform: translateX(-100%);
+          transition: transform 0.6s ease;
         }
-        
-        .lesson-header:hover::before {
-          opacity: 1;
-          transform: rotate(20deg);
-        }
-        
+        .lesson-header:hover::after { transform: translateX(100%); }
         .lesson-header:hover {
           transform: translateY(-2px);
-          box-shadow: 0 0 25px rgba(0, 240, 255, 0.5),
-                      inset 0 0 20px rgba(255, 255, 255, 0.15);
+          box-shadow: 0 0 30px rgba(99,102,241,0.8), 0 0 60px rgba(6,182,212,0.4);
         }
-        
         .lesson-header span.title {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          z-index: 1;
+          overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 1;
         }
-        
         .lesson-header .burger {
-          font-size: 1.5rem;
-          margin-left: 0.8rem;
-          line-height: 1;
-          transition: transform 0.3s ease;
-          z-index: 1;
+          font-size: 1.4rem; margin-left: 0.8rem; line-height: 1;
+          transition: transform 0.3s, filter 0.3s; z-index: 1;
         }
-        
         .lesson-header:hover .burger {
           transform: rotate(90deg) scale(1.2);
-          filter: drop-shadow(0 0 4px cyan);
-        }
-
-        .lesson-header span.title {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        .lesson-header .burger {
-          font-size: 1.4rem;
-          margin-left: 0.8rem;
-          line-height: 1;
-          transition: transform 0.2s ease;
-        }
-
-        .lesson-header:hover .burger {
-          transform: rotate(90deg);
+          filter: drop-shadow(0 0 6px cyan);
         }
 
         #quiz-box {
-          background-color: white;
-          border-radius: 0 0 16px 16px;
-          box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-          padding: 1.5rem;
-          max-width: 90vw;
-          width: 400px;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
+          background: rgba(255,255,255,0.07);
+          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,0.15);
+          border-top: none;
+          border-radius: 0 0 18px 18px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+          padding: 1.5rem; max-width: 90vw; width: 400px;
+          text-align: center; color: #fff;
+          display: flex; flex-direction: column; justify-content: space-between;
         }
 
         /* Popup */
         .lesson-popup {
-          position: fixed;
-          top: 50%;
-          left: 50%;
+          position: fixed; top: 50%; left: 50%;
           transform: translate(-50%, -50%);
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-          padding: 1rem;
-          width: 320px;
-          max-width: 90vw;
-          z-index: 200;
-          display: none;
+          background: rgba(15,15,40,0.92);
+          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(99,102,241,0.4);
+          border-radius: 16px;
+          box-shadow: 0 0 40px rgba(99,102,241,0.4), 0 20px 60px rgba(0,0,0,0.6);
+          padding: 1rem; width: 320px; max-width: 90vw;
+          z-index: 200; display: none; color: #fff;
         }
 
         .lesson-popup.active { display: block; }
 
         .lesson-popup h2 {
-          font-size: 1.1rem;
-          margin: 0 0 0.8rem 0;
-          text-align: center;
+          font-size: 1.1rem; margin: 0 0 0.8rem 0;
+          text-align: center; color: #c4b5fd;
+          text-shadow: 0 0 10px rgba(167,139,250,0.6);
         }
 
         .lesson-popup .set-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.6rem;
-          max-height: 50vh;
-          overflow-y: auto;
+          display: flex; flex-direction: column;
+          gap: 0.6rem; max-height: 50vh; overflow-y: auto;
         }
 
         .lesson-popup button {
-          background: #4dd0e1;
-          color: white;
-          border: none;
-          border-radius: 8px;
-          padding: 0.6rem 1rem;
-          font-size: 1rem;
-          cursor: pointer;
-          transition: background 0.2s;
+          background: rgba(99,102,241,0.3);
+          color: #e0e7ff; border: 1px solid rgba(99,102,241,0.4);
+          border-radius: 10px; padding: 0.6rem 1rem;
+          font-size: 1rem; cursor: pointer;
+          transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
         }
-
         .lesson-popup button:hover {
-          background: #26c6da;
+          background: rgba(99,102,241,0.7);
+          box-shadow: 0 0 14px rgba(99,102,241,0.6);
+          transform: translateX(4px);
         }
-
         .lesson-popup button.active {
-          background: #0097a7;
-          font-weight: bold;
+          background: rgba(99,102,241,0.9);
+          box-shadow: 0 0 20px rgba(99,102,241,0.8);
+          font-weight: bold; color: #fff;
         }
 
         .lesson-overlay {
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.4);
-          z-index: 150;
-          display: none;
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.6);
+          backdrop-filter: blur(4px);
+          z-index: 150; display: none;
         }
 
         .lesson-overlay.active { display: block; }
