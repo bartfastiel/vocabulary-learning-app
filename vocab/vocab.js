@@ -112,26 +112,26 @@ class VocabTrainer extends HTMLElement {
         .lesson-header {
           display: flex; align-items: center; justify-content: space-between;
           position: relative; overflow: hidden;
-          background: linear-gradient(135deg, rgba(99,102,241,0.85) 0%, rgba(6,182,212,0.85) 100%);
+          background: linear-gradient(135deg, rgba(14,165,233,0.85) 0%, rgba(56,189,248,0.85) 100%);
           backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255,255,255,0.25);
+          border: 1px solid rgba(255,255,255,0.5);
           color: #fff; border-radius: 16px 16px 0 0;
           padding: 0.9rem 1.2rem; cursor: pointer; user-select: none;
           font-size: 1.1rem; font-weight: 600;
           width: 400px; max-width: 90vw; margin-top: 1.2rem;
-          box-shadow: 0 0 20px rgba(99,102,241,0.5), 0 0 40px rgba(6,182,212,0.2);
+          box-shadow: 0 0 20px rgba(56,189,248,0.5), 0 0 40px rgba(125,211,252,0.2);
           transition: box-shadow 0.3s, transform 0.2s;
         }
         .lesson-header::after {
           content: ""; position: absolute; inset: 0;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
           transform: translateX(-100%);
           transition: transform 0.6s ease;
         }
         .lesson-header:hover::after { transform: translateX(100%); }
         .lesson-header:hover {
           transform: translateY(-2px);
-          box-shadow: 0 0 30px rgba(99,102,241,0.8), 0 0 60px rgba(6,182,212,0.4);
+          box-shadow: 0 0 30px rgba(14,165,233,0.8), 0 0 60px rgba(56,189,248,0.5);
         }
         .lesson-header span.title {
           overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 1;
@@ -146,14 +146,14 @@ class VocabTrainer extends HTMLElement {
         }
 
         #quiz-box {
-          background: rgba(255,255,255,0.07);
+          background: rgba(255,255,255,0.55);
           backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.15);
+          border: 1px solid rgba(255,255,255,0.8);
           border-top: none;
           border-radius: 0 0 18px 18px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+          box-shadow: 0 20px 60px rgba(56,189,248,0.2), inset 0 1px 0 rgba(255,255,255,0.9);
           padding: 1.5rem; max-width: 90vw; width: 400px;
-          text-align: center; color: #fff;
+          text-align: center; color: #0c4a6e;
           display: flex; flex-direction: column; justify-content: space-between;
         }
 
@@ -161,21 +161,20 @@ class VocabTrainer extends HTMLElement {
         .lesson-popup {
           position: fixed; top: 50%; left: 50%;
           transform: translate(-50%, -50%);
-          background: rgba(15,15,40,0.92);
+          background: rgba(224,242,254,0.95);
           backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(99,102,241,0.4);
+          border: 1px solid rgba(255,255,255,0.8);
           border-radius: 16px;
-          box-shadow: 0 0 40px rgba(99,102,241,0.4), 0 20px 60px rgba(0,0,0,0.6);
+          box-shadow: 0 0 40px rgba(56,189,248,0.3), 0 20px 60px rgba(0,0,0,0.15);
           padding: 1rem; width: 320px; max-width: 90vw;
-          z-index: 200; display: none; color: #fff;
+          z-index: 200; display: none; color: #0c4a6e;
         }
 
         .lesson-popup.active { display: block; }
 
         .lesson-popup h2 {
           font-size: 1.1rem; margin: 0 0 0.8rem 0;
-          text-align: center; color: #c4b5fd;
-          text-shadow: 0 0 10px rgba(167,139,250,0.6);
+          text-align: center; color: #0369a1;
         }
 
         .lesson-popup .set-list {
@@ -184,21 +183,21 @@ class VocabTrainer extends HTMLElement {
         }
 
         .lesson-popup button {
-          background: rgba(99,102,241,0.3);
-          color: #e0e7ff; border: 1px solid rgba(99,102,241,0.4);
+          background: rgba(56,189,248,0.2);
+          color: #0c4a6e; border: 1px solid rgba(56,189,248,0.4);
           border-radius: 10px; padding: 0.6rem 1rem;
           font-size: 1rem; cursor: pointer;
           transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
         }
         .lesson-popup button:hover {
-          background: rgba(99,102,241,0.7);
-          box-shadow: 0 0 14px rgba(99,102,241,0.6);
+          background: rgba(14,165,233,0.35);
+          box-shadow: 0 0 14px rgba(56,189,248,0.4);
           transform: translateX(4px);
         }
         .lesson-popup button.active {
-          background: rgba(99,102,241,0.9);
-          box-shadow: 0 0 20px rgba(99,102,241,0.8);
-          font-weight: bold; color: #fff;
+          background: rgba(14,165,233,0.7);
+          box-shadow: 0 0 20px rgba(56,189,248,0.5);
+          font-weight: bold; color: white;
         }
 
         .lesson-overlay {

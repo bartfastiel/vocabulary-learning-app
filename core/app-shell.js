@@ -23,7 +23,7 @@ class AppShell extends HTMLElement {
         html, :host, body {
           margin: 0; padding: 0; height: 100%; overflow: hidden;
           font-family: "Segoe UI", sans-serif;
-          background: #0d0d2b;
+          background: #daf0fa;
           display: flex; flex-direction: column;
           align-items: center; justify-content: center;
         }
@@ -31,24 +31,23 @@ class AppShell extends HTMLElement {
         /* ── Animated background ── */
         #bg {
           position: fixed; inset: 0; z-index: 0;
-          background: linear-gradient(135deg, #0d0d2b 0%, #1a0533 50%, #0d1f3c 100%);
           animation: bgShift 12s ease-in-out infinite alternate;
         }
         @keyframes bgShift {
-          0%   { background: linear-gradient(135deg, #0d0d2b, #1a0533, #0d1f3c); }
-          50%  { background: linear-gradient(135deg, #0f1f40, #200d40, #0d2b1f); }
-          100% { background: linear-gradient(135deg, #150d2b, #0d2040, #2b0d1a); }
+          0%   { background: linear-gradient(135deg, #bde8f7, #d4f1ff, #a8ddf5); }
+          50%  { background: linear-gradient(135deg, #c8f0ff, #b0e4f8, #cdf3ff); }
+          100% { background: linear-gradient(135deg, #a8ddf5, #c0ecff, #b8e8fc); }
         }
 
         .orb {
           position: absolute; border-radius: 50%;
-          filter: blur(80px); opacity: 0.45;
+          filter: blur(80px); opacity: 0.55;
           animation: float 14s ease-in-out infinite;
         }
-        .orb1 { width: 420px; height: 420px; background: #7c3aed; top: -120px; left: -100px; animation-duration: 16s; }
-        .orb2 { width: 350px; height: 350px; background: #06b6d4; bottom: -80px; right: -80px; animation-duration: 12s; animation-delay: -4s; }
-        .orb3 { width: 280px; height: 280px; background: #10b981; top: 40%; left: 60%; animation-duration: 18s; animation-delay: -8s; }
-        .orb4 { width: 200px; height: 200px; background: #f59e0b; top: 20%; right: 20%; animation-duration: 10s; animation-delay: -2s; }
+        .orb1 { width: 420px; height: 420px; background: #7dd3fc; top: -120px; left: -100px; animation-duration: 16s; }
+        .orb2 { width: 350px; height: 350px; background: #38bdf8; bottom: -80px; right: -80px; animation-duration: 12s; animation-delay: -4s; }
+        .orb3 { width: 280px; height: 280px; background: #93c5fd; top: 40%; left: 60%; animation-duration: 18s; animation-delay: -8s; }
+        .orb4 { width: 200px; height: 200px; background: #bae6fd; top: 20%; right: 20%; animation-duration: 10s; animation-delay: -2s; }
 
         @keyframes float {
           0%, 100% { transform: translate(0, 0) scale(1); }
@@ -65,13 +64,13 @@ class AppShell extends HTMLElement {
 
         h1 {
           font-size: 2rem; margin: 0 0 0.6rem 0;
-          color: #fff;
-          text-shadow: 0 0 20px rgba(124,58,237,0.9), 0 0 40px rgba(6,182,212,0.6);
+          color: #0c4a6e;
+          text-shadow: 0 0 20px rgba(56,189,248,0.7), 0 0 40px rgba(125,211,252,0.5);
           animation: titleGlow 3s ease-in-out infinite alternate;
         }
         @keyframes titleGlow {
-          from { text-shadow: 0 0 16px rgba(124,58,237,0.8), 0 0 32px rgba(6,182,212,0.5); }
-          to   { text-shadow: 0 0 28px rgba(124,58,237,1),   0 0 56px rgba(6,182,212,0.9), 0 0 80px rgba(16,185,129,0.4); }
+          from { text-shadow: 0 0 16px rgba(56,189,248,0.6), 0 0 32px rgba(125,211,252,0.4); }
+          to   { text-shadow: 0 0 28px rgba(14,165,233,0.9), 0 0 56px rgba(56,189,248,0.7), 0 0 80px rgba(147,197,253,0.4); }
         }
 
         .info-grid {
@@ -81,15 +80,15 @@ class AppShell extends HTMLElement {
 
         #score, #streak-box {
           display: flex; align-items: center; justify-content: center;
-          background: rgba(255,255,255,0.08);
+          background: rgba(255,255,255,0.45);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255,255,255,0.18);
+          border: 1px solid rgba(255,255,255,0.7);
           border-radius: 14px;
           padding: 0.6rem 1rem; font-size: 1rem;
           min-height: 2.5rem; box-sizing: border-box;
-          white-space: nowrap; color: #fff;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+          white-space: nowrap; color: #0c4a6e;
+          box-shadow: 0 4px 20px rgba(56,189,248,0.2), inset 0 1px 0 rgba(255,255,255,0.8);
         }
 
         #treasure {
@@ -128,17 +127,17 @@ class AppShell extends HTMLElement {
         }
         #info-btn, #edit-vocab-btn {
           font-size: 0.95rem;
-          background: rgba(99,102,241,0.75);
+          background: rgba(14,165,233,0.75);
           backdrop-filter: blur(8px);
-          color: white; border: 1px solid rgba(255,255,255,0.25);
+          color: white; border: 1px solid rgba(255,255,255,0.4);
           padding: 0.4rem 0.7rem; border-radius: 10px;
           cursor: pointer; white-space: nowrap;
-          box-shadow: 0 0 12px rgba(99,102,241,0.5);
+          box-shadow: 0 0 12px rgba(56,189,248,0.4);
           transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
         }
         #info-btn:hover, #edit-vocab-btn:hover {
-          background: rgba(99,102,241,1);
-          box-shadow: 0 0 20px rgba(99,102,241,0.9);
+          background: rgba(2,132,199,0.95);
+          box-shadow: 0 0 20px rgba(56,189,248,0.7);
           transform: translateY(-2px);
         }
 
@@ -147,14 +146,14 @@ class AppShell extends HTMLElement {
           position: absolute; top: 10px; left: 12px; z-index: 2;
           width: 46px; height: 46px; border-radius: 50%;
           overflow: hidden; cursor: pointer;
-          border: 2px solid rgba(255,255,255,0.4);
-          box-shadow: 0 0 14px rgba(124,58,237,0.7), 0 0 28px rgba(6,182,212,0.4);
+          border: 2px solid rgba(255,255,255,0.7);
+          box-shadow: 0 0 14px rgba(56,189,248,0.6), 0 0 28px rgba(125,211,252,0.4);
           transition: transform 0.2s, box-shadow 0.2s;
-          background: #1e1b4b;
+          background: #e0f2fe;
         }
         #avatar-btn:hover {
           transform: scale(1.12);
-          box-shadow: 0 0 22px rgba(124,58,237,1), 0 0 44px rgba(6,182,212,0.7);
+          box-shadow: 0 0 22px rgba(14,165,233,0.8), 0 0 44px rgba(56,189,248,0.6);
         }
         #avatar-mini { width: 100%; height: 100%; }
         #avatar-mini svg { width: 100%; height: 100%; display: block; }
