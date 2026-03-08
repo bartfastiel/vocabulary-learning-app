@@ -6,7 +6,7 @@
 
 import "./help-overlay.js";
 import "../vocab/vocab.js";
-import "../game/rocket-game.js";
+import "../game/game-lobby.js";
 import { PointsManager } from "../vocab/points.js";
 import { getAvatarSVG } from "./avatar-builder.js";
 
@@ -97,16 +97,7 @@ class AppShell extends HTMLElement {
           100% { transform: translateX(0); }
         }
 
-        #game-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 999;
-          display: none;
-        }
-        #info-btn {
+#info-btn {
           position: absolute;
           top: 12px;
           right: 12px;
@@ -158,7 +149,7 @@ class AppShell extends HTMLElement {
         <div class="info-grid">
           <div id="score">
             Punkte: <span id="points">0</span>
-            <span id="treasure">🪙</span>
+            <span id="treasure" title="Fun-Spiele">🎮</span>
           </div>
 
           <div id="streak-box">
@@ -171,7 +162,7 @@ class AppShell extends HTMLElement {
         <vocab-trainer></vocab-trainer>
       </div>
 
-      <div id="game-container"></div>
+      <game-lobby></game-lobby>
     `;
 
         this.init();
@@ -179,37 +170,19 @@ class AppShell extends HTMLElement {
 
     init() {
         const treasureEl = this.shadowRoot.getElementById("treasure");
-        const gameContainer = this.shadowRoot.getElementById("game-container");
-        const pointsEl = this.shadowRoot.getElementById("points");
-
         const pointsManager = new PointsManager(this.shadowRoot);
 
         // Connect trainer with points manager
         const trainer = this.shadowRoot.querySelector("vocab-trainer");
         trainer.points = pointsManager;
 
-        // Placeholder handlers (points.ts will attach real ones)
-        const getPoints = () => parseInt(pointsEl.textContent || "0");
-        const setPoints = (value) => (pointsEl.textContent = value);
+        // Connect game lobby with points manager
+        const gameLobby = this.shadowRoot.querySelector("game-lobby");
+        gameLobby.pointsManager = pointsManager;
 
         treasureEl.addEventListener("click", () => {
             if (treasureEl.classList.contains("disabled")) return;
-
-            const currentPoints = getPoints();
-
-            setPoints(currentPoints - 5);
-
-            // Start game overlay
-            gameContainer.style.display = "block";
-            const game = document.createElement("rocket-game");
-            gameContainer.innerHTML = "";
-            gameContainer.append(game);
-
-            // Close overlay when rocket-game signals "close-game"
-            game.addEventListener("close-game", () => {
-                gameContainer.style.display = "none";
-                game.remove();
-            });
+            gameLobby.open();
         });
 
         // Avatar

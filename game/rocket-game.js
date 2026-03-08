@@ -107,6 +107,11 @@ class RocketGame extends HTMLElement {
         this.setup();
     }
 
+    disconnectedCallback() {
+        // clean up document-level listeners and animation loop
+        if (this._cleanupFn) this._cleanupFn();
+    }
+
     setup() {
         const shadow = this.shadowRoot;
         const canvas = shadow.getElementById("game-canvas");
@@ -149,22 +154,24 @@ class RocketGame extends HTMLElement {
             rocket.x = clamp(x, 0, canvas.width - rocket.w);
         };
 
-        document.addEventListener("keydown", (e) => {
+        const onKeyDown = (e) => {
             if (e.key === "ArrowLeft" || e.key === "a") leftPressed = true;
             if (e.key === "ArrowRight" || e.key === "d") rightPressed = true;
-
-            if (e.key === " " && !spaceDown) {
-                spaceDown = true;
-                e.preventDefault();
-                shoot();
-            }
-        });
-
-        document.addEventListener("keyup", (e) => {
+            if (e.key === " " && !spaceDown) { spaceDown = true; e.preventDefault(); shoot(); }
+        };
+        const onKeyUp = (e) => {
             if (e.key === "ArrowLeft" || e.key === "a") leftPressed = false;
             if (e.key === "ArrowRight" || e.key === "d") rightPressed = false;
             if (e.key === " ") spaceDown = false;
-        });
+        };
+        document.addEventListener("keydown", onKeyDown);
+        document.addEventListener("keyup",   onKeyUp);
+        let rafId;
+        this._cleanupFn = () => {
+            document.removeEventListener("keydown", onKeyDown);
+            document.removeEventListener("keyup",   onKeyUp);
+            cancelAnimationFrame(rafId);
+        };
 
         let touchX = null;
         let hasShotThisTouch = false;
@@ -326,11 +333,11 @@ class RocketGame extends HTMLElement {
 
             coins = coins.filter((c) => c.y < canvas.height + 20);
 
-            requestAnimationFrame(loop);
+            rafId = requestAnimationFrame(loop);
         };
 
         updateComboBar();
-        requestAnimationFrame(loop);
+        rafId = requestAnimationFrame(loop);
     }
 }
 
