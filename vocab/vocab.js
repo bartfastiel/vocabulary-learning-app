@@ -335,9 +335,14 @@ class VocabTrainer extends HTMLElement {
         if (!keepCurrentSet && this.vocabSets.length > 0) this.loadSet(0);
     }
 
-    /** Called when custom vocab changes — re-merges without resetting the active lesson. */
+    /** Called when custom vocab changes — switches to the last (newly added) lesson. */
     reload() {
-        this._mergeAndRender(true);
+        const custom = this._loadCustom();
+        this.vocabSets = [...(this._builtinSets ?? []), ...custom];
+        this.renderPopupButtons();
+        if (this.vocabSets.length > 0) {
+            this.loadSet(this.vocabSets.length - 1);
+        }
     }
 
     renderPopupButtons() {
