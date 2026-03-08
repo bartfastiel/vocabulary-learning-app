@@ -225,6 +225,7 @@ class AppShell extends HTMLElement {
         const avatarBuilder = this.shadowRoot.querySelector("avatar-builder");
         const refreshAvatar = () => { avatarMini.innerHTML = getAvatarSVG(); };
         refreshAvatar();
+        avatarBuilder.pointsManager = pointsManager;
         this.shadowRoot.getElementById("avatar-btn").onclick = () => avatarBuilder.open();
         this.shadowRoot.addEventListener("avatar-saved", refreshAvatar);
 
