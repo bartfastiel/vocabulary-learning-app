@@ -314,17 +314,30 @@ class VocabTrainer extends HTMLElement {
 
     async loadSets() {
         try {
-            const base = location.origin;
             const data = await fetch(`vocab/vocab.json`).then(r => r.json());
-
-            this.vocabSets = data;
-            this.renderPopupButtons();
-            if (this.vocabSets.length > 0) this.loadSet(0);
+            this._builtinSets = data;
+            this._mergeAndRender();
         } catch (err) {
             this.shadowRoot.querySelector("#question").textContent =
                 "❌ Fehler beim Laden von vocab.json";
             console.error("Fehler beim Laden von vocab.json:", err);
         }
+    }
+
+    _loadCustom() {
+        try { return JSON.parse(localStorage.getItem("customVocab") || "[]"); } catch { return []; }
+    }
+
+    _mergeAndRender(keepCurrentSet = false) {
+        const custom   = this._loadCustom();
+        this.vocabSets = [...(this._builtinSets ?? []), ...custom];
+        this.renderPopupButtons();
+        if (!keepCurrentSet && this.vocabSets.length > 0) this.loadSet(0);
+    }
+
+    /** Called when custom vocab changes — re-merges without resetting the active lesson. */
+    reload() {
+        this._mergeAndRender(true);
     }
 
     renderPopupButtons() {

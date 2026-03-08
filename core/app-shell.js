@@ -6,6 +6,7 @@
 
 import "./help-overlay.js";
 import "../vocab/vocab.js";
+import "../vocab/vocab-editor.js";
 import "../game/game-lobby.js";
 import { PointsManager } from "../vocab/points.js";
 import { getAvatarSVG } from "./avatar-builder.js";
@@ -97,21 +98,22 @@ class AppShell extends HTMLElement {
           100% { transform: translateX(0); }
         }
 
-#info-btn {
+.top-right-btns {
           position: absolute;
-          top: 12px;
-          right: 12px;
-          font-size: 1.2rem;
+          top: 10px; right: 12px;
+          display: flex; flex-direction: column; gap: 6px;
+        }
+        #info-btn, #edit-vocab-btn {
+          font-size: 0.95rem;
           background: #26c6da;
           color: white;
           border: none;
           padding: 0.4rem 0.7rem;
           border-radius: 8px;
           cursor: pointer;
+          white-space: nowrap;
         }
-        #info-btn:hover {
-          background: #00acc1;
-        }
+        #info-btn:hover, #edit-vocab-btn:hover { background: #00acc1; }
 
         #avatar-btn {
           position: absolute;
@@ -136,12 +138,16 @@ class AppShell extends HTMLElement {
 
       </style>
 
-      <button id="info-btn">ⓘ Hilfe</button>
+      <div class="top-right-btns">
+        <button id="info-btn">ⓘ Hilfe</button>
+        <button id="edit-vocab-btn">✏️ Vokabeln</button>
+      </div>
       <div id="avatar-btn" title="Avatar bearbeiten">
         <div id="avatar-mini"></div>
       </div>
       <vocab-help></vocab-help>
       <avatar-builder></avatar-builder>
+      <vocab-editor></vocab-editor>
 
       <div id="quiz-container">
         <h1>🎓 Vokabeltrainer</h1>
@@ -192,6 +198,11 @@ class AppShell extends HTMLElement {
         refreshAvatar();
         this.shadowRoot.getElementById("avatar-btn").onclick = () => avatarBuilder.open();
         this.shadowRoot.addEventListener("avatar-saved", refreshAvatar);
+
+        // Vocab editor
+        const vocabEditor = this.shadowRoot.querySelector("vocab-editor");
+        this.shadowRoot.getElementById("edit-vocab-btn").onclick = () => vocabEditor.open();
+        this.shadowRoot.addEventListener("vocab-updated", () => trainer.reload());
 
         const help = this.shadowRoot.querySelector("vocab-help");
         const infoBtn = this.shadowRoot.getElementById("info-btn");
