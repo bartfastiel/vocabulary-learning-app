@@ -306,7 +306,12 @@ class VocabTrainer extends HTMLElement {
             popup.classList.toggle("active", show);
         };
 
-        header.addEventListener("click", () => togglePopup(true));
+        header.addEventListener("click", () => {
+            const custom = this._loadCustom();
+            this.vocabSets = [...(this._builtinSets ?? []), ...custom];
+            this.renderPopupButtons();
+            togglePopup(true);
+        });
         overlay.addEventListener("click", () => togglePopup(false));
 
         this.togglePopup = togglePopup;
