@@ -85,7 +85,6 @@ class FlappyGame extends HTMLElement {
             if (!p.scored && p.x + PIPE_W < bx) {
                 p.scored = true;
                 this._score++;
-                this._speed = BASE_SPEED + this._score * 0.08;
             }
         }
         this._pipes = this._pipes.filter(p => p.x + PIPE_W > 0);

@@ -115,7 +115,7 @@ class JumpGame extends HTMLElement {
 
         this._frame++;
         this._score = Math.floor(this._frame / 60);
-        this._speed = BASE_SPEED + this._score * 0.06;
+        this._speed = BASE_SPEED;
         this._bgX  -= this._speed * 0.3;
 
         // character physics
@@ -143,8 +143,7 @@ class JumpGame extends HTMLElement {
                 h,
                 color: colors[Math.floor(Math.random() * colors.length)],
             });
-            this._nextObs = 90 + Math.random() * 80 - this._score * 0.8;
-            if (this._nextObs < 55) this._nextObs = 55;
+            this._nextObs = 90 + Math.random() * 80;
         }
 
         // move obstacles

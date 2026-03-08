@@ -14,6 +14,9 @@ import "./flappy-game.js";
 import "./jump-game.js";
 import "./reaction-game.js";
 import "./memory-game.js";
+import "./snake-game.js";
+import "./breakout-game.js";
+import "./catcher-game.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -47,7 +50,28 @@ const GAMES = [
         scoreLabel: "Rohre",
     },
     {
-        id: "rocket",   label: "Rakete",          emoji: "🚀",
+        id: "snake",    label: "Snake",            emoji: "🐍",
+        cost: 5,  maxEarn: 15,
+        component: "snake-game",
+        desc: "Iss Äpfel, weiche dir selbst aus!",
+        scoreLabel: "Äpfel",
+    },
+    {
+        id: "breakout", label: "Breakout",          emoji: "🧱",
+        cost: 8,  maxEarn: 15,
+        component: "breakout-game",
+        desc: "Zerstöre alle Blöcke!",
+        scoreLabel: "Blöcke",
+    },
+    {
+        id: "catcher",  label: "Fänger",            emoji: "🧺",
+        cost: 5,  maxEarn: 10,
+        component: "catcher-game",
+        desc: "Fange Sterne, meide Bomben!",
+        scoreLabel: "Gefangen",
+    },
+    {
+        id: "rocket",   label: "Rakete",            emoji: "🚀",
         cost: 5,  maxEarn: 0,
         component: "rocket-game",
         desc: "Schieße Münzen ab!",
