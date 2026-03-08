@@ -381,10 +381,16 @@ class VocabTrainer extends HTMLElement {
         }
 
         const word = this.vocab[this.index];
+        const needsDistractors = [
+            "vocab-answer-choosewordenglish",
+            "vocab-answer-choosewordgerman",
+            "vocab-answer-choosevoiceenglish",
+            "vocab-answer-chooseimage",
+        ];
         const availableModes = MODES.filter(mode => {
-            if (word.allowImage) return true;
-            return mode.question !== "vocab-question-image" &&
-                mode.answer !== "vocab-answer-chooseimage";
+            if (!word.allowImage && (mode.question === "vocab-question-image" || mode.answer === "vocab-answer-chooseimage")) return false;
+            if (this.vocab.length < 4 && needsDistractors.includes(mode.answer)) return false;
+            return true;
         });
         const mode = availableModes[Math.floor(Math.random() * availableModes.length)];
 

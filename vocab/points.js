@@ -57,7 +57,7 @@ export class PointsManager {
 
     // --- helpers ---
     checkTreasure() {
-        if (this.points < 5) {
+        if (this.points < 2) {
             this.treasureEl.classList.add("disabled");
         } else {
             this.treasureEl.classList.remove("disabled");
