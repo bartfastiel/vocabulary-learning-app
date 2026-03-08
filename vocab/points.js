@@ -15,7 +15,8 @@ export class PointsManager {
         this.shipEl = root.getElementById("ship");
         this.treasureEl = root.getElementById("treasure");
 
-        this.points = parseInt(localStorage.getItem("points") || "0");
+        this._isDev = localStorage.getItem("userRole") === "developer";
+        this.points = this._isDev ? Infinity : parseInt(localStorage.getItem("points") || "0");
         this.streak = 0;
         this.streakRecord = parseInt(localStorage.getItem("streakRecord") || "0");
 
@@ -25,6 +26,12 @@ export class PointsManager {
 
     // --- called from answer components ---
     updatePoints(delta) {
+        if (this._isDev) {
+            this.points = Infinity;
+            this.pointsEl.textContent = "∞";
+            this.checkTreasure();
+            return;
+        }
         this.points += delta;
         this.pointsEl.textContent = this.points.toString();
         localStorage.setItem("points", this.points.toString());

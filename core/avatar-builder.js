@@ -10,6 +10,19 @@
 
 const LS_KEY   = "avatarSelection";
 const LS_UNLOCK = "avatarUnlocked";
+const LS_BG    = "appBg";
+
+// ─── App background themes ────────────────────────────────────────────────────
+const APP_BG_THEMES = [
+    { key: "dark",   label: "Nacht",    color: "#050d1a", accent: "#0ea5e9" },
+    { key: "ocean",  label: "Ozean",    color: "#021a22", accent: "#06b6d4" },
+    { key: "purple", label: "Lila",     color: "#0f0520", accent: "#a855f7" },
+    { key: "forest", label: "Wald",     color: "#041505", accent: "#22c55e" },
+    { key: "sunset", label: "Abendrot", color: "#1a0805", accent: "#f97316" },
+    { key: "rose",   label: "Rosa",     color: "#1a0510", accent: "#ec4899" },
+    { key: "gold",   label: "Gold",     color: "#1a1000", accent: "#eab308" },
+    { key: "ice",    label: "Eis",      color: "#f0f8ff", accent: "#93c5fd" },
+];
 
 // ─── artwork ──────────────────────────────────────────────────────────────────
 // Canvas: 200×200.  Face oval: cx=100 cy=120 rx=54 ry=60 (top≈60, bottom≈180).
@@ -105,6 +118,47 @@ const LAYERS = {
           <circle cx="190" cy="40" r="1" fill="white"/><circle cx="8" cy="60" r="1.5" fill="white"/>
           <circle cx="100" cy="100" r="6" fill="#FF69B4" opacity="0.7"/>
           <circle cx="100" cy="100" r="3" fill="white" opacity="0.9"/>` },
+        { label: "Türkis",      svg: `<rect width="200" height="200" fill="#00BCD4"/>` },
+        { label: "Mint",        svg: `<rect width="200" height="200" fill="#A8E6CF"/>` },
+        { label: "Koralle",     svg: `<rect width="200" height="200" fill="#FF7F7F"/>` },
+        { label: "Himmelblau",  svg: `<rect width="200" height="200" fill="#B3E5FC"/>
+          <ellipse cx="100" cy="175" rx="100" ry="35" fill="#81D4FA"/>` },
+        { label: "Verlauf Lila",svg: `<defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9B59B6"/><stop offset="100%" stop-color="#3498DB"/></linearGradient></defs>
+          <rect width="200" height="200" fill="url(#g1)"/>` },
+        { label: "Verlauf Rosa",svg: `<defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFB7C5"/><stop offset="100%" stop-color="#FF69B4"/></linearGradient></defs>
+          <rect width="200" height="200" fill="url(#g2)"/>` },
+        { label: "Verlauf Grün",svg: `<defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#56CCF2"/><stop offset="100%" stop-color="#2ECC71"/></linearGradient></defs>
+          <rect width="200" height="200" fill="url(#g3)"/>` },
+        { label: "Sonnenunt.2", svg: `<defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1A1A4E"/><stop offset="50%" stop-color="#FF6B35"/><stop offset="100%" stop-color="#FFD700"/></linearGradient></defs>
+          <rect width="200" height="200" fill="url(#g4)"/>
+          <circle cx="100" cy="160" r="30" fill="#FFD700" opacity="0.9"/>` },
+        { label: "Herzen",      svg: `<rect width="200" height="200" fill="#FFE4E8"/>
+          <text x="15"  y="40"  font-size="22">❤️</text>
+          <text x="60"  y="25"  font-size="16">🩷</text>
+          <text x="110" y="38"  font-size="20">❤️</text>
+          <text x="155" y="30"  font-size="14">🩷</text>
+          <text x="5"   y="80"  font-size="14">🩷</text>
+          <text x="140" y="75"  font-size="18">❤️</text>
+          <text x="170" y="110" font-size="14">🩷</text>
+          <text x="10"  y="150" font-size="18">❤️</text>
+          <text x="160" y="155" font-size="20">🩷</text>` },
+        { label: "Blitze",      svg: `<rect width="200" height="200" fill="#1A1A2E"/>
+          <polygon points="110,10 90,80 108,80 88,170 120,90 100,90 125,10" fill="#FFD700" opacity="0.9"/>
+          <polygon points="55,20 44,55 53,55 40,100 62,60 52,60 66,20" fill="#FFD700" opacity="0.6"/>
+          <polygon points="155,30 144,65 153,65 140,110 162,70 152,70 166,30" fill="#FFD700" opacity="0.6"/>` },
+        { label: "Kariert",     svg: `<rect width="200" height="200" fill="white"/>
+          <rect x="0"   y="0"   width="25" height="25" fill="#E3F2FD"/>
+          <rect x="50"  y="0"   width="25" height="25" fill="#E3F2FD"/>
+          <rect x="100" y="0"   width="25" height="25" fill="#E3F2FD"/>
+          <rect x="150" y="0"   width="25" height="25" fill="#E3F2FD"/>
+          <rect x="25"  y="25"  width="25" height="25" fill="#E3F2FD"/>
+          <rect x="75"  y="25"  width="25" height="25" fill="#E3F2FD"/>
+          <rect x="125" y="25"  width="25" height="25" fill="#E3F2FD"/>
+          <rect x="175" y="25"  width="25" height="25" fill="#E3F2FD"/>
+          <rect x="0"   y="50"  width="25" height="25" fill="#E3F2FD"/>
+          <rect x="50"  y="50"  width="25" height="25" fill="#E3F2FD"/>
+          <rect x="100" y="50"  width="25" height="25" fill="#E3F2FD"/>
+          <rect x="150" y="50"  width="25" height="25" fill="#E3F2FD"/>` },
         // ── PREMIUM ──
         { label: "⭐ Feuerwerk", cost: 1, svg: `<rect width="200" height="200" fill="#07001A"/>
           <line x1="60" y1="80" x2="60" y2="50" stroke="#FFD700" stroke-width="2"/>
@@ -152,6 +206,49 @@ const LAYERS = {
           <rect x="80"  y="140" width="20" height="20" fill="#A29BFE"/>
           <rect x="120" y="140" width="20" height="20" fill="#FF8FA3"/>
           <rect x="160" y="140" width="20" height="20" fill="#00FF88"/>` },
+        { label: "⭐ Lava",      cost: 1, svg: `<rect width="200" height="200" fill="#1A0000"/>
+          <ellipse cx="50"  cy="180" rx="60" ry="40" fill="#FF3D00" opacity="0.8"/>
+          <ellipse cx="150" cy="170" rx="70" ry="50" fill="#FF6D00" opacity="0.7"/>
+          <ellipse cx="100" cy="190" rx="80" ry="35" fill="#FFAB00" opacity="0.6"/>
+          <circle cx="30"  cy="160" r="18" fill="#FF3D00" opacity="0.5"/>
+          <circle cx="170" cy="150" r="22" fill="#FF6D00" opacity="0.5"/>
+          <circle cx="100" cy="140" r="15" fill="#FFAB00" opacity="0.4"/>` },
+        { label: "⭐ Matrix",    cost: 1, svg: `<rect width="200" height="200" fill="#001100"/>
+          <text x="10"  y="20"  fill="#00FF41" font-size="10" font-family="monospace" opacity="0.8">10110</text>
+          <text x="50"  y="35"  fill="#00FF41" font-size="10" font-family="monospace" opacity="0.6">01001</text>
+          <text x="100" y="15"  fill="#00FF41" font-size="10" font-family="monospace" opacity="0.9">11010</text>
+          <text x="150" y="28"  fill="#00FF41" font-size="10" font-family="monospace" opacity="0.7">00111</text>
+          <text x="5"   y="55"  fill="#00FF41" font-size="10" font-family="monospace" opacity="0.5">10101</text>
+          <text x="80"  y="48"  fill="#00FF41" font-size="10" font-family="monospace" opacity="0.8">01110</text>
+          <text x="140" y="60"  fill="#00FF41" font-size="10" font-family="monospace" opacity="0.6">11001</text>
+          <text x="20"  y="80"  fill="#39FF14" font-size="12" font-family="monospace" opacity="0.9">0101</text>
+          <text x="120" y="75"  fill="#39FF14" font-size="12" font-family="monospace" opacity="0.7">1010</text>
+          <text x="60"  y="90"  fill="#00FF41" font-size="10" font-family="monospace" opacity="0.5">10011</text>` },
+        { label: "⭐ Diamant",   cost: 1, svg: `<rect width="200" height="200" fill="#0A0020"/>
+          <polygon points="100,20 130,60 100,80 70,60" fill="#B9F2FF" opacity="0.9"/>
+          <polygon points="100,20 130,60 100,40" fill="white" opacity="0.6"/>
+          <polygon points="100,80 130,60 145,100 100,120" fill="#74D7FF" opacity="0.8"/>
+          <polygon points="100,80 70,60 55,100 100,120" fill="#A0E8FF" opacity="0.8"/>
+          <polygon points="100,120 145,100 130,140 100,160" fill="#4FC3F7" opacity="0.7"/>
+          <polygon points="100,120 55,100 70,140 100,160" fill="#81D4FA" opacity="0.7"/>
+          <circle cx="30" cy="40" r="3" fill="#B9F2FF" opacity="0.6"/>
+          <circle cx="170" cy="30" r="2" fill="#74D7FF" opacity="0.6"/>
+          <circle cx="20" cy="150" r="2" fill="#A0E8FF" opacity="0.5"/>
+          <circle cx="180" cy="160" r="3" fill="#B9F2FF" opacity="0.5"/>` },
+        { label: "⭐ Wolken",    cost: 1, svg: `<rect width="200" height="200" fill="#87CEEB"/>
+          <ellipse cx="50"  cy="40"  rx="35" ry="22" fill="white" opacity="0.9"/>
+          <ellipse cx="35"  cy="45"  rx="25" ry="18" fill="white" opacity="0.9"/>
+          <ellipse cx="68"  cy="45"  rx="25" ry="18" fill="white" opacity="0.9"/>
+          <ellipse cx="150" cy="30"  rx="30" ry="20" fill="white" opacity="0.9"/>
+          <ellipse cx="136" cy="35"  rx="22" ry="16" fill="white" opacity="0.9"/>
+          <ellipse cx="166" cy="35"  rx="22" ry="16" fill="white" opacity="0.9"/>
+          <ellipse cx="100" cy="70"  rx="40" ry="25" fill="white" opacity="0.8"/>
+          <ellipse cx="80"  cy="76"  rx="28" ry="20" fill="white" opacity="0.8"/>
+          <ellipse cx="122" cy="76"  rx="28" ry="20" fill="white" opacity="0.8"/>
+          <circle cx="60"  cy="150" r="8"  fill="#FFD700" opacity="0.9"/>
+          <line x1="60" y1="135" x2="60" y2="125" stroke="#FFD700" stroke-width="2"/>
+          <line x1="45" y1="140" x2="38" y2="133" stroke="#FFD700" stroke-width="2"/>
+          <line x1="75" y1="140" x2="82" y2="133" stroke="#FFD700" stroke-width="2"/>` },
     ],
 
     face: [
@@ -161,6 +258,70 @@ const LAYERS = {
         { label: "Olive",       svg: `<ellipse cx="100" cy="120" rx="54" ry="60" fill="#C68642"/>` },
         { label: "Dunkel",      svg: `<ellipse cx="100" cy="120" rx="54" ry="60" fill="#8D5524"/>` },
         { label: "Sehr dunkel", svg: `<ellipse cx="100" cy="120" rx="54" ry="60" fill="#4A2912"/>` },
+        // ── TIERE (5 Taler) ──
+        { label: "🐱 Katze",  cost: 5, svg: `
+          <ellipse cx="100" cy="118" rx="54" ry="58" fill="#E8C49A"/>
+          <polygon points="60,72 44,36 88,68" fill="#E8C49A"/>
+          <polygon points="140,72 156,36 112,68" fill="#E8C49A"/>
+          <polygon points="62,70 52,46 84,67" fill="#FFB6C1" opacity="0.85"/>
+          <polygon points="138,70 148,46 116,67" fill="#FFB6C1" opacity="0.85"/>
+          <polygon points="100,127 94,133 106,133" fill="#FF8FA3"/>
+          <line x1="100" y1="133" x2="96" y2="138" stroke="#D0788A" stroke-width="1.5"/>
+          <line x1="100" y1="133" x2="104" y2="138" stroke="#D0788A" stroke-width="1.5"/>` },
+        { label: "🐶 Hund",   cost: 5, svg: `
+          <ellipse cx="100" cy="116" rx="54" ry="56" fill="#D4A464"/>
+          <ellipse cx="54" cy="112" rx="22" ry="34" fill="#B8843E"/>
+          <ellipse cx="146" cy="112" rx="22" ry="34" fill="#B8843E"/>
+          <ellipse cx="100" cy="138" rx="24" ry="18" fill="#C8A87A"/>
+          <ellipse cx="100" cy="130" rx="11" ry="8" fill="#222"/>
+          <ellipse cx="97" cy="128" rx="3" ry="2" fill="#555"/>` },
+        { label: "🦊 Fuchs",  cost: 5, svg: `
+          <ellipse cx="100" cy="118" rx="52" ry="58" fill="#D4622A"/>
+          <polygon points="68,70 50,32 90,66" fill="#D4622A"/>
+          <polygon points="132,70 150,32 110,66" fill="#D4622A"/>
+          <polygon points="70,68 56,40 86,65" fill="#FFD0A0"/>
+          <polygon points="130,68 144,40 114,65" fill="#FFD0A0"/>
+          <ellipse cx="100" cy="132" rx="28" ry="20" fill="#FFF0D8"/>
+          <ellipse cx="100" cy="124" rx="9" ry="7" fill="#222"/>` },
+        { label: "🐻 Bär",    cost: 5, svg: `
+          <ellipse cx="100" cy="120" rx="56" ry="62" fill="#8B5E3C"/>
+          <circle cx="56" cy="68" r="20" fill="#7A4E2D"/>
+          <circle cx="144" cy="68" r="20" fill="#7A4E2D"/>
+          <circle cx="56" cy="68" r="11" fill="#A07850"/>
+          <circle cx="144" cy="68" r="11" fill="#A07850"/>
+          <ellipse cx="100" cy="140" rx="24" ry="17" fill="#C8A882"/>
+          <ellipse cx="100" cy="130" rx="11" ry="8" fill="#222"/>` },
+        { label: "🐰 Hase",   cost: 5, svg: `
+          <ellipse cx="100" cy="120" rx="52" ry="60" fill="#F0E6D8"/>
+          <ellipse cx="76" cy="44" rx="14" ry="40" fill="#F0E6D8"/>
+          <ellipse cx="124" cy="44" rx="14" ry="40" fill="#F0E6D8"/>
+          <ellipse cx="76" cy="44" rx="8" ry="32" fill="#FFB6C1"/>
+          <ellipse cx="124" cy="44" rx="8" ry="32" fill="#FFB6C1"/>
+          <ellipse cx="100" cy="128" rx="7" ry="5" fill="#FF8FA3"/>` },
+        { label: "🐼 Panda",  cost: 5, svg: `
+          <ellipse cx="100" cy="120" rx="56" ry="62" fill="white"/>
+          <circle cx="56" cy="66" r="20" fill="#222"/>
+          <circle cx="144" cy="66" r="20" fill="#222"/>
+          <ellipse cx="78" cy="108" rx="17" ry="15" fill="#222"/>
+          <ellipse cx="122" cy="108" rx="17" ry="15" fill="#222"/>
+          <ellipse cx="100" cy="130" rx="9" ry="6" fill="#222"/>` },
+        { label: "🦁 Löwe",   cost: 5, svg: `
+          <circle cx="100" cy="115" r="68" fill="#C07820" opacity="0.65"/>
+          <circle cx="100" cy="115" r="62" fill="none" stroke="#A06010" stroke-width="8" stroke-dasharray="13,7" opacity="0.8"/>
+          <ellipse cx="100" cy="118" rx="50" ry="54" fill="#E8A030"/>
+          <ellipse cx="100" cy="136" rx="22" ry="16" fill="#F0C068"/>
+          <ellipse cx="100" cy="128" rx="10" ry="7" fill="#8B4513"/>` },
+        { label: "🐯 Tiger",  cost: 5, svg: `
+          <ellipse cx="100" cy="118" rx="54" ry="58" fill="#FF8C00"/>
+          <polygon points="62,72 50,40 86,68" fill="#FF8C00"/>
+          <polygon points="138,72 150,40 114,68" fill="#FF8C00"/>
+          <polygon points="64,70 56,48 82,67" fill="#FFB6A0" opacity="0.7"/>
+          <polygon points="136,70 144,48 118,67" fill="#FFB6A0" opacity="0.7"/>
+          <path d="M58,82 Q68,90 56,102" stroke="#222" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.65"/>
+          <path d="M142,82 Q132,90 144,102" stroke="#222" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.65"/>
+          <path d="M100,70 L97,82 L100,76 L103,82Z" fill="#222" opacity="0.55"/>
+          <ellipse cx="100" cy="134" rx="26" ry="18" fill="#FFF5E0"/>
+          <ellipse cx="100" cy="126" rx="10" ry="7" fill="#CC5522"/>` },
     ],
 
     hair: [
@@ -205,6 +366,48 @@ const LAYERS = {
           <circle cx="76" cy="68" r="16" fill="#3E2723"/><circle cx="124" cy="68" r="16" fill="#3E2723"/>
           <ellipse cx="100" cy="72" rx="52" ry="28" fill="#3E2723"/>` },
         { label: "Kahl",          svg: `` },
+        { label: "Wellig",        svg: `<path d="M42,80 Q55,60 70,72 Q85,84 100,66 Q115,48 130,66 Q145,84 158,72" fill="#4A3728" stroke="none"/>
+          <ellipse cx="100" cy="64" rx="58" ry="30" fill="#4A3728"/>` },
+        { label: "Bob",           svg: `<ellipse cx="100" cy="70" rx="58" ry="34" fill="#3B2314"/>
+          <rect x="42" y="82" width="17" height="48" rx="8" fill="#3B2314"/>
+          <rect x="141" y="82" width="17" height="48" rx="8" fill="#3B2314"/>` },
+        { label: "Stachelig",     svg: `<ellipse cx="100" cy="68" rx="56" ry="32" fill="#2C1B0E"/>
+          <polygon points="68,60 72,30 78,58" fill="#2C1B0E"/>
+          <polygon points="82,58 86,26 92,56" fill="#2C1B0E"/>
+          <polygon points="96,56 100,22 104,56" fill="#2C1B0E"/>
+          <polygon points="108,56 114,26 118,58" fill="#2C1B0E"/>
+          <polygon points="122,58 128,30 132,60" fill="#2C1B0E"/>` },
+        { label: "Seitenscheitel",svg: `<ellipse cx="100" cy="66" rx="58" ry="36" fill="#5D3A1A"/>
+          <path d="M42,66 Q60,48 100,60 Q140,72 158,60 L158,90 Q140,90 100,80 Q60,70 42,80Z" fill="#5D3A1A"/>
+          <path d="M42,62 Q55,50 80,56" stroke="#3B2314" stroke-width="3" fill="none"/>` },
+        { label: "Locken lang",   svg: `<ellipse cx="100" cy="64" rx="58" ry="34" fill="#8B4513"/>
+          <circle cx="50" cy="88" r="14" fill="#8B4513"/>
+          <circle cx="50" cy="108" r="13" fill="#8B4513"/>
+          <circle cx="52" cy="128" r="12" fill="#8B4513"/>
+          <circle cx="150" cy="88" r="14" fill="#8B4513"/>
+          <circle cx="150" cy="108" r="13" fill="#8B4513"/>
+          <circle cx="148" cy="128" r="12" fill="#8B4513"/>` },
+        { label: "Kurz schwarz",  svg: `<ellipse cx="100" cy="66" rx="58" ry="34" fill="#1A1A1A"/>` },
+        { label: "Pigtails",      svg: `<ellipse cx="100" cy="68" rx="56" ry="34" fill="#A0522D"/>
+          <ellipse cx="52" cy="80" rx="14" ry="24" fill="#A0522D" transform="rotate(-10,52,80)"/>
+          <ellipse cx="148" cy="80" rx="14" ry="24" fill="#A0522D" transform="rotate(10,148,80)"/>
+          <circle cx="50" cy="68" r="5" fill="#FF69B4"/>
+          <circle cx="150" cy="68" r="5" fill="#FF69B4"/>` },
+        { label: "Dreads",        svg: `<ellipse cx="100" cy="64" rx="58" ry="32" fill="#2C1B0E"/>
+          <rect x="56" y="72" width="9" height="55" rx="4" fill="#2C1B0E"/>
+          <rect x="70" y="72" width="9" height="65" rx="4" fill="#3B2314"/>
+          <rect x="84" y="72" width="9" height="58" rx="4" fill="#2C1B0E"/>
+          <rect x="107" y="72" width="9" height="58" rx="4" fill="#2C1B0E"/>
+          <rect x="121" y="72" width="9" height="65" rx="4" fill="#3B2314"/>
+          <rect x="135" y="72" width="9" height="55" rx="4" fill="#2C1B0E"/>` },
+        { label: "Undercut",      svg: `<ellipse cx="100" cy="58" rx="58" ry="28" fill="#1A1A1A"/>
+          <rect x="42" y="62" width="12" height="8" rx="4" fill="#1A1A1A"/>
+          <rect x="146" y="62" width="12" height="8" rx="4" fill="#1A1A1A"/>` },
+        { label: "Hochsteckfris.",svg: `<ellipse cx="100" cy="68" rx="58" ry="34" fill="#6B4226"/>
+          <ellipse cx="100" cy="56" rx="22" ry="18" fill="#6B4226"/>
+          <ellipse cx="100" cy="52" rx="16" ry="14" fill="#8B5E3C"/>
+          <line x1="88" y1="62" x2="84" y2="70" stroke="#6B4226" stroke-width="3"/>
+          <line x1="112" y1="62" x2="116" y2="70" stroke="#6B4226" stroke-width="3"/>` },
         // ── PREMIUM ──
         { label: "⭐ Gold",       cost: 1, svg: `<ellipse cx="100" cy="66" rx="58" ry="36" fill="#FFD700"/>
           <rect x="42" y="82" width="17" height="85" rx="8" fill="#FFD700"/>
@@ -222,6 +425,17 @@ const LAYERS = {
           <ellipse cx="100" cy="58" rx="20" ry="18" fill="#A29BFE"/>
           <rect x="42" y="84" width="14" height="80" rx="7" fill="#FF6B6B"/>
           <rect x="144" y="84" width="14" height="80" rx="7" fill="#4ECDC4"/>` },
+        { label: "⭐ Weiß lang",  cost: 1, svg: `<ellipse cx="100" cy="66" rx="58" ry="36" fill="#F5F5F5"/>
+          <rect x="42" y="82" width="17" height="95" rx="8" fill="#E8E8E8"/>
+          <rect x="141" y="82" width="17" height="95" rx="8" fill="#E8E8E8"/>
+          <ellipse cx="78" cy="56" rx="10" ry="5" fill="white" opacity="0.8"/>` },
+        { label: "⭐ Rosa lang",  cost: 1, svg: `<ellipse cx="100" cy="66" rx="58" ry="36" fill="#FF69B4"/>
+          <rect x="42" y="82" width="17" height="95" rx="8" fill="#FF69B4"/>
+          <rect x="141" y="82" width="17" height="95" rx="8" fill="#FF69B4"/>
+          <ellipse cx="82" cy="56" rx="10" ry="5" fill="#FFB6C1" opacity="0.7"/>` },
+        { label: "⭐ Grün",       cost: 1, svg: `<ellipse cx="100" cy="66" rx="58" ry="36" fill="#00C853"/>
+          <rect x="42" y="82" width="17" height="70" rx="8" fill="#00C853"/>
+          <rect x="141" y="82" width="17" height="70" rx="8" fill="#00C853"/>` },
     ],
 
     eyebrows: [
@@ -247,6 +461,28 @@ const LAYERS = {
         { label: "Rot",       svg: `
           <path d="M63,93 Q78,88 93,93" stroke="#C0392B" stroke-width="4" fill="none" stroke-linecap="round"/>
           <path d="M107,93 Q122,88 137,93" stroke="#C0392B" stroke-width="4" fill="none" stroke-linecap="round"/>` },
+        { label: "Schmal",    svg: `
+          <path d="M66,93 Q78,91 92,93" stroke="#4A3728" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M108,93 Q122,91 134,93" stroke="#4A3728" stroke-width="2" fill="none" stroke-linecap="round"/>` },
+        { label: "Gerade",    svg: `
+          <line x1="64" y1="91" x2="93" y2="91" stroke="#4A3728" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="107" y1="91" x2="136" y2="91" stroke="#4A3728" stroke-width="3.5" stroke-linecap="round"/>` },
+        { label: "Gestrichelt",svg: `
+          <line x1="64" y1="92" x2="72" y2="90" stroke="#4A3728" stroke-width="3" stroke-linecap="round"/>
+          <line x1="76" y1="90" x2="84" y2="91" stroke="#4A3728" stroke-width="3" stroke-linecap="round"/>
+          <line x1="88" y1="92" x2="93" y2="93" stroke="#4A3728" stroke-width="3" stroke-linecap="round"/>
+          <line x1="107" y1="93" x2="112" y2="92" stroke="#4A3728" stroke-width="3" stroke-linecap="round"/>
+          <line x1="116" y1="90" x2="124" y2="90" stroke="#4A3728" stroke-width="3" stroke-linecap="round"/>
+          <line x1="128" y1="91" x2="136" y2="93" stroke="#4A3728" stroke-width="3" stroke-linecap="round"/>` },
+        { label: "Grau",      svg: `
+          <path d="M63,93 Q78,88 93,93" stroke="#888" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M107,93 Q122,88 137,93" stroke="#888" stroke-width="4" fill="none" stroke-linecap="round"/>` },
+        { label: "Lila",      svg: `
+          <path d="M63,93 Q78,88 93,93" stroke="#9B59B6" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M107,93 Q122,88 137,93" stroke="#9B59B6" stroke-width="4" fill="none" stroke-linecap="round"/>` },
+        { label: "Gebogen",   svg: `
+          <path d="M65,95 Q72,84 93,90" stroke="#4A3728" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M107,90 Q128,84 135,95" stroke="#4A3728" stroke-width="3.5" fill="none" stroke-linecap="round"/>` },
         // ── PREMIUM ──
         { label: "⭐ Gold",   cost: 1, svg: `
           <path d="M63,93 Q78,88 93,93" stroke="#FFD700" stroke-width="5" fill="none" stroke-linecap="round"/>
@@ -256,6 +492,14 @@ const LAYERS = {
         { label: "⭐ Neon",   cost: 1, svg: `
           <path d="M63,93 Q78,88 93,93" stroke="#00FF88" stroke-width="4" fill="none" stroke-linecap="round"/>
           <path d="M107,93 Q122,88 137,93" stroke="#00FF88" stroke-width="4" fill="none" stroke-linecap="round"/>` },
+        { label: "⭐ Pink",   cost: 1, svg: `
+          <path d="M63,93 Q78,88 93,93" stroke="#FF69B4" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M107,93 Q122,88 137,93" stroke="#FF69B4" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <circle cx="78" cy="89" r="2" fill="#FFB6C1"/>
+          <circle cx="122" cy="89" r="2" fill="#FFB6C1"/>` },
+        { label: "⭐ Blau",   cost: 1, svg: `
+          <path d="M63,93 Q78,88 93,93" stroke="#1E90FF" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M107,93 Q122,88 137,93" stroke="#1E90FF" stroke-width="5" fill="none" stroke-linecap="round"/>` },
     ],
 
     eyes: [
@@ -308,6 +552,57 @@ const LAYERS = {
         { label: "Geschlossen", svg: `
           <path d="M64,107 Q78,115 92,107" stroke="#3D2B1F" stroke-width="3.5" fill="none" stroke-linecap="round"/>
           <path d="M108,107 Q122,115 136,107" stroke="#3D2B1F" stroke-width="3.5" fill="none" stroke-linecap="round"/>` },
+        { label: "Schläfrig",   svg: `
+          <circle cx="78"  cy="107" r="10" fill="white"/>
+          <circle cx="78"  cy="107" r="6"  fill="#3D2B1F"/>
+          <circle cx="80"  cy="105" r="2"  fill="white"/>
+          <path d="M66,104 Q78,100 90,104" stroke="#3D2B1F" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle cx="122" cy="107" r="10" fill="white"/>
+          <circle cx="122" cy="107" r="6"  fill="#3D2B1F"/>
+          <circle cx="124" cy="105" r="2"  fill="white"/>
+          <path d="M110,104 Q122,100 134,104" stroke="#3D2B1F" stroke-width="3" fill="none" stroke-linecap="round"/>` },
+        { label: "Groß",        svg: `
+          <circle cx="78"  cy="107" r="14" fill="white"/>
+          <circle cx="78"  cy="107" r="9"  fill="#5B4A3F"/>
+          <circle cx="78"  cy="107" r="5"  fill="#2C1B0E"/>
+          <circle cx="81"  cy="103" r="2.5" fill="white"/>
+          <circle cx="122" cy="107" r="14" fill="white"/>
+          <circle cx="122" cy="107" r="9"  fill="#5B4A3F"/>
+          <circle cx="122" cy="107" r="5"  fill="#2C1B0E"/>
+          <circle cx="125" cy="103" r="2.5" fill="white"/>` },
+        { label: "Punkt",       svg: `
+          <circle cx="78"  cy="107" r="4" fill="#2C1B0E"/>
+          <circle cx="122" cy="107" r="4" fill="#2C1B0E"/>` },
+        { label: "X Augen",     svg: `
+          <line x1="70" y1="99" x2="86" y2="115" stroke="#CC0000" stroke-width="4" stroke-linecap="round"/>
+          <line x1="86" y1="99" x2="70" y2="115" stroke="#CC0000" stroke-width="4" stroke-linecap="round"/>
+          <line x1="114" y1="99" x2="130" y2="115" stroke="#CC0000" stroke-width="4" stroke-linecap="round"/>
+          <line x1="130" y1="99" x2="114" y2="115" stroke="#CC0000" stroke-width="4" stroke-linecap="round"/>` },
+        { label: "Sternaugen2", svg: `
+          <text x="65" y="116" font-size="20" text-anchor="middle">⭐</text>
+          <text x="135" y="116" font-size="20" text-anchor="middle">⭐</text>` },
+        { label: "Herzaugen2",  svg: `
+          <text x="65" y="116" font-size="20" text-anchor="middle">❤️</text>
+          <text x="135" y="116" font-size="20" text-anchor="middle">❤️</text>` },
+        { label: "Blau",        svg: `
+          <circle cx="78"  cy="107" r="10" fill="white"/>
+          <circle cx="78"  cy="107" r="6"  fill="#1E90FF"/>
+          <circle cx="80"  cy="105" r="2"  fill="white"/>
+          <circle cx="122" cy="107" r="10" fill="white"/>
+          <circle cx="122" cy="107" r="6"  fill="#1E90FF"/>
+          <circle cx="124" cy="105" r="2"  fill="white"/>` },
+        { label: "Grün",        svg: `
+          <circle cx="78"  cy="107" r="10" fill="white"/>
+          <circle cx="78"  cy="107" r="6"  fill="#2ECC71"/>
+          <circle cx="80"  cy="105" r="2"  fill="white"/>
+          <circle cx="122" cy="107" r="10" fill="white"/>
+          <circle cx="122" cy="107" r="6"  fill="#2ECC71"/>
+          <circle cx="124" cy="105" r="2"  fill="white"/>` },
+        { label: "Zwinkern2",   svg: `
+          <circle cx="78"  cy="107" r="10" fill="white"/>
+          <circle cx="78"  cy="107" r="6"  fill="#3D2B1F"/>
+          <circle cx="80"  cy="105" r="2"  fill="white"/>
+          <path d="M110,107 Q122,115 134,107" stroke="#3D2B1F" stroke-width="3.5" fill="none" stroke-linecap="round"/>` },
         // ── PREMIUM ──
         { label: "⭐ Regenbogen", cost: 1, svg: `
           <circle cx="78" cy="107" r="11" fill="white"/>
@@ -336,6 +631,37 @@ const LAYERS = {
           <circle cx="122" cy="107" r="7" fill="#00FF88"/>
           <circle cx="122" cy="107" r="4" fill="#AAFFCC"/>
           <circle cx="124" cy="105" r="1.5" fill="white"/>` },
+        { label: "⭐ Pink",       cost: 1, svg: `
+          <circle cx="78"  cy="107" r="10" fill="white"/>
+          <circle cx="78"  cy="107" r="7"  fill="#FF69B4"/>
+          <circle cx="78"  cy="107" r="4"  fill="#FFB6C1"/>
+          <circle cx="80"  cy="105" r="1.5" fill="white"/>
+          <circle cx="122" cy="107" r="10" fill="white"/>
+          <circle cx="122" cy="107" r="7"  fill="#FF69B4"/>
+          <circle cx="122" cy="107" r="4"  fill="#FFB6C1"/>
+          <circle cx="124" cy="105" r="1.5" fill="white"/>` },
+        { label: "⭐ Blau",       cost: 1, svg: `
+          <circle cx="78"  cy="107" r="10" fill="white"/>
+          <circle cx="78"  cy="107" r="7"  fill="#1E90FF"/>
+          <circle cx="78"  cy="107" r="4"  fill="#87CEEB"/>
+          <circle cx="80"  cy="105" r="1.5" fill="white"/>
+          <circle cx="122" cy="107" r="10" fill="white"/>
+          <circle cx="122" cy="107" r="7"  fill="#1E90FF"/>
+          <circle cx="122" cy="107" r="4"  fill="#87CEEB"/>
+          <circle cx="124" cy="105" r="1.5" fill="white"/>` },
+        { label: "⭐ Glitzer",    cost: 1, svg: `
+          <circle cx="78"  cy="107" r="10" fill="white"/>
+          <circle cx="78"  cy="107" r="7"  fill="#C0A0FF"/>
+          <circle cx="78"  cy="107" r="4"  fill="#E8D0FF"/>
+          <circle cx="80"  cy="105" r="1.5" fill="white"/>
+          <circle cx="122" cy="107" r="10" fill="white"/>
+          <circle cx="122" cy="107" r="7"  fill="#C0A0FF"/>
+          <circle cx="122" cy="107" r="4"  fill="#E8D0FF"/>
+          <circle cx="124" cy="105" r="1.5" fill="white"/>
+          <circle cx="73"  cy="100" r="1.5" fill="#FFD700" opacity="0.9"/>
+          <circle cx="84"  cy="102" r="1"   fill="#FFD700" opacity="0.8"/>
+          <circle cx="117" cy="100" r="1.5" fill="#FFD700" opacity="0.9"/>
+          <circle cx="128" cy="102" r="1"   fill="#FFD700" opacity="0.8"/>` },
     ],
 
     mouth: [
@@ -356,6 +682,25 @@ const LAYERS = {
         { label: "Schief",      svg: `<path d="M84,140 Q96,148 112,135" stroke="#C0836A" stroke-width="3" fill="none" stroke-linecap="round"/>` },
         { label: "Schnute",     svg: `<ellipse cx="100" cy="140" rx="15" ry="7" fill="#D4857A"/>
           <ellipse cx="100" cy="136" rx="15" ry="5" fill="#E09090"/>` },
+        { label: "Breit",       svg: `<path d="M74,133 Q100,158 126,133" stroke="#333" stroke-width="2" fill="#FF6B6B"/>
+          <rect x="80" y="133" width="40" height="12" rx="2" fill="white"/>
+          <line x1="88" y1="133" x2="88" y2="145" stroke="#ddd" stroke-width="1"/>
+          <line x1="96" y1="133" x2="96" y2="145" stroke="#ddd" stroke-width="1"/>
+          <line x1="104" y1="133" x2="104" y2="145" stroke="#ddd" stroke-width="1"/>
+          <line x1="112" y1="133" x2="112" y2="145" stroke="#ddd" stroke-width="1"/>` },
+        { label: "Zahnspange",  svg: `<path d="M80,133 Q100,150 120,133" stroke="#333" stroke-width="2" fill="#FF6B6B"/>
+          <rect x="83" y="133" width="34" height="8" rx="2" fill="white"/>
+          <rect x="83" y="135" width="34" height="4" rx="1" fill="#C0C0C0"/>
+          <line x1="89" y1="133" x2="89" y2="141" stroke="#888" stroke-width="1.5"/>
+          <line x1="96" y1="133" x2="96" y2="141" stroke="#888" stroke-width="1.5"/>
+          <line x1="103" y1="133" x2="103" y2="141" stroke="#888" stroke-width="1.5"/>
+          <line x1="110" y1="133" x2="110" y2="141" stroke="#888" stroke-width="1.5"/>` },
+        { label: "Besorgt",     svg: `<path d="M82,145 Q91,135 100,140 Q109,145 118,135" stroke="#C0836A" stroke-width="3" fill="none" stroke-linecap="round"/>` },
+        { label: "Cool",        svg: `<path d="M85,139 Q93,146 108,140" stroke="#C0836A" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <line x1="82" y1="141" x2="86" y2="138" stroke="#C0836A" stroke-width="2" stroke-linecap="round"/>` },
+        { label: "Schmunzeln",  svg: `<path d="M84,138 Q92,147 100,144 Q108,141 116,144" stroke="#C0836A" stroke-width="3" fill="none" stroke-linecap="round"/>` },
+        { label: "Lippenstift", svg: `<path d="M82,136 Q100,150 118,136" stroke="#CC0044" stroke-width="2" fill="#FF3366"/>
+          <path d="M82,136 Q91,130 100,133 Q109,130 118,136" fill="#FF3366" stroke="none"/>` },
         // ── PREMIUM ──
         { label: "⭐ Gold",     cost: 1, svg: `
           <path d="M80,134 Q100,150 120,134" stroke="#FFD700" stroke-width="4.5" fill="none" stroke-linecap="round"/>
@@ -365,6 +710,18 @@ const LAYERS = {
           <path d="M80,134 Q88,145 96,141"  stroke="#FF6B6B" stroke-width="4" fill="none" stroke-linecap="round"/>
           <path d="M90,140 Q100,149 110,140" stroke="#FFD700" stroke-width="4" fill="none" stroke-linecap="round"/>
           <path d="M104,141 Q112,145 120,134" stroke="#4ECDC4" stroke-width="4" fill="none" stroke-linecap="round"/>` },
+        { label: "⭐ Vampir",   cost: 1, svg: `
+          <path d="M82,133 Q100,148 118,133" stroke="#333" stroke-width="2" fill="#CC0000"/>
+          <polygon points="88,133 92,125 96,133" fill="white"/>
+          <polygon points="104,133 108,125 112,133" fill="white"/>` },
+        { label: "⭐ Katze",    cost: 1, svg: `
+          <path d="M84,138 Q100,150 116,138" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <line x1="96" y1="138" x2="96" y2="145" stroke="#555" stroke-width="1.5"/>
+          <line x1="104" y1="138" x2="104" y2="145" stroke="#555" stroke-width="1.5"/>
+          <line x1="70" y1="135" x2="85" y2="138" stroke="#888" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="68" y1="140" x2="84" y2="140" stroke="#888" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="115" y1="138" x2="130" y2="135" stroke="#888" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="116" y1="140" x2="132" y2="140" stroke="#888" stroke-width="1.5" stroke-linecap="round"/>` },
     ],
 
     glasses: [
@@ -409,6 +766,30 @@ const LAYERS = {
           <line x1="95" y1="107" x2="105" y2="107" stroke="#8B7355" stroke-width="2.5"/>
           <line x1="61" y1="107" x2="52" y2="103" stroke="#8B7355" stroke-width="2.5"/>
           <line x1="139" y1="107" x2="148" y2="103" stroke="#8B7355" stroke-width="2.5"/>` },
+        { label: "Halbrahmen",   svg: `
+          <path d="M63,100 Q78,96 93,100" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <line x1="63" y1="100" x2="54" y2="103" stroke="#333" stroke-width="2.5"/>
+          <path d="M107,100 Q122,96 137,100" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <line x1="137" y1="100" x2="146" y2="103" stroke="#333" stroke-width="2.5"/>
+          <line x1="93" y1="100" x2="107" y2="100" stroke="#333" stroke-width="2.5"/>` },
+        { label: "Übergroß",     svg: `
+          <ellipse cx="78" cy="109" rx="22" ry="16" fill="rgba(0,0,0,0.08)" stroke="#222" stroke-width="3"/>
+          <ellipse cx="122" cy="109" rx="22" ry="16" fill="rgba(0,0,0,0.08)" stroke="#222" stroke-width="3"/>
+          <line x1="100" y1="109" x2="100" y2="109" stroke="#222" stroke-width="3"/>
+          <line x1="56" y1="109" x2="46" y2="105" stroke="#222" stroke-width="2.5"/>
+          <line x1="144" y1="109" x2="154" y2="105" stroke="#222" stroke-width="2.5"/>` },
+        { label: "Blau getönt",  svg: `
+          <rect x="60" y="97" width="36" height="18" rx="9" fill="rgba(30,144,255,0.35)" stroke="#1E90FF" stroke-width="2"/>
+          <rect x="104" y="97" width="36" height="18" rx="9" fill="rgba(30,144,255,0.35)" stroke="#1E90FF" stroke-width="2"/>
+          <line x1="96" y1="106" x2="104" y2="106" stroke="#1E90FF" stroke-width="2"/>
+          <line x1="60" y1="106" x2="52" y2="103" stroke="#1E90FF" stroke-width="2"/>
+          <line x1="140" y1="106" x2="148" y2="103" stroke="#1E90FF" stroke-width="2"/>` },
+        { label: "Lesen",        svg: `
+          <ellipse cx="78" cy="112" rx="12" ry="9" fill="rgba(200,230,255,0.3)" stroke="#555" stroke-width="2"/>
+          <ellipse cx="122" cy="112" rx="12" ry="9" fill="rgba(200,230,255,0.3)" stroke="#555" stroke-width="2"/>
+          <line x1="90" y1="112" x2="110" y2="112" stroke="#555" stroke-width="2"/>
+          <line x1="66" y1="112" x2="58" y2="108" stroke="#555" stroke-width="2"/>
+          <line x1="134" y1="112" x2="142" y2="108" stroke="#555" stroke-width="2"/>` },
         // ── PREMIUM ──
         { label: "⭐ Gold",      cost: 1, svg: `
           <circle cx="78" cy="107" r="15" fill="none" stroke="#FFD700" stroke-width="3.5"/>
@@ -422,6 +803,18 @@ const LAYERS = {
           <line x1="93" y1="107" x2="107" y2="107" stroke="#00FF88" stroke-width="3"/>
           <line x1="63" y1="107" x2="54" y2="103" stroke="#00FF88" stroke-width="3"/>
           <line x1="137" y1="107" x2="146" y2="103" stroke="#00FF88" stroke-width="3"/>` },
+        { label: "⭐ Rosa Rund", cost: 1, svg: `
+          <circle cx="78" cy="107" r="15" fill="rgba(255,105,180,0.18)" stroke="#FF69B4" stroke-width="3"/>
+          <circle cx="122" cy="107" r="15" fill="rgba(255,105,180,0.18)" stroke="#FF69B4" stroke-width="3"/>
+          <line x1="93" y1="107" x2="107" y2="107" stroke="#FF69B4" stroke-width="3"/>
+          <line x1="63" y1="107" x2="54" y2="103" stroke="#FF69B4" stroke-width="3"/>
+          <line x1="137" y1="107" x2="146" y2="103" stroke="#FF69B4" stroke-width="3"/>` },
+        { label: "⭐ Sterne",    cost: 1, svg: `
+          <polygon points="78,96 80,103 87,103 82,108 84,115 78,111 72,115 74,108 69,103 76,103" fill="none" stroke="#FFD700" stroke-width="2.5" stroke-linejoin="round"/>
+          <polygon points="122,96 124,103 131,103 126,108 128,115 122,111 116,115 118,108 113,103 120,103" fill="none" stroke="#FFD700" stroke-width="2.5" stroke-linejoin="round"/>
+          <line x1="93" y1="107" x2="107" y2="107" stroke="#FFD700" stroke-width="2.5"/>
+          <line x1="63" y1="107" x2="54" y2="103" stroke="#FFD700" stroke-width="2.5"/>
+          <line x1="137" y1="107" x2="146" y2="103" stroke="#FFD700" stroke-width="2.5"/>` },
     ],
 
     accessory: [
@@ -486,6 +879,57 @@ const LAYERS = {
         { label: "Stirnband",      svg: `
           <path d="M42,88 Q100,78 158,88" fill="none" stroke="#E53935" stroke-width="10" stroke-linecap="round"/>
           <circle cx="100" cy="82" r="7" fill="#FFD700"/>` },
+        { label: "Bandana",        svg: `
+          <path d="M42,100 Q100,88 158,100 L158,88 Q100,76 42,88Z" fill="#E53935"/>
+          <path d="M42,88 Q100,78 158,88" fill="none" stroke="#CC0000" stroke-width="2"/>
+          <line x1="58" y1="90" x2="62" y2="96" stroke="#CC0000" stroke-width="1.5"/>
+          <line x1="80" y1="84" x2="84" y2="90" stroke="#CC0000" stroke-width="1.5"/>
+          <line x1="100" y1="80" x2="104" y2="86" stroke="#CC0000" stroke-width="1.5"/>
+          <line x1="120" y1="83" x2="124" y2="89" stroke="#CC0000" stroke-width="1.5"/>
+          <line x1="138" y1="88" x2="142" y2="94" stroke="#CC0000" stroke-width="1.5"/>` },
+        { label: "Halskette",      svg: `
+          <path d="M62,165 Q100,178 138,165" fill="none" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="78"  cy="172" r="3" fill="#FFD700"/>
+          <circle cx="100" cy="178" r="5" fill="#FFD700"/>
+          <circle cx="122" cy="172" r="3" fill="#FFD700"/>
+          <circle cx="100" cy="178" r="3" fill="#FF69B4"/>` },
+        { label: "Ohrringe",       svg: `
+          <circle cx="46" cy="125" r="6" fill="none" stroke="#FFD700" stroke-width="2.5"/>
+          <circle cx="154" cy="125" r="6" fill="none" stroke="#FFD700" stroke-width="2.5"/>` },
+        { label: "Partyhut",       svg: `
+          <polygon points="100,20 60,82 140,82" fill="#FF6B6B"/>
+          <polygon points="100,20 80,60 100,55 120,60" fill="#FFD700"/>
+          <ellipse cx="100" cy="82" rx="40" ry="10" fill="#FFB347"/>
+          <circle cx="100" cy="20" r="5" fill="#FFD700"/>
+          <line x1="100" y1="15" x2="105" y2="5" stroke="#FFD700" stroke-width="2"/>
+          <circle cx="106" cy="4" r="3" fill="#FF6B6B"/>` },
+        { label: "Brille am Kopf", svg: `
+          <circle cx="78" cy="72" r="13" fill="rgba(255,255,255,0.2)" stroke="#333" stroke-width="2.5"/>
+          <circle cx="106" cy="70" r="13" fill="rgba(255,255,255,0.2)" stroke="#333" stroke-width="2.5"/>
+          <line x1="91" y1="71" x2="93" y2="71" stroke="#333" stroke-width="2.5"/>
+          <line x1="65" y1="72" x2="58" y2="75" stroke="#333" stroke-width="2.5"/>
+          <line x1="119" y1="70" x2="126" y2="73" stroke="#333" stroke-width="2.5"/>` },
+        { label: "Diadem",         svg: `
+          <path d="M50,86 Q75,72 100,80 Q125,72 150,86" fill="none" stroke="#FFD700" stroke-width="3"/>
+          <circle cx="100" cy="75" r="6" fill="#FF69B4"/>
+          <circle cx="75"  cy="78" r="4" fill="#74D7FF"/>
+          <circle cx="125" cy="78" r="4" fill="#74D7FF"/>
+          <circle cx="55"  cy="85" r="3" fill="#FFD700"/>
+          <circle cx="145" cy="85" r="3" fill="#FFD700"/>` },
+        { label: "Haarspangen",    svg: `
+          <rect x="62" y="74" width="22" height="8" rx="4" fill="#FF69B4" transform="rotate(-20,73,78)"/>
+          <rect x="116" y="74" width="22" height="8" rx="4" fill="#FF69B4" transform="rotate(20,127,78)"/>` },
+        { label: "Schweißband",    svg: `
+          <path d="M42,92 Q100,82 158,92 L158,100 Q100,90 42,100Z" fill="#FFFFFF" opacity="0.9"/>
+          <path d="M42,92 Q100,82 158,92" fill="none" stroke="#4A90D9" stroke-width="1.5"/>
+          <path d="M42,100 Q100,90 158,100" fill="none" stroke="#4A90D9" stroke-width="1.5"/>` },
+        { label: "Schal",          svg: `
+          <path d="M50,165 Q100,158 150,165 Q155,175 150,182 Q100,175 50,182 Q45,175 50,165Z" fill="#E53935"/>
+          <line x1="55" y1="165" x2="55" y2="182" stroke="#CC0000" stroke-width="1.5"/>
+          <line x1="75" y1="160" x2="75" y2="177" stroke="#CC0000" stroke-width="1.5"/>
+          <line x1="100" y1="158" x2="100" y2="175" stroke="#CC0000" stroke-width="1.5"/>
+          <line x1="125" y1="160" x2="125" y2="177" stroke="#CC0000" stroke-width="1.5"/>
+          <line x1="145" y1="165" x2="145" y2="182" stroke="#CC0000" stroke-width="1.5"/>` },
         // ── PREMIUM ──
         { label: "⭐ Diamant Krone", cost: 1, svg: `
           <polygon points="54,82 54,48 70,64 100,42 130,64 146,48 146,82" fill="#B9F2FF" stroke="#74D7FF" stroke-width="2"/>
@@ -511,12 +955,34 @@ const LAYERS = {
           <path d="M52,72 Q76,52 124,52 Q148,60 148,72Z" fill="#FFD700"/>
           <path d="M55,64 Q78,48 122,48 Q145,55 145,64Z" fill="#4ECDC4"/>
           <path d="M60,57 Q80,44 120,44 Q140,50 140,57Z" fill="#A29BFE"/>` },
+        { label: "⭐ Einhorn",       cost: 1, svg: `
+          <path d="M100,60 L94,18 L100,28 L106,18Z" fill="#FF69B4"/>
+          <path d="M100,60 L95,22 L100,30 L105,22Z" fill="#FFB6C1" opacity="0.8"/>
+          <path d="M100,28 L94,18 L88,12 L96,22Z" fill="#FF8FA3" opacity="0.6"/>
+          <circle cx="100" cy="20" r="4" fill="#FFD700" opacity="0.7"/>` },
+        { label: "⭐ Drachen",       cost: 1, svg: `
+          <path d="M75,68 C68,48 52,42 48,55 C44,68 58,78 70,72Z" fill="#4CAF50"/>
+          <path d="M125,68 C132,48 148,42 152,55 C156,68 142,78 130,72Z" fill="#4CAF50"/>
+          <ellipse cx="72" cy="56" rx="8" ry="5" fill="#388E3C"/>
+          <ellipse cx="128" cy="56" rx="8" ry="5" fill="#388E3C"/>
+          <path d="M66,52 L72,44 L78,52" fill="#FF6D00" opacity="0.8"/>
+          <path d="M122,52 L128,44 L134,52" fill="#FF6D00" opacity="0.8"/>` },
+        { label: "⭐ Engel",         cost: 1, svg: `
+          <path d="M46,90 C20,70 10,100 20,120 C30,140 50,130 54,110 C58,90 50,80 46,90Z" fill="rgba(255,255,255,0.65)" stroke="#FFD700" stroke-width="1.5"/>
+          <path d="M154,90 C180,70 190,100 180,120 C170,140 150,130 146,110 C142,90 150,80 154,90Z" fill="rgba(255,255,255,0.65)" stroke="#FFD700" stroke-width="1.5"/>
+          <ellipse cx="100" cy="52" rx="22" ry="8" fill="none" stroke="#FFD700" stroke-width="3"/>` },
+        { label: "⭐ Weihnacht",     cost: 1, svg: `
+          <ellipse cx="100" cy="82" rx="60" ry="14" fill="#CC0000"/>
+          <path d="M48,82 Q50,48 100,44 Q150,48 152,82Z" fill="#CC0000"/>
+          <ellipse cx="100" cy="44" rx="18" ry="18" fill="#EEEEEE"/>
+          <path d="M40,82 Q100,72 160,82" fill="white" stroke="white" stroke-width="1"/>
+          <circle cx="100" cy="38" r="6" fill="#CC0000"/>` },
     ],
 };
 
 const CATEGORIES = [
     { id: "background", label: "Hintergrund" },
-    { id: "face",       label: "Gesicht" },
+    { id: "face",       label: "Charakter" },
     { id: "hair",       label: "Haare" },
     { id: "eyebrows",   label: "Augenbrauen" },
     { id: "eyes",       label: "Augen" },
@@ -581,7 +1047,45 @@ class AvatarBuilder extends HTMLElement {
         this._unlocked = this._loadUnlocked();
         this._updatePreview();
         this._renderOptions();
+        this._updateRoleLabel();
         this.shadowRoot.querySelector(".overlay").classList.add("active");
+    }
+
+    _updateRoleLabel() {
+        const role = localStorage.getItem("userRole") || "student";
+        const label = this.shadowRoot.getElementById("role-label");
+        const roleNames = { teacher: "👩‍🏫 Lehrer", student: "🎒 Schüler", developer: "💻 Entwickler" };
+        if (label) label.textContent = "Rolle: " + (roleNames[role] || "🎒 Schüler");
+        const btn = this.shadowRoot.getElementById("role-change-btn");
+        if (btn) btn.onclick = () => {
+            localStorage.removeItem("userRole");
+            this.close();
+            this.dispatchEvent(new CustomEvent("show-role-select", { bubbles: true, composed: true }));
+        };
+        this._initBgPicker();
+    }
+
+    _initBgPicker() {
+        const row = this.shadowRoot.getElementById("bg-picker-row");
+        if (!row) return;
+        row.innerHTML = "";
+        const current = localStorage.getItem(LS_BG) || "dark";
+        APP_BG_THEMES.forEach(theme => {
+            const swatch = document.createElement("div");
+            swatch.className = "bg-swatch" + (theme.key === current ? " active" : "");
+            swatch.title = theme.label;
+            swatch.style.background =
+                `radial-gradient(circle at 35% 35%, ${theme.accent}cc, ${theme.color})`;
+            swatch.innerHTML = `<span class="bg-swatch-tip">${theme.label}</span>`;
+            swatch.onclick = () => {
+                localStorage.setItem(LS_BG, theme.key);
+                row.querySelectorAll(".bg-swatch").forEach(s => s.classList.remove("active"));
+                swatch.classList.add("active");
+                this.dispatchEvent(new CustomEvent("bg-changed",
+                    { bubbles: true, composed: true, detail: { theme: theme.key } }));
+            };
+            row.appendChild(swatch);
+        });
     }
 
     close() {
@@ -629,7 +1133,7 @@ class AvatarBuilder extends HTMLElement {
         .preview-area { display: flex; justify-content: center; padding: 0.4rem 0; }
 
         .avatar-preview {
-          width: 150px; height: 150px; border-radius: 50%;
+          width: 220px; height: 220px; border-radius: 50%;
           overflow: hidden;
           border: 3px solid rgba(14,165,233,0.5);
           box-shadow: 0 0 24px rgba(56,189,248,0.4);
@@ -711,6 +1215,47 @@ class AvatarBuilder extends HTMLElement {
         }
         .save-btn:hover  { filter: brightness(1.1); }
         .save-btn:active { filter: brightness(0.9); }
+
+        .role-switch {
+          display: flex; align-items: center; justify-content: space-between;
+          background: rgba(14,165,233,0.08); border: 1px solid rgba(14,165,233,0.25);
+          border-radius: 10px; padding: 0.45rem 0.7rem;
+          font-size: 0.85rem; color: #0369a1; flex-shrink: 0;
+        }
+        .role-switch span { font-weight: bold; }
+        .role-switch button {
+          background: rgba(14,165,233,0.2); border: 1px solid rgba(14,165,233,0.4);
+          border-radius: 7px; padding: 0.25rem 0.6rem; font-size: 0.8rem;
+          color: #0369a1; cursor: pointer; transition: background 0.15s;
+        }
+        .role-switch button:hover { background: rgba(14,165,233,0.4); }
+
+        .bg-picker-section {
+          display: flex; flex-direction: column; gap: 0.4rem; flex-shrink: 0;
+          background: rgba(14,165,233,0.06); border: 1px solid rgba(14,165,233,0.2);
+          border-radius: 10px; padding: 0.5rem 0.7rem;
+        }
+        .bg-picker-label {
+          font-size: 0.78rem; font-weight: bold; color: #0369a1; text-align: center;
+        }
+        .bg-picker-row {
+          display: flex; gap: 0.45rem; justify-content: center; flex-wrap: wrap;
+        }
+        .bg-swatch {
+          width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+          border: 2px solid transparent;
+          transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+          position: relative; display: flex; align-items: flex-end; justify-content: center;
+        }
+        .bg-swatch:hover { transform: scale(1.18); }
+        .bg-swatch.active {
+          border-color: #fff;
+          box-shadow: 0 0 0 2px #0ea5e9, 0 0 8px rgba(14,165,233,0.6);
+        }
+        .bg-swatch-tip {
+          position: absolute; bottom: -17px; left: 50%; transform: translateX(-50%);
+          font-size: 0.52rem; white-space: nowrap; color: #888; pointer-events: none;
+        }
       </style>
 
       <div class="overlay">
@@ -725,6 +1270,14 @@ class AvatarBuilder extends HTMLElement {
           <div class="category-tabs"></div>
           <div class="points-info" id="pts-info"></div>
           <div class="options-grid"></div>
+          <div class="role-switch">
+            <span id="role-label"></span>
+            <button id="role-change-btn">Rolle wechseln</button>
+          </div>
+          <div class="bg-picker-section">
+            <div class="bg-picker-label">🖼 App-Hintergrund</div>
+            <div class="bg-picker-row" id="bg-picker-row"></div>
+          </div>
           <button class="save-btn">💾 Avatar speichern</button>
         </div>
       </div>
@@ -763,28 +1316,31 @@ class AvatarBuilder extends HTMLElement {
     _renderOptions() {
         const container = this.shadowRoot.querySelector(".options-grid");
         if (!container) return;
-        const catId = this._activeCategory;
+        const catId  = this._activeCategory;
+        const isDev  = localStorage.getItem("userRole") === "developer";
         container.innerHTML = LAYERS[catId].map((opt, i) => {
             const key      = `${catId}:${i}`;
-            const isLocked = opt.cost && !this._unlocked.has(key);
+            const cost     = opt.cost ?? 0;
+            const isLocked = cost > 0 && !isDev && !this._unlocked.has(key);
             const thumb    = composeSVG({ ...this._sel, [catId]: i });
             return `<button class="option-btn${this._sel[catId] === i ? " selected" : ""}${isLocked ? " locked" : ""}"
-                data-idx="${i}" data-cat="${catId}" data-locked="${isLocked ? "1" : "0"}">
+                data-idx="${i}" data-cat="${catId}" data-locked="${isLocked ? "1" : "0"}" data-cost="${cost}">
               <span class="opt-thumb">${thumb}</span>
               <span class="opt-label">${opt.label}</span>
-              ${isLocked ? `<span class="lock-badge">🔒 1🪙</span>` : ""}
+              ${isLocked ? `<span class="lock-badge">🔒 ${cost}🪙</span>` : ""}
             </button>`;
         }).join("");
 
         container.querySelectorAll(".option-btn").forEach(btn => {
             btn.onclick = () => {
                 if (btn.dataset.locked === "1") {
+                    const cost = parseInt(btn.dataset.cost) || 1;
                     const pts = this.pointsManager?.points ?? 0;
-                    if (pts < 1) {
-                        alert("Du brauchst 1 Taler um diese Option freizuschalten!\nLerne mehr Vokabeln um Taler zu verdienen.");
+                    if (pts < cost) {
+                        alert(`Du brauchst ${cost} Taler um diese Option freizuschalten!\nLerne mehr Vokabeln um Taler zu verdienen.`);
                         return;
                     }
-                    this.pointsManager.updatePoints(-1);
+                    this.pointsManager.updatePoints(-cost);
                     const key = `${btn.dataset.cat}:${btn.dataset.idx}`;
                     this._unlocked.add(key);
                     this._saveUnlocked();

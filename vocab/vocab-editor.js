@@ -128,6 +128,20 @@ class VocabEditor extends HTMLElement {
         }
         input[type=text]:focus { border-color: #4dd0e1; }
 
+        .quick-textarea {
+          width: 100%; min-height: 220px; padding: 0.7rem 0.8rem;
+          border: 2px solid #e0e0e0; border-radius: 8px;
+          font-size: 0.95rem; font-family: monospace; outline: none;
+          resize: vertical; transition: border-color 0.15s; line-height: 1.7;
+        }
+        .quick-textarea:focus { border-color: #4dd0e1; }
+
+        .format-hint {
+          font-size: 0.78rem; color: #aaa; margin-top: 0.3rem;
+          line-height: 1.5;
+        }
+        .format-hint b { color: #007ea7; }
+
         .word-list { display: flex; flex-direction: column; gap: 0.4rem; }
         .word-row {
           display: grid; grid-template-columns: 1fr 1fr auto;
@@ -137,17 +151,6 @@ class VocabEditor extends HTMLElement {
         }
         .word-de { color: #333; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .word-en { color: #007ea7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        .add-form {
-          display: grid; grid-template-columns: 1fr 1fr auto;
-          gap: 0.5rem; align-items: end;
-        }
-        .add-form .btn-add {
-          padding: 0.62rem 0.8rem; background: #4dd0e1; border: none;
-          border-radius: 8px; color: white; font-size: 1.1rem; font-weight: bold;
-          cursor: pointer; transition: filter 0.2s; white-space: nowrap;
-        }
-        .add-form .btn-add:hover { filter: brightness(1.08); }
 
         .divider { border: none; border-top: 1px solid #eee; margin: 0.2rem 0; }
 
@@ -200,23 +203,12 @@ class VocabEditor extends HTMLElement {
                        autocomplete="off" autocorrect="off" spellcheck="false"/>
               </div>
               <hr class="divider"/>
-              <div class="section-title">Wörter</div>
-              <div class="word-list" id="word-list"></div>
-              <div class="add-form" id="add-form">
-                <div>
-                  <label>Deutsch</label>
-                  <input id="input-de" type="text" placeholder="z.B. Hund"
-                         autocomplete="off" autocorrect="off" spellcheck="false"/>
-                </div>
-                <div>
-                  <label>Englisch</label>
-                  <input id="input-en" type="text" placeholder="z.B. dog"
-                         autocomplete="off" autocorrect="off" spellcheck="false"/>
-                </div>
-                <div>
-                  <label>&nbsp;</label>
-                  <button class="btn-add" id="btn-add-word">+</button>
-                </div>
+              <div class="section-title">Wörter eingeben</div>
+              <textarea id="quick-input" class="quick-textarea"
+                placeholder="Hund = dog&#10;Katze = cat&#10;Haus = house&#10;Auto = car"
+                autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+              <div class="format-hint">
+                Ein Wortpaar pro Zeile: <b>Deutsch = Englisch</b>
               </div>
             </div>
             <div class="footer">
@@ -230,17 +222,9 @@ class VocabEditor extends HTMLElement {
 
         // static listeners
         this.shadowRoot.querySelectorAll(".ph-close").forEach(b => b.onclick = () => this.close());
-        this.shadowRoot.getElementById("btn-back").onclick     = () => this._showLessons();
-        this.shadowRoot.getElementById("btn-add-word").onclick = () => this._addWord();
-        this.shadowRoot.getElementById("btn-save").onclick     = () => this._saveLesson();
+        this.shadowRoot.getElementById("btn-back").onclick       = () => this._showLessons();
+        this.shadowRoot.getElementById("btn-save").onclick       = () => this._saveLesson();
         this.shadowRoot.getElementById("btn-del-lesson").onclick = () => this._deleteLesson();
-
-        // Enter key in word inputs → add word
-        ["input-de", "input-en"].forEach(id => {
-            this.shadowRoot.getElementById(id).addEventListener("keydown", e => {
-                if (e.key === "Enter") this._addWord();
-            });
-        });
     }
 
     // ── lesson list screen ────────────────────────────────────────────────────
@@ -297,9 +281,8 @@ class VocabEditor extends HTMLElement {
 
     _showEdit(idx) {
         this._editIdx = idx;
-        const isNew   = idx === -1;
-        const lesson  = isNew ? { name: "", words: [] } : this._data[idx];
-        this._editWords = lesson.words.map(w => ({ ...w }));  // working copy
+        const isNew  = idx === -1;
+        const lesson = isNew ? { name: "", words: [] } : this._data[idx];
 
         this.shadowRoot.getElementById("screen-lessons").hidden = true;
         this.shadowRoot.getElementById("screen-edit").hidden    = false;
@@ -309,47 +292,26 @@ class VocabEditor extends HTMLElement {
         this.shadowRoot.getElementById("lesson-name-input").value = lesson.name;
         this.shadowRoot.getElementById("btn-del-lesson").hidden = isNew;
 
-        this._renderWordList();
-        this.shadowRoot.getElementById("input-de").focus();
+        // Fill textarea with existing words
+        const ta = this.shadowRoot.getElementById("quick-input");
+        ta.value = lesson.words.map(w => `${w.de} = ${w.en}`).join("\n");
+        ta.focus();
     }
 
-    _renderWordList() {
-        const list = this.shadowRoot.getElementById("word-list");
-        list.innerHTML = "";
-        if (this._editWords.length === 0) {
-            list.innerHTML = `<div style="color:#aaa;font-size:0.85rem;text-align:center;padding:0.5rem">
-        Noch keine Wörter – füge unten welche hinzu.</div>`;
-            return;
-        }
-        this._editWords.forEach((w, i) => {
-            const row = document.createElement("div");
-            row.className = "word-row";
-            row.innerHTML = `
-        <span class="word-de" title="${this._esc(w.de)}">${this._esc(w.de)}</span>
-        <span class="word-en" title="${this._esc(w.en)}">${this._esc(w.en)}</span>
-        <button class="btn-icon del" title="Löschen">🗑</button>`;
-            row.querySelector(".btn-icon").onclick = () => {
-                this._editWords.splice(i, 1);
-                this._renderWordList();
-            };
-            list.appendChild(row);
-        });
-    }
-
-    _addWord() {
-        const deInput = this.shadowRoot.getElementById("input-de");
-        const enInput = this.shadowRoot.getElementById("input-en");
-        const de = deInput.value.trim();
-        const en = enInput.value.trim();
-        if (!de || !en) {
-            if (!de) deInput.focus(); else enInput.focus();
-            return;
-        }
-        this._editWords.push({ de, en, allowImage: false });
-        deInput.value = "";
-        enInput.value = "";
-        this._renderWordList();
-        deInput.focus();
+    _parseTextarea() {
+        const ta = this.shadowRoot.getElementById("quick-input");
+        return ta.value.split("\n")
+            .map(line => line.trim())
+            .filter(line => line.includes("="))
+            .map(line => {
+                const sep = line.indexOf("=");
+                return {
+                    de: line.slice(0, sep).trim(),
+                    en: line.slice(sep + 1).trim(),
+                    allowImage: false
+                };
+            })
+            .filter(w => w.de && w.en);
     }
 
     _saveLesson() {
@@ -358,11 +320,12 @@ class VocabEditor extends HTMLElement {
             this.shadowRoot.getElementById("lesson-name-input").focus();
             return;
         }
-        if (this._editWords.length === 0) {
-            alert("Füge mindestens ein Wort hinzu.");
+        const words = this._parseTextarea();
+        if (words.length === 0) {
+            alert("Füge mindestens ein Wortpaar hinzu.\nFormat: Hund = dog");
             return;
         }
-        const lesson = { name, words: this._editWords };
+        const lesson = { name, words };
         if (this._editIdx === -1) {
             this._data.push(lesson);
         } else {
