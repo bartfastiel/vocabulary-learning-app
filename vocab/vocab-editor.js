@@ -370,7 +370,8 @@ class VocabEditor extends HTMLElement {
         }
         saveCustom(this._data);
         this.dispatchEvent(new CustomEvent("vocab-updated", { bubbles: true, composed: true }));
-        this._showLessons();
+        this.close();
+        if (typeof this.onSaved === "function") this.onSaved();
     }
 
     _deleteLesson() {

@@ -202,7 +202,11 @@ class AppShell extends HTMLElement {
         // Vocab editor
         const vocabEditor = this.shadowRoot.querySelector("vocab-editor");
         this.shadowRoot.getElementById("edit-vocab-btn").onclick = () => vocabEditor.open();
-        this.shadowRoot.addEventListener("vocab-updated", () => trainer.reload());
+        vocabEditor.onSaved = () => {
+            trainer.reload();
+            trainer.togglePopup(true);
+        };
+        vocabEditor.addEventListener("vocab-updated", () => trainer.reload());
 
         const help = this.shadowRoot.querySelector("vocab-help");
         const infoBtn = this.shadowRoot.getElementById("info-btn");
