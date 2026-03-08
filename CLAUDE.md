@@ -71,8 +71,18 @@ Voice clips are pre-generated OpenAI TTS files. Filename convention: `assets/aud
 
 Generation scripts use an API key from `env.sh` (see `env.sh.template`). The `log/` directory (gitignored) holds request/response logs from generation runs.
 
+### Avatar builder
+
+`core/avatar-builder.js` is a self-contained Web Component (`<avatar-builder>`) with all artwork as inline SVG — no external image assets.
+
+- **API**: `avatarBuilder.open()` / `avatarBuilder.close()`; fires `CustomEvent("avatar-saved")` on save.
+- **Export**: `getAvatarSVG()` — returns the composite SVG string for the current saved avatar.
+- **Layers** (bottom→top): `background`, `face`, `hair`, `eyes`, `mouth`, `glasses`, `accessory`. Each layer is a fragment inside a `200×200` viewBox. `glasses` and `accessory` have index 0 = "none".
+- **Adding artwork**: add an entry `{ label, svg }` to the relevant array in `LAYERS` inside `avatar-builder.js`. No other changes needed.
+
 ### LocalStorage keys
 
 - `points` — persisted point total
 - `streakRecord` — all-time best streak
 - `vocabHelpSeen` — set after the onboarding tutorial is dismissed
+- `avatarSelection` — JSON object `{ background, face, hair, eyes, mouth, glasses, accessory }` (indices into each LAYERS array)

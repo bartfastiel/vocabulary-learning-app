@@ -8,6 +8,7 @@ import "./help-overlay.js";
 import "../vocab/vocab.js";
 import "../game/rocket-game.js";
 import { PointsManager } from "../vocab/points.js";
+import { getAvatarSVG } from "./avatar-builder.js";
 
 class AppShell extends HTMLElement {
     constructor() {
@@ -121,10 +122,35 @@ class AppShell extends HTMLElement {
           background: #00acc1;
         }
 
+        #avatar-btn {
+          position: absolute;
+          top: 10px;
+          left: 12px;
+          width: 46px;
+          height: 46px;
+          border-radius: 50%;
+          overflow: hidden;
+          cursor: pointer;
+          border: 3px solid rgba(255,255,255,0.8);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          transition: transform 0.2s, box-shadow 0.2s;
+          background: #e0f7fa;
+        }
+        #avatar-btn:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+        }
+        #avatar-mini { width: 100%; height: 100%; }
+        #avatar-mini svg { width: 100%; height: 100%; display: block; }
+
       </style>
 
       <button id="info-btn">ⓘ Hilfe</button>
+      <div id="avatar-btn" title="Avatar bearbeiten">
+        <div id="avatar-mini"></div>
+      </div>
       <vocab-help></vocab-help>
+      <avatar-builder></avatar-builder>
 
       <div id="quiz-container">
         <h1>🎓 Vokabeltrainer</h1>
@@ -185,6 +211,14 @@ class AppShell extends HTMLElement {
                 game.remove();
             });
         });
+
+        // Avatar
+        const avatarMini = this.shadowRoot.getElementById("avatar-mini");
+        const avatarBuilder = this.shadowRoot.querySelector("avatar-builder");
+        const refreshAvatar = () => { avatarMini.innerHTML = getAvatarSVG(); };
+        refreshAvatar();
+        this.shadowRoot.getElementById("avatar-btn").onclick = () => avatarBuilder.open();
+        this.shadowRoot.addEventListener("avatar-saved", refreshAvatar);
 
         const help = this.shadowRoot.querySelector("vocab-help");
         const infoBtn = this.shadowRoot.getElementById("info-btn");
