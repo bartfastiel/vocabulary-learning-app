@@ -23,8 +23,10 @@ class VocabEditor extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
-        this._data    = [];
-        this._editIdx = -1;   // -1 = new lesson
+        this._data      = [];
+        this._editIdx   = -1;   // -1 = new lesson
+        this._stream    = null; // active camera stream
+        this._scanPairs = [];   // OCR result pairs
     }
 
     connectedCallback() {
@@ -38,6 +40,7 @@ class VocabEditor extends HTMLElement {
     }
 
     close() {
+        this._stopCamera();
         this.shadowRoot.querySelector(".overlay").classList.remove("active");
     }
 
@@ -174,6 +177,73 @@ class VocabEditor extends HTMLElement {
           letter-spacing: 0.05em; color: #aaa; margin-top: 0.3rem;
         }
 
+        /* scan button in edit screen */
+        .btn-scan-open {
+          width: 100%; padding: 0.65rem; border: 2px solid #4dd0e1;
+          background: white; color: #007ea7; border-radius: 10px;
+          font-size: 0.9rem; font-weight: bold; cursor: pointer;
+          transition: all 0.15s; margin-top: 0.2rem;
+        }
+        .btn-scan-open:hover { background: #e0f7fa; }
+
+        /* ── scan screen ─────────────────────────────────────────────────── */
+
+        .scan-video-wrap {
+          width: 100%; border-radius: 10px; overflow: hidden;
+          background: #111; aspect-ratio: 4/3;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        #scan-video {
+          width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .scan-no-cam {
+          color: #aaa; font-size: 0.9rem; text-align: center; padding: 2rem 1rem;
+        }
+        .scan-or {
+          text-align: center; color: #aaa; font-size: 0.85rem;
+        }
+        .btn-upload-label {
+          display: block; width: 100%; padding: 0.65rem; text-align: center;
+          border: 2px solid #4dd0e1; background: white; color: #007ea7;
+          border-radius: 10px; font-size: 0.95rem; font-weight: bold;
+          cursor: pointer; transition: all 0.15s;
+        }
+        .btn-upload-label:hover { background: #e0f7fa; }
+
+        .scan-status-wrap {
+          flex: 1; display: flex; flex-direction: column;
+          align-items: center; justify-content: center; gap: 0.8rem;
+          padding: 1.5rem; text-align: center;
+        }
+        .scan-spinner {
+          width: 40px; height: 40px; border: 4px solid #e0f7fa;
+          border-top-color: #26c6da; border-radius: 50%;
+          animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .scan-status-text { color: #007ea7; font-size: 0.95rem; line-height: 1.6; }
+
+        .scan-result-header {
+          font-size: 0.85rem; font-weight: bold; color: #555;
+        }
+        .scan-result-row {
+          display: grid; grid-template-columns: auto 1fr 1fr;
+          gap: 0.5rem; align-items: center;
+          background: #f8f8f8; border-radius: 8px; padding: 0.45rem 0.6rem;
+          font-size: 0.9rem; cursor: pointer;
+        }
+        .scan-result-row:hover { background: #e8f7fa; }
+        .scan-result-row input[type=checkbox] { width: auto; cursor: pointer; }
+        .scan-cb-de { color: #333; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .scan-cb-en { color: #007ea7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .scan-empty {
+          text-align: center; color: #aaa; font-size: 0.9rem;
+          padding: 1.5rem 0.5rem; line-height: 1.6;
+          border: 2px dashed #e0e0e0; border-radius: 10px;
+        }
+
         [hidden] { display: none !important; }
       </style>
 
@@ -210,10 +280,51 @@ class VocabEditor extends HTMLElement {
               <div class="format-hint">
                 Ein Wortpaar pro Zeile: <b>Deutsch = Englisch</b>
               </div>
+              <button class="btn-scan-open" id="btn-scan-open">📷 Aus Foto einscannen</button>
             </div>
             <div class="footer">
               <button class="btn-del-lesson" id="btn-del-lesson">🗑 Löschen</button>
               <button class="btn-save" id="btn-save">💾 Speichern</button>
+            </div>
+          </div>
+
+          <!-- SCAN SCREEN -->
+          <div id="screen-scan" hidden>
+            <div class="ph">
+              <button class="ph-back" id="btn-scan-back">←</button>
+              <span class="ph-title">📷 Vokabeln scannen</span>
+              <button class="ph-close">✕</button>
+            </div>
+
+            <!-- Phase: capture -->
+            <div class="body" id="scan-phase-capture">
+              <div class="scan-video-wrap">
+                <video id="scan-video" autoplay playsinline muted></video>
+                <div class="scan-no-cam" id="scan-no-cam" hidden>📵 Kamera nicht verfügbar</div>
+              </div>
+              <button class="btn-primary" id="btn-capture">📸 Foto aufnehmen</button>
+              <div class="scan-or">— oder —</div>
+              <label class="btn-upload-label">
+                🖼 Bild hochladen
+                <input type="file" id="scan-file" accept="image/*" hidden>
+              </label>
+            </div>
+
+            <!-- Phase: processing -->
+            <div class="body scan-status-wrap" id="scan-phase-processing" hidden>
+              <div class="scan-spinner"></div>
+              <div class="scan-status-text" id="scan-status-text">Lade OCR-Modul…</div>
+            </div>
+
+            <!-- Phase: results -->
+            <div class="body" id="scan-phase-results" hidden>
+              <div class="scan-result-header" id="scan-result-header"></div>
+              <div class="word-list" id="scan-results-list"></div>
+            </div>
+
+            <div class="footer" id="scan-footer" hidden>
+              <button class="btn-del-lesson" id="btn-scan-retry">↩ Nochmal</button>
+              <button class="btn-save" id="btn-scan-add">✅ Übernehmen</button>
             </div>
           </div>
 
@@ -222,9 +333,17 @@ class VocabEditor extends HTMLElement {
 
         // static listeners
         this.shadowRoot.querySelectorAll(".ph-close").forEach(b => b.onclick = () => this.close());
-        this.shadowRoot.getElementById("btn-back").onclick       = () => this._showLessons();
-        this.shadowRoot.getElementById("btn-save").onclick       = () => this._saveLesson();
-        this.shadowRoot.getElementById("btn-del-lesson").onclick = () => this._deleteLesson();
+        this.shadowRoot.getElementById("btn-back").onclick          = () => this._showLessons();
+        this.shadowRoot.getElementById("btn-save").onclick          = () => this._saveLesson();
+        this.shadowRoot.getElementById("btn-del-lesson").onclick    = () => this._deleteLesson();
+        this.shadowRoot.getElementById("btn-scan-open").onclick     = () => this._showScan();
+        this.shadowRoot.getElementById("btn-scan-back").onclick     = () => this._hideScan();
+        this.shadowRoot.getElementById("btn-scan-retry").onclick    = () => this._showScan();
+        this.shadowRoot.getElementById("btn-capture").onclick       = () => this._capturePhoto();
+        this.shadowRoot.getElementById("btn-scan-add").onclick      = () => this._addScannedWords();
+        this.shadowRoot.getElementById("scan-file").onchange        = (e) => {
+            if (e.target.files[0]) this._loadFile(e.target.files[0]);
+        };
     }
 
     // ── lesson list screen ────────────────────────────────────────────────────
@@ -232,6 +351,7 @@ class VocabEditor extends HTMLElement {
     _showLessons() {
         this.shadowRoot.getElementById("screen-lessons").hidden = false;
         this.shadowRoot.getElementById("screen-edit").hidden    = true;
+        this.shadowRoot.getElementById("screen-scan").hidden    = true;
         this._renderLessonList();
     }
 
@@ -286,6 +406,7 @@ class VocabEditor extends HTMLElement {
 
         this.shadowRoot.getElementById("screen-lessons").hidden = true;
         this.shadowRoot.getElementById("screen-edit").hidden    = false;
+        this.shadowRoot.getElementById("screen-scan").hidden    = true;
 
         this.shadowRoot.getElementById("edit-header-title").textContent =
             isNew ? "Neue Lektion" : lesson.name || "Lektion";
@@ -346,6 +467,218 @@ class VocabEditor extends HTMLElement {
         this.dispatchEvent(new CustomEvent("vocab-updated", { bubbles: true, composed: true }));
         this._showLessons();
     }
+
+    // ── scan screen ───────────────────────────────────────────────────────────
+
+    _showScan() {
+        this._stopCamera();
+        this._scanPhase("capture");
+        this.shadowRoot.getElementById("screen-edit").hidden = true;
+        this.shadowRoot.getElementById("screen-scan").hidden = false;
+        // Reset file input so the same file can be re-selected
+        this.shadowRoot.getElementById("scan-file").value = "";
+        this._startCamera();
+    }
+
+    _hideScan() {
+        this._stopCamera();
+        this.shadowRoot.getElementById("screen-scan").hidden = true;
+        this.shadowRoot.getElementById("screen-edit").hidden = false;
+    }
+
+    _scanPhase(phase) {
+        this.shadowRoot.getElementById("scan-phase-capture").hidden    = phase !== "capture";
+        this.shadowRoot.getElementById("scan-phase-processing").hidden = phase !== "processing";
+        this.shadowRoot.getElementById("scan-phase-results").hidden    = phase !== "results";
+        this.shadowRoot.getElementById("scan-footer").hidden           = phase !== "results";
+    }
+
+    async _startCamera() {
+        const video  = this.shadowRoot.getElementById("scan-video");
+        const noCam  = this.shadowRoot.getElementById("scan-no-cam");
+        const capBtn = this.shadowRoot.getElementById("btn-capture");
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 } }
+            });
+            video.srcObject = stream;
+            this._stream   = stream;
+            noCam.hidden   = true;
+            capBtn.hidden  = false;
+        } catch {
+            video.hidden  = true;
+            noCam.hidden  = false;
+            capBtn.hidden = true;
+        }
+    }
+
+    _stopCamera() {
+        if (this._stream) {
+            this._stream.getTracks().forEach(t => t.stop());
+            this._stream = null;
+        }
+        const video = this.shadowRoot.getElementById("scan-video");
+        if (video) { video.srcObject = null; video.hidden = false; }
+    }
+
+    async _capturePhoto() {
+        const video  = this.shadowRoot.getElementById("scan-video");
+        const canvas = document.createElement("canvas");
+        canvas.width  = video.videoWidth  || 640;
+        canvas.height = video.videoHeight || 480;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+        this._stopCamera();
+        await this._processImage(canvas);
+    }
+
+    async _loadFile(file) {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+        URL.revokeObjectURL(url);
+        const canvas = document.createElement("canvas");
+        canvas.width  = img.width;
+        canvas.height = img.height;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        await this._processImage(canvas);
+    }
+
+    async _processImage(canvas) {
+        this._scanPhase("processing");
+        const status = this.shadowRoot.getElementById("scan-status-text");
+
+        try {
+            // Load Tesseract.js on first use
+            if (!window.Tesseract) {
+                status.textContent = "Lade OCR-Modul…";
+                await new Promise((resolve, reject) => {
+                    const s = document.createElement("script");
+                    s.src     = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+                    s.onload  = resolve;
+                    s.onerror = () => reject(new Error("Tesseract.js konnte nicht geladen werden."));
+                    document.head.appendChild(s);
+                });
+            }
+
+            status.textContent = "Erkenne Text… 0 %";
+            const { data: { text } } = await Tesseract.recognize(canvas, "deu+eng", {
+                logger: m => {
+                    if (m.status === "recognizing text") {
+                        status.textContent = `Erkenne Text… ${Math.round(m.progress * 100)} %`;
+                    }
+                }
+            });
+
+            const pairs = this._parseOCRText(text);
+            this._showScanResults(pairs);
+        } catch (err) {
+            status.innerHTML =
+                `<b>Fehler:</b> ${this._esc(err.message || "Texterkennung fehlgeschlagen.")}<br>
+                 <small>Bitte erneut versuchen.</small>`;
+        }
+    }
+
+    _parseOCRText(rawText) {
+        const pairs = [];
+        const seen  = new Set();
+
+        for (const line of rawText.split("\n")) {
+            const l = line.trim();
+            if (l.length < 3) continue;
+
+            let de = "", en = "";
+
+            if (l.includes("=")) {
+                const sep = l.indexOf("=");
+                de = l.slice(0, sep).trim();
+                en = l.slice(sep + 1).trim();
+            } else if (/\s[-–—]\s/.test(l)) {
+                const m = l.match(/^(.+?)\s[-–—]\s(.+)$/);
+                if (m) { de = m[1].trim(); en = m[2].trim(); }
+            } else if (l.includes("|")) {
+                const parts = l.split("|");
+                if (parts.length >= 2) { de = parts[0].trim(); en = parts[1].trim(); }
+            } else if (l.includes("\t")) {
+                const parts = l.split("\t");
+                if (parts.length >= 2) { de = parts[0].trim(); en = parts[1].trim(); }
+            }
+
+            // Strip leading numbers / bullets (e.g. "1. Hund = dog")
+            de = de.replace(/^\d+[\.\)\s]+/, "").trim();
+            en = en.replace(/^\d+[\.\)\s]+/, "").trim();
+
+            const key = `${de}|${en}`;
+            if (de.length > 1 && en.length > 1 && !seen.has(key)) {
+                seen.add(key);
+                pairs.push({ de, en });
+            }
+        }
+
+        return pairs;
+    }
+
+    _showScanResults(pairs) {
+        const header = this.shadowRoot.getElementById("scan-result-header");
+        const list   = this.shadowRoot.getElementById("scan-results-list");
+        list.innerHTML = "";
+
+        if (pairs.length === 0) {
+            header.textContent = "";
+            const hint = document.createElement("div");
+            hint.className = "scan-empty";
+            hint.innerHTML =
+                "Keine Wortpaare erkannt.<br>" +
+                "<small>Tipps: Klares Foto, gute Beleuchtung,<br>" +
+                "Format <b>Deutsch = Englisch</b> oder <b>Deutsch – Englisch</b>.</small>";
+            list.appendChild(hint);
+            this._scanPhase("results");
+            this.shadowRoot.getElementById("scan-footer").hidden = true;
+            return;
+        }
+
+        header.textContent = `${pairs.length} Wortpaar${pairs.length === 1 ? "" : "e"} erkannt — bitte prüfen:`;
+
+        this._scanPairs = pairs;
+        pairs.forEach((pair, i) => {
+            const row = document.createElement("div");
+            row.className = "scan-result-row";
+            row.innerHTML = `
+              <input type="checkbox" id="sp-${i}" checked>
+              <label for="sp-${i}" class="scan-cb-de">${this._esc(pair.de)}</label>
+              <label for="sp-${i}" class="scan-cb-en">${this._esc(pair.en)}</label>`;
+            row.onclick = (e) => {
+                if (e.target.tagName !== "INPUT") {
+                    const cb = row.querySelector("input");
+                    cb.checked = !cb.checked;
+                }
+            };
+            list.appendChild(row);
+        });
+
+        this._scanPhase("results");
+    }
+
+    _addScannedWords() {
+        const list     = this.shadowRoot.getElementById("scan-results-list");
+        const selected = [];
+        list.querySelectorAll("input[type=checkbox]").forEach((cb, i) => {
+            if (cb.checked) selected.push(this._scanPairs[i]);
+        });
+
+        if (selected.length === 0) {
+            alert("Bitte wähle mindestens ein Wortpaar aus.");
+            return;
+        }
+
+        const ta       = this.shadowRoot.getElementById("quick-input");
+        const existing = ta.value.trim();
+        const newText  = selected.map(p => `${p.de} = ${p.en}`).join("\n");
+        ta.value       = existing ? `${existing}\n${newText}` : newText;
+
+        this._hideScan();
+    }
+
+    // ── helpers ───────────────────────────────────────────────────────────────
 
     _esc(str) {
         return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
