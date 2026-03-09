@@ -17,6 +17,8 @@ import "./memory-game.js";
 import "./snake-game.js";
 import "./breakout-game.js";
 import "./catcher-game.js";
+import "./tetris-game.js";
+import "./invaders-game.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -76,6 +78,20 @@ const GAMES = [
         component: "rocket-game",
         desc: "Schieße Münzen ab!",
         scoreLabel: null,
+    },
+    {
+        id: "tetris",   label: "Tetris",             emoji: "🟦",
+        cost: 2,  maxEarn: 25,
+        component: "tetris-game",
+        desc: "Stapele Blöcke & räume Reihen!",
+        scoreLabel: "Punkte",
+    },
+    {
+        id: "invaders", label: "Space Invaders",     emoji: "👾",
+        cost: 2,  maxEarn: 30,
+        component: "invaders-game",
+        desc: "Vernichte die Alien-Flotte!",
+        scoreLabel: "Punkte",
     },
 ];
 
