@@ -40,7 +40,6 @@ class VocabEditor extends HTMLElement {
     }
 
     close() {
-        this._stopCamera();
         this.shadowRoot.querySelector(".overlay").classList.remove("active");
     }
 
