@@ -188,28 +188,20 @@ class VocabEditor extends HTMLElement {
 
         /* ── scan screen ─────────────────────────────────────────────────── */
 
-        .scan-video-wrap {
-          width: 100%; border-radius: 10px; overflow: hidden;
-          background: #111; aspect-ratio: 4/3;
-          display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0;
+        .scan-upload-area {
+          flex: 1; display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          gap: 1rem; text-align: center; padding: 1rem;
         }
-        #scan-video {
-          width: 100%; height: 100%; object-fit: cover; display: block;
-        }
-        .scan-no-cam {
-          color: #aaa; font-size: 0.9rem; text-align: center; padding: 2rem 1rem;
-        }
-        .scan-or {
-          text-align: center; color: #aaa; font-size: 0.85rem;
-        }
+        .scan-upload-icon { font-size: 4rem; line-height: 1; }
+        .scan-upload-hint { color: #666; font-size: 0.9rem; line-height: 1.5; margin: 0; }
         .btn-upload-label {
-          display: block; width: 100%; padding: 0.65rem; text-align: center;
-          border: 2px solid #4dd0e1; background: white; color: #007ea7;
-          border-radius: 10px; font-size: 0.95rem; font-weight: bold;
-          cursor: pointer; transition: all 0.15s;
+          display: block; width: 100%; padding: 0.75rem; text-align: center;
+          border: none; background: linear-gradient(to right, #4dd0e1, #26c6da);
+          color: white; border-radius: 10px; font-size: 1rem; font-weight: bold;
+          cursor: pointer; transition: filter 0.2s;
         }
-        .btn-upload-label:hover { background: #e0f7fa; }
+        .btn-upload-label:hover { filter: brightness(1.08); }
 
         .scan-status-wrap {
           flex: 1; display: flex; flex-direction: column;
@@ -298,16 +290,16 @@ class VocabEditor extends HTMLElement {
 
             <!-- Phase: capture -->
             <div class="body" id="scan-phase-capture">
-              <div class="scan-video-wrap">
-                <video id="scan-video" autoplay playsinline muted></video>
-                <div class="scan-no-cam" id="scan-no-cam" hidden>📵 Kamera nicht verfügbar</div>
+              <div class="scan-upload-area">
+                <div class="scan-upload-icon">📄</div>
+                <p class="scan-upload-hint">
+                  Foto der Vokabelliste aufnehmen<br>oder Bild aus der Galerie auswählen.
+                </p>
+                <label class="btn-upload-label">
+                  📷 Foto / Bild auswählen
+                  <input type="file" id="scan-file" accept="image/*" hidden>
+                </label>
               </div>
-              <button class="btn-primary" id="btn-capture">📸 Foto aufnehmen</button>
-              <div class="scan-or">— oder —</div>
-              <label class="btn-upload-label">
-                🖼 Bild hochladen
-                <input type="file" id="scan-file" accept="image/*" hidden>
-              </label>
             </div>
 
             <!-- Phase: processing -->
@@ -339,7 +331,6 @@ class VocabEditor extends HTMLElement {
         this.shadowRoot.getElementById("btn-scan-open").onclick     = () => this._showScan();
         this.shadowRoot.getElementById("btn-scan-back").onclick     = () => this._hideScan();
         this.shadowRoot.getElementById("btn-scan-retry").onclick    = () => this._showScan();
-        this.shadowRoot.getElementById("btn-capture").onclick       = () => this._capturePhoto();
         this.shadowRoot.getElementById("btn-scan-add").onclick      = () => this._addScannedWords();
         this.shadowRoot.getElementById("scan-file").onchange        = (e) => {
             if (e.target.files[0]) this._loadFile(e.target.files[0]);
@@ -471,17 +462,14 @@ class VocabEditor extends HTMLElement {
     // ── scan screen ───────────────────────────────────────────────────────────
 
     _showScan() {
-        this._stopCamera();
         this._scanPhase("capture");
         this.shadowRoot.getElementById("screen-edit").hidden = true;
         this.shadowRoot.getElementById("screen-scan").hidden = false;
         // Reset file input so the same file can be re-selected
         this.shadowRoot.getElementById("scan-file").value = "";
-        this._startCamera();
     }
 
     _hideScan() {
-        this._stopCamera();
         this.shadowRoot.getElementById("screen-scan").hidden = true;
         this.shadowRoot.getElementById("screen-edit").hidden = false;
     }
@@ -491,44 +479,6 @@ class VocabEditor extends HTMLElement {
         this.shadowRoot.getElementById("scan-phase-processing").hidden = phase !== "processing";
         this.shadowRoot.getElementById("scan-phase-results").hidden    = phase !== "results";
         this.shadowRoot.getElementById("scan-footer").hidden           = phase !== "results";
-    }
-
-    async _startCamera() {
-        const video  = this.shadowRoot.getElementById("scan-video");
-        const noCam  = this.shadowRoot.getElementById("scan-no-cam");
-        const capBtn = this.shadowRoot.getElementById("btn-capture");
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 } }
-            });
-            video.srcObject = stream;
-            this._stream   = stream;
-            noCam.hidden   = true;
-            capBtn.hidden  = false;
-        } catch {
-            video.hidden  = true;
-            noCam.hidden  = false;
-            capBtn.hidden = true;
-        }
-    }
-
-    _stopCamera() {
-        if (this._stream) {
-            this._stream.getTracks().forEach(t => t.stop());
-            this._stream = null;
-        }
-        const video = this.shadowRoot.getElementById("scan-video");
-        if (video) { video.srcObject = null; video.hidden = false; }
-    }
-
-    async _capturePhoto() {
-        const video  = this.shadowRoot.getElementById("scan-video");
-        const canvas = document.createElement("canvas");
-        canvas.width  = video.videoWidth  || 640;
-        canvas.height = video.videoHeight || 480;
-        canvas.getContext("2d").drawImage(video, 0, 0);
-        this._stopCamera();
-        await this._processImage(canvas);
     }
 
     async _loadFile(file) {

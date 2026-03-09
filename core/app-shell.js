@@ -621,14 +621,21 @@ class AppShell extends HTMLElement {
         const treasureEl = this.shadowRoot.getElementById("treasure");
         const pointsManager = new PointsManager(this.shadowRoot);
 
+        const help = this.shadowRoot.querySelector("vocab-help");
+
         // ── Rollenauswahl ──
         const roleOverlay = this.shadowRoot.getElementById("role-overlay");
+        const savedRole   = localStorage.getItem("userRole");
         const applyRole = (role) => {
+            const isFirst = !localStorage.getItem("userRole");
             localStorage.setItem("userRole", role);
             roleOverlay.classList.add("hidden");
             treasureEl.style.display = role === "teacher" ? "none" : "";
+            // Hilfe starten wenn Rolle zum ersten Mal gewählt wird
+            if (isFirst && !localStorage.getItem("vocabHelpSeen")) {
+                setTimeout(() => this.startHelp(help), 500);
+            }
         };
-        const savedRole = localStorage.getItem("userRole");
         if (savedRole) {
             applyRole(savedRole);
         } else {
@@ -703,12 +710,11 @@ class AppShell extends HTMLElement {
         };
         vocabEditor.addEventListener("vocab-updated", () => trainer.reload());
 
-        const help = this.shadowRoot.querySelector("vocab-help");
         const infoBtn = this.shadowRoot.getElementById("info-btn");
-
         infoBtn.onclick = () => this.startHelp(help);
 
-        if (!localStorage.getItem("vocabHelpSeen")) {
+        // Hilfe beim ersten Start (wenn Rolle schon gesetzt war, z.B. nach Reload)
+        if (savedRole && !localStorage.getItem("vocabHelpSeen")) {
             setTimeout(() => this.startHelp(help), 500);
         }
     }
