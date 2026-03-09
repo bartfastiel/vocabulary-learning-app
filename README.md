@@ -1,22 +1,38 @@
 # **📘 Vocabulary Learning App**
 
-Ein modularer, webbasierter Vokabeltrainer mit mehreren Interaktionsmodi (Text, Bild, Audio).
-Er nutzt **native Web Components** für vollständige Kapselung — jede Komponente enthält ihr eigenes HTML, CSS und JS.
-Keine Frameworks, kein Build-System und keine globalen Stylesheets.
+A modular, web-based vocabulary trainer with multiple interaction modes (text, image, audio).
+It uses **native Web Components** for full encapsulation — each component contains its own HTML, CSS, and JS.
+No frameworks, no build system, no global stylesheets.
 
-Nur ein einziger Helper wird geteilt: `core/audio.js`.
+The only shared helper is `core/audio.js`.
+
+---
+
+# 🚀 **Getting Started**
+
+There is no build step. Serve the project root with any static file server (required for ES module imports and `fetch` calls):
+
+```sh
+# Python
+python -m http.server 8080
+
+# Node
+npx serve .
+```
+
+Then open `http://localhost:8080` in a browser.
 
 ---
 
 # 🧭 **Design Principles**
 
-* **Domain-oriented structure** – Gliederung nach Funktionsbereichen statt nach Dateitypen
-* **Full encapsulation** – jede Komponente ist vollständig eigenständig (Shadow DOM + eigenes CSS)
-* **No global utilities or stylesheets** – einzige Ausnahme: `core/audio.js`
-* **Deterministic imports** – alle Module werden explizit in `vocab.js` importiert
-* **Predictable modes** – alle erlaubten Kombinationen von question/answer befinden sich in einem statischen Array
-* **Composable** – neue question/answer Komponenten können flexibel kombiniert werden
-* **Maintainability** – klarer, expliziter Lernfluss ohne versteckte Magie
+* **Domain-oriented structure** – organized by feature area, not by file type
+* **Full encapsulation** – each component is fully self-contained (Shadow DOM + own CSS)
+* **No global utilities or stylesheets** – the only exception is `core/audio.js`
+* **Deterministic imports** – all modules are explicitly imported in `vocab.js`
+* **Predictable modes** – all allowed question/answer combinations are defined in a static array
+* **Composable** – new question/answer components can be combined freely
+* **Maintainability** – clear, explicit learning flow with no hidden magic
 
 ---
 
@@ -28,7 +44,8 @@ vocabulary-learning-app/
 │
 ├── core/
 │   ├── app-shell.js         # root element that loads <vocab-trainer> or the game
-│   └── audio.js             # unified sound + voice playback
+│   ├── audio.js             # unified sound + voice playback
+│   └── help-overlay.js      # onboarding tutorial overlay
 │
 ├── vocab/
 │   ├── vocab.js             # orchestrator: modes, flow, component creation
@@ -69,153 +86,196 @@ vocabulary-learning-app/
 
 ## **index.html**
 
-* Minimal Root-Dokument
-* Bindet `<app-shell>` ein
-* Keine eigene Logik oder Styles
+* Minimal root document
+* Mounts `<app-shell>`
+* No logic or styles of its own
 
 ---
 
 ## **core/app-shell.js**
 
-* Wurzelkomponente
-* Enthält:
-
-  * Header (Punkte / Streak)
-  * den weißen Quiz-Bereich
-  * das Overlay für das Minispiel
-* Bindet `<vocab-trainer>` oder `<rocket-game>` je nach Interaktion
-* Keine Lernlogik
+* Root component
+* Contains:
+  * Header (points / streak)
+  * The white quiz area
+  * The mini-game overlay
+* Loads `<vocab-trainer>` or `<rocket-game>` depending on interaction
+* No learning logic
 
 ---
 
 ## **core/audio.js**
 
-Der **einzige global geteilte Helper**.
+The **only globally shared helper**.
 
-Bietet:
+Provides:
 
 ```js
 playSound("ding" | "buzz");
 playVoice(englishWord);
 ```
 
-* Einheitliches Soundverhalten
-* Einheitliches Voice-Playback (OpenAI TTS)
-* Garantiert identisches Lautstärke- und Timing-Verhalten in allen Komponenten
+* Consistent sound behavior
+* Consistent voice playback (OpenAI TTS)
+* Guaranteed identical volume and timing behavior across all components
+
+---
+
+## **core/help-overlay.js**
+
+Onboarding tutorial overlay shown to first-time users. Dismissed via LocalStorage key `vocabHelpSeen`.
 
 ---
 
 # **vocab/vocab.js — Orchestrator**
 
-Die zentrale Steuerlogik der Anwendung:
+The central control logic of the application:
 
-* Lädt `vocab.json`
+* Loads `vocab.json`
 
-* Selektiert zufällige Wörter
+* Selects a random word
 
-* Selektiert einen **Mode** aus einer Liste fester Kombinationen:
+* Selects a **mode** from a list of fixed combinations:
 
   ```js
   { question: "vocab-question-wordgerman", answer: "vocab-answer-choosewordenglish" }
-  ...
+  // ...
   ```
 
-* Erzeugt dynamisch die passenden Web Components
+* Dynamically creates the matching Web Components
 
-* Setzt das `data`-Objekt für Antwortkomponenten
+* Sets the `data` object on answer components
 
-* Hört auf das `answered`-Event der Antwortkomponenten
+* Listens for the `answered` event from answer components
 
-* Verbindet das Ergebnis mit `points.js`
+* Delegates results to `points.js`
 
-* Führt zur nächsten Runde weiter
+* Advances to the next round
 
-🔥 **Keine globale oder implizite Abhängigkeit — alles explicit wiring.**
+🔥 **No global or implicit dependencies — everything is explicit wiring.**
 
 ---
 
 # **vocab/points.js**
 
-Verantwortlich für:
+Responsible for:
 
-* lokale Punkte
-* Streak-Logik
-* Highscore-Tracking
-* Punktestand in DOM aktualisieren (über Referenzen von `app-shell`)
+* Local point total
+* Streak logic
+* Highscore tracking
+* Updating the score display in the DOM (via references from `app-shell`)
 
-Keine Lernlogik, nur Statusmanagement.
+No learning logic — pure state management.
 
 ---
 
 # **vocab/question/**
 
-Jede Frage ist ein eigener Web Component:
+Each question type is its own Web Component:
 
-| Component                  | Aufgabe                    |
-| -------------------------- | -------------------------- |
-| `question-wordgerman.js`   | Zeigt deutsches Wort       |
-| `question-wordenglish.js`  | Zeigt englisches Wort      |
-| `question-image.js`        | Zeigt ein Bild             |
-| `question-voiceenglish.js` | Spielt englisches Audio ab |
+| Component                  | Role                         |
+| -------------------------- | ---------------------------- |
+| `question-wordgerman.js`   | Displays the German word     |
+| `question-wordenglish.js`  | Displays the English word    |
+| `question-image.js`        | Displays an image            |
+| `question-voiceenglish.js` | Plays English audio          |
 
-Alle setzen:
+All accept:
 
 ```js
-this.word = {...}
+this.word = { de: "...", en: "...", allowImage: true }
 ```
 
-und rendern sofort ihren Inhalt.
+and render immediately.
 
 ---
 
 # **vocab/answer/**
 
-Jede Antwortkomponente implementiert exakt **eine** Interaktionsform.
+Each answer component implements exactly **one** interaction form.
 
-| Component                      | Aufgabe                           |
+| Component                      | Role                              |
 | ------------------------------ | --------------------------------- |
-| `answer-choosewordenglish.js`  | Englisch per Klick auswählen      |
-| `answer-choosewordgerman.js`   | Deutsch per Klick auswählen       |
-| `answer-chooseimage.js`        | Bild auswählen                    |
-| `answer-choosevoiceenglish.js` | Stimme auswählen / Audiovergleich |
-| `answer-typewordenglish.js`    | Englisch eintippen                |
+| `answer-choosewordenglish.js`  | Choose English word by clicking   |
+| `answer-choosewordgerman.js`   | Choose German word by clicking    |
+| `answer-chooseimage.js`        | Choose the correct image          |
+| `answer-choosevoiceenglish.js` | Choose by listening to audio      |
+| `answer-typewordenglish.js`    | Type the English word             |
 
-Jede Komponente löst aus:
+Each component dispatches:
 
 ```js
 this.dispatchEvent(new CustomEvent("answered", {
   bubbles: true,
-  detail: { correct: true/false }
+  detail: { correct: true | false }
 }));
 ```
 
 ---
 
-# 🎮 **game/** Domain
+# 🎮 **game/ Domain**
 
-Mini-Game zum spielerischen Punktetausch.
+Mini-game for spending points playfully.
 
-| Datei            | Aufgabe                                                          |
+| File             | Role                                                             |
 | ---------------- | ---------------------------------------------------------------- |
-| `rocket-game.js` | eigenes Overlay, eigener Loop, keine Verbindung zur Vokabellogik |
+| `rocket-game.js` | Own overlay, own loop, no connection to the vocab learning logic |
 
 ---
 
-# 🧠 **Mode Handling (aktuelles System)**
+# 🧠 **Mode Handling**
 
-README **aktualisiert**:
+There are **no `mode-*.js` files**.
 
-Es gibt **keine `mode-*.js` Dateien** mehr.
+Instead:
 
-Stattdessen:
-
-* Alle gültigen Kombinationen stehen im `MODES`-Array in `vocab.js`.
-* Jede Kombination ist statisch definiert:
+* All valid combinations are listed in the `MODES` array in `vocab.js`.
+* Each combination is statically defined:
 
   ```js
   { question: "vocab-question-image", answer: "vocab-answer-choosewordenglish" }
   ```
-* Neue Frage-/Antwortkomponenten können einfach über neue Mode-Einträge kombiniert werden.
+* Modes that use images are filtered out if `word.allowImage` is false.
+* New question/answer components can be added by importing them in `vocab.js` and appending entries to `MODES`.
+
+---
+
+# 📄 **vocab.json Structure**
+
+```json
+[
+  {
+    "name": "Lesson 1",
+    "words": [
+      { "de": "Hund", "en": "dog", "allowImage": true }
+    ]
+  }
+]
+```
+
+Optional word fields: `en_info` (displayed as an extra hint).
+
+---
+
+# 🔊 **Audio Assets**
+
+Voice clips are pre-generated OpenAI TTS files.
+
+Filename convention: `assets/audio/voice/<normalized_word>_<voice>.mp3`
+- Word is lowercased with non-alphanumeric characters replaced by `_`
+- Voice is one of: `alloy`, `ash`, `coral`, `nova`, `onyx`
+
+Generation scripts (`generate-voice.sh`, `generate-images.sh`) read an API key from `env.sh` (see `env.sh.template`).
+
+---
+
+# 💾 **LocalStorage Keys**
+
+| Key             | Purpose                                              |
+| --------------- | ---------------------------------------------------- |
+| `points`        | Persisted point total                                |
+| `streakRecord`  | All-time best streak                                 |
+| `vocabHelpSeen` | Set after the onboarding tutorial is dismissed       |
 
 ---
 
@@ -225,18 +285,18 @@ Stattdessen:
 * **Shadow DOM**
 * **ES Modules**
 * **LocalStorage**
-* **OpenAI TTS** für audio playback (voice clips)
-* **Keine Frameworks, keine Abhängigkeiten**
+* **OpenAI TTS** for audio playback (voice clips)
+* **No frameworks, no dependencies**
 
 ---
 
 # 🚀 **Future Extensions**
 
-* Mehr Fragetypen (z. B. Satzbeschreibung, Grammatik)
-* Erweiterte Antworttypen (Drag&Drop, Satzbau)
-* Erweiterter Sprachumfang
-* Leaderboards / Cloud-Sync
-* Adaptive Lernlogik
+* More question types (e.g. sentence description, grammar)
+* Extended answer types (drag & drop, sentence building)
+* Broader vocabulary
+* Leaderboards / cloud sync
+* Adaptive learning logic
 
 ---
 
@@ -244,5 +304,5 @@ Stattdessen:
 
 * `buzz.mp3` — LorenzoTheGreat (CC BY 3.0)
 * `ding.mp3` — timgormly (CC0)
-* Bilder in `assets/img` — DALL·E
-* Audio-Clips — OpenAI Text-To-Speech Model
+* Images in `assets/img` — DALL·E
+* Audio clips — OpenAI Text-To-Speech
