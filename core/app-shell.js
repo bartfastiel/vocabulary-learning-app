@@ -1,8 +1,5 @@
 // core/app-shell.js
-//
-// Layout: headline on top, below a two-column grid with equal-height
-// score and streak boxes.
-//
+// Clean ANTON-style dashboard with subject cards and trainer views.
 
 import "./help-overlay.js";
 import "./group-board.js";
@@ -25,581 +22,470 @@ class AppShell extends HTMLElement {
     connectedCallback() {
         this.shadowRoot.innerHTML = `
       <style>
-        html, :host, body {
-          margin: 0; padding: 0; height: 100%; overflow: hidden;
-          font-family: "Segoe UI", sans-serif;
-          background: #050d1a;
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
+        *, *::before, *::after { box-sizing: border-box; }
+        :host {
+          display: block; margin: 0; padding: 0;
+          min-height: 100vh;
+          font-family: "Segoe UI", system-ui, sans-serif;
+          background: #f0f4f8;
+          color: #2d3748;
         }
 
-        /* ── Animated background ── */
-        #bg {
-          position: fixed; inset: 0; z-index: 0;
-          animation: bgShift 14s ease-in-out infinite alternate;
+        /* ── Top bar ── */
+        .topbar {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 0.7rem 1.2rem;
+          background: white;
+          border-bottom: 1px solid #e2e8f0;
+          position: sticky; top: 0; z-index: 100;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
-        @keyframes bgShift {
-          0%   { background: radial-gradient(ellipse at 20% 30%, #0a1f3a 0%, #050d1a 60%, #020810 100%); }
-          50%  { background: radial-gradient(ellipse at 70% 60%, #0d2240 0%, #060f1e 60%, #020810 100%); }
-          100% { background: radial-gradient(ellipse at 40% 80%, #091830 0%, #050d1a 60%, #010608 100%); }
-        }
-
-        /* Sterne-Partikel */
-        #bg::before {
-          content: "";
-          position: absolute; inset: 0;
-          background-image:
-            radial-gradient(1px 1px at 10% 15%, rgba(147,210,255,0.7) 0%, transparent 100%),
-            radial-gradient(1px 1px at 25% 40%, rgba(100,180,255,0.5) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 50% 10%, rgba(180,230,255,0.8) 0%, transparent 100%),
-            radial-gradient(1px 1px at 70% 25%, rgba(120,200,255,0.6) 0%, transparent 100%),
-            radial-gradient(1px 1px at 85% 55%, rgba(150,220,255,0.5) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 35% 70%, rgba(100,180,255,0.7) 0%, transparent 100%),
-            radial-gradient(1px 1px at 90% 80%, rgba(170,225,255,0.6) 0%, transparent 100%),
-            radial-gradient(1px 1px at 15% 85%, rgba(130,210,255,0.5) 0%, transparent 100%),
-            radial-gradient(2px 2px at 60% 50%, rgba(56,189,248,0.4) 0%, transparent 100%),
-            radial-gradient(1px 1px at 45% 90%, rgba(100,180,255,0.6) 0%, transparent 100%);
-        }
-
-        .orb {
-          position: absolute; border-radius: 50%;
-          filter: blur(90px); opacity: 0.35;
-          animation: float 14s ease-in-out infinite;
-        }
-        .orb1 { width: 500px; height: 500px; background: #0369a1; top: -180px; left: -150px; animation-duration: 18s; }
-        .orb2 { width: 420px; height: 420px; background: #0ea5e9; bottom: -120px; right: -100px; animation-duration: 14s; animation-delay: -5s; }
-        .orb3 { width: 320px; height: 320px; background: #1d4ed8; top: 35%; left: 55%; animation-duration: 20s; animation-delay: -9s; }
-        .orb4 { width: 250px; height: 250px; background: #38bdf8; top: 15%; right: 15%; animation-duration: 11s; animation-delay: -3s; }
-        .orb5 { width: 180px; height: 180px; background: #7dd3fc; bottom: 20%; left: 10%; animation-duration: 16s; animation-delay: -7s; opacity: 0.25; }
-
-        @keyframes float {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33%       { transform: translate(35px, -50px) scale(1.1); }
-          66%       { transform: translate(-25px, 25px) scale(0.93); }
-        }
-
-        /* ── Subject tabs ── */
-        .subject-tabs {
-          display: flex; gap: 0.5rem; margin-bottom: 0.6rem;
-          z-index: 1; position: relative;
-        }
-        .subject-tab {
-          padding: 0.5rem 1.1rem;
-          border: 2px solid rgba(56,189,248,0.3);
-          border-radius: 12px;
-          background: rgba(3,30,60,0.5);
-          color: #7dd3fc;
-          font-size: 0.95rem; font-weight: bold;
-          cursor: pointer;
-          transition: all 0.2s;
-          backdrop-filter: blur(10px);
-        }
-        .subject-tab:hover {
-          background: rgba(3,60,110,0.7);
-          border-color: rgba(56,189,248,0.6);
-          transform: translateY(-2px);
-        }
-        .subject-tab.active {
-          background: linear-gradient(135deg, rgba(14,165,233,0.8), rgba(56,189,248,0.8));
-          border-color: rgba(56,189,248,0.9);
-          color: white;
-          box-shadow: 0 0 20px rgba(14,165,233,0.5);
-        }
-        .trainer-container { display: none; width: 100%; }
-        .trainer-container.active { display: block; }
-
-        /* ── Layout ── */
-        #quiz-container {
-          position: relative; z-index: 1;
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-        }
-
-        h1 {
-          font-size: 2rem; margin: 0 0 0.6rem 0;
-          color: #e0f2fe;
-          text-shadow: 0 0 20px rgba(56,189,248,0.9), 0 0 40px rgba(14,165,233,0.7), 0 0 70px rgba(56,189,248,0.4);
-          animation: titleGlow 3s ease-in-out infinite alternate;
-        }
-        @keyframes titleGlow {
-          from { text-shadow: 0 0 18px rgba(56,189,248,0.8), 0 0 36px rgba(14,165,233,0.5); }
-          to   { text-shadow: 0 0 30px rgba(56,189,248,1), 0 0 60px rgba(14,165,233,0.8), 0 0 100px rgba(125,211,252,0.5); }
-        }
-
-        .info-grid {
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: 0.8rem; width: 100%; max-width: 420px;
-        }
-
-        #score, #streak-box {
-          display: flex; align-items: center; justify-content: center;
-          background: rgba(3,30,60,0.65);
-          backdrop-filter: blur(18px);
-          -webkit-backdrop-filter: blur(18px);
-          border: 1px solid rgba(56,189,248,0.35);
-          border-radius: 14px;
-          padding: 0.6rem 1rem; font-size: 1rem;
-          min-height: 2.5rem; box-sizing: border-box;
-          white-space: nowrap; color: #bae6fd;
-          box-shadow: 0 0 18px rgba(14,165,233,0.25), inset 0 1px 0 rgba(56,189,248,0.2);
-        }
-
-        #treasure {
-          margin-left: 10px; cursor: pointer;
-          transition: transform 0.2s, filter 0.2s, opacity 0.2s;
-          animation: treasurePulse 2s ease-in-out infinite;
-        }
-        @keyframes treasurePulse {
-          0%, 100% { filter: drop-shadow(0 0 4px #f59e0b); }
-          50%       { filter: drop-shadow(0 0 12px #f59e0b) drop-shadow(0 0 24px #fbbf24); }
-        }
-        #treasure.disabled {
-          cursor: default; opacity: 0.25;
-          filter: grayscale(100%); animation: none;
-        }
-        #treasure:not(.disabled):hover { transform: scale(1.3); }
-
-        #ship { font-size: 1.3rem; margin-left: 0.5rem; }
-        .streak-10 #ship { transform: scale(1.3); }
-        .streak-15 #ship { transform: scale(1.6) rotate(15deg); }
-        .streak-20 #ship { transform: scale(2) rotate(360deg); }
-        .streak-broken #ship { animation: shake 0.5s; color: #e53935; }
-
-        @keyframes shake {
-          0%   { transform: translateX(0); }
-          25%  { transform: translateX(-5px); }
-          50%  { transform: translateX(5px); }
-          75%  { transform: translateX(-5px); }
-          100% { transform: translateX(0); }
-        }
-
-        /* ── Buttons ── */
-        .top-right-btns {
-          position: absolute; top: 10px; right: 12px; z-index: 2;
-          display: flex; flex-direction: column; gap: 6px;
-        }
-        #info-btn, #edit-vocab-btn, #group-btn {
-          font-size: 0.95rem;
-          background: rgba(3,105,161,0.7);
-          backdrop-filter: blur(10px);
-          color: #e0f2fe; border: 1px solid rgba(56,189,248,0.45);
-          padding: 0.4rem 0.7rem; border-radius: 10px;
-          cursor: pointer; white-space: nowrap;
-          box-shadow: 0 0 14px rgba(14,165,233,0.4);
-          transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
-        }
-        #info-btn:hover, #edit-vocab-btn:hover, #group-btn:hover {
-          background: rgba(2,132,199,0.9);
-          box-shadow: 0 0 24px rgba(56,189,248,0.8);
-          transform: translateY(-2px);
-        }
-
-        /* ── Avatar ── */
-        #avatar-btn {
-          position: absolute; top: 10px; left: 12px; z-index: 2;
-          width: 200px; height: 200px; border-radius: 50%;
+        .topbar-left { display: flex; align-items: center; gap: 0.7rem; }
+        .topbar-avatar {
+          width: 40px; height: 40px; border-radius: 50%;
           overflow: hidden; cursor: pointer;
-          border: 2px solid rgba(56,189,248,0.6);
-          box-shadow: 0 0 18px rgba(14,165,233,0.7), 0 0 36px rgba(56,189,248,0.4);
-          transition: transform 0.2s, box-shadow 0.2s;
-          background: #071a2e;
+          border: 2px solid #e2e8f0;
+          background: #edf2f7;
+          display: flex; align-items: center; justify-content: center;
+          transition: border-color 0.2s, transform 0.15s;
         }
-        #avatar-btn:hover {
-          transform: scale(1.1);
-          box-shadow: 0 0 28px rgba(56,189,248,1), 0 0 56px rgba(14,165,233,0.7);
+        .topbar-avatar:hover { border-color: #4299e1; transform: scale(1.08); }
+        .topbar-avatar svg { width: 100%; height: 100%; display: block; }
+        .topbar-name {
+          font-weight: 700; font-size: 1rem; color: #2d3748;
+          cursor: pointer;
         }
-        #avatar-mini { width: 100%; height: 100%; }
-        #avatar-mini svg { width: 100%; height: 100%; display: block; }
+        .topbar-name:hover { color: #4299e1; }
+        .topbar-right { display: flex; align-items: center; gap: 0.5rem; }
+        .topbar-stats {
+          display: flex; align-items: center; gap: 0.3rem;
+          background: #edf2f7; border-radius: 20px;
+          padding: 0.3rem 0.8rem; font-size: 0.85rem; font-weight: 600;
+          color: #4a5568;
+        }
+        .topbar-btn {
+          background: none; border: none; cursor: pointer;
+          font-size: 1.3rem; padding: 0.3rem;
+          border-radius: 8px; transition: background 0.15s;
+          color: #4a5568;
+        }
+        .topbar-btn:hover { background: #edf2f7; }
 
-        /* ── Profilwechsler unter Avatar ── */
-        #profile-switcher {
-          position: absolute; top: 214px; left: 12px; z-index: 2;
-          width: 200px; text-align: center; cursor: pointer;
-          color: #7dd3fc; font-size: 0.75rem;
-          background: rgba(3,20,45,0.7);
-          border: 1px solid rgba(56,189,248,0.3);
-          border-radius: 0 0 12px 12px;
-          padding: 0.22rem 0.5rem;
-          transition: background 0.2s, color 0.2s;
+        /* ── Dashboard / Home ── */
+        #home-screen {
+          max-width: 600px; margin: 0 auto;
+          padding: 1.5rem 1rem 2rem;
         }
-        #profile-switcher:hover { background: rgba(3,60,110,0.85); color: #e0f2fe; }
+        #trainer-screen {
+          display: none;
+          max-width: 600px; margin: 0 auto;
+          padding: 0 1rem 2rem;
+        }
 
-        /* ── Profilauswahl Overlay ── */
+        .welcome {
+          font-size: 1.5rem; font-weight: 800;
+          margin: 0 0 0.3rem; color: #1a202c;
+        }
+        .welcome-sub {
+          font-size: 0.95rem; color: #718096;
+          margin: 0 0 1.5rem;
+        }
+
+        /* ── Subject cards ── */
+        .subject-cards {
+          display: flex; flex-direction: column; gap: 0.9rem;
+          margin-bottom: 1.5rem;
+        }
+        .subject-card {
+          display: flex; align-items: center; gap: 1rem;
+          padding: 1.1rem 1.2rem;
+          background: white;
+          border-radius: 16px;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.15s, box-shadow 0.15s;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          text-align: left; width: 100%;
+          font-family: inherit;
+        }
+        .subject-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .subject-card:active { transform: scale(0.98); }
+        .card-icon {
+          width: 56px; height: 56px; border-radius: 14px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 1.8rem; flex-shrink: 0;
+        }
+        .card-icon.englisch { background: #ebf8ff; }
+        .card-icon.mathe    { background: #fefcbf; }
+        .card-icon.deutsch  { background: #fed7e2; }
+        .card-info { flex: 1; }
+        .card-title { font-size: 1.1rem; font-weight: 700; color: #1a202c; margin: 0; }
+        .card-desc { font-size: 0.82rem; color: #a0aec0; margin: 0.15rem 0 0; }
+        .card-arrow { font-size: 1.3rem; color: #cbd5e0; }
+
+        /* ── Action buttons on home ── */
+        .home-actions {
+          display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem;
+          margin-bottom: 1.2rem;
+        }
+        .action-card {
+          display: flex; align-items: center; gap: 0.7rem;
+          padding: 0.9rem 1rem;
+          background: white; border-radius: 14px;
+          border: none; cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+          transition: transform 0.15s, box-shadow 0.15s;
+          font-family: inherit; text-align: left; width: 100%;
+        }
+        .action-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        }
+        .action-icon { font-size: 1.5rem; }
+        .action-label { font-size: 0.9rem; font-weight: 600; color: #2d3748; }
+
+        /* ── Trainer view ── */
+        .back-btn {
+          display: inline-flex; align-items: center; gap: 0.4rem;
+          background: white; border: 1px solid #e2e8f0;
+          border-radius: 10px; padding: 0.5rem 1rem;
+          font-size: 0.9rem; font-weight: 600; color: #4a5568;
+          cursor: pointer; margin: 1rem 0 0.5rem;
+          transition: all 0.15s;
+          font-family: inherit;
+        }
+        .back-btn:hover { background: #edf2f7; color: #2d3748; }
+        .trainer-title {
+          font-size: 1.3rem; font-weight: 800; margin: 0.5rem 0 0.8rem;
+          color: #1a202c;
+        }
+
+        /* ── Stats banner on home ── */
+        .stats-banner {
+          display: flex; gap: 0.7rem; margin-bottom: 1.5rem;
+        }
+        .stat-box {
+          flex: 1; background: white; border-radius: 14px;
+          padding: 0.8rem; text-align: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stat-value { font-size: 1.4rem; font-weight: 800; color: #2d3748; }
+        .stat-label { font-size: 0.75rem; color: #a0aec0; margin-top: 0.1rem; }
+
+        /* Streak badge */
+        #ship { font-size: 1rem; margin-left: 0.2rem; }
+
+        /* ── Profile overlay ── */
         #profile-overlay {
           position: fixed; inset: 0; z-index: 9998;
-          background: rgba(0,5,15,0.96);
-          backdrop-filter: blur(18px);
+          background: rgba(0,0,0,0.5);
+          backdrop-filter: blur(8px);
           display: flex; align-items: center; justify-content: center;
         }
         #profile-overlay.hidden { display: none; }
         #profile-box {
-          background: rgba(4,20,45,0.92);
-          border: 1px solid rgba(56,189,248,0.35);
-          border-radius: 22px;
-          box-shadow: 0 0 60px rgba(14,165,233,0.3);
-          padding: 1.8rem 1.5rem;
-          width: min(480px, 94vw); max-height: 90vh;
+          background: white; border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+          padding: 2rem 1.5rem;
+          width: min(440px, 92vw); max-height: 90vh;
           overflow-y: auto;
           display: flex; flex-direction: column; gap: 1.2rem; align-items: center;
         }
-        #profile-box h2 {
-          margin: 0; font-size: 1.4rem; color: #e0f2fe;
-          text-shadow: 0 0 20px rgba(56,189,248,0.8);
-        }
+        #profile-box h2 { margin: 0; font-size: 1.3rem; color: #1a202c; }
         #profile-grid {
           display: flex; flex-wrap: wrap; gap: 0.8rem;
           justify-content: center; width: 100%;
         }
         .profile-card {
-          display: flex; flex-direction: column; align-items: center; gap: 0.45rem;
-          padding: 0.75rem 0.6rem; border-radius: 14px; cursor: pointer;
-          border: 2px solid rgba(56,189,248,0.25);
-          background: rgba(3,30,60,0.55);
+          display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+          padding: 0.8rem; border-radius: 14px; cursor: pointer;
+          border: 2px solid #e2e8f0; background: #f7fafc;
           transition: all 0.2s; position: relative; width: 90px;
         }
-        .profile-card:hover {
-          border-color: rgba(56,189,248,0.75);
-          transform: translateY(-3px);
-          box-shadow: 0 0 20px rgba(56,189,248,0.35);
-        }
+        .profile-card:hover { border-color: #4299e1; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(66,153,225,0.15); }
         .profile-avatar-wrap {
-          width: 60px; height: 60px; border-radius: 50%;
-          overflow: hidden; border: 2px solid rgba(56,189,248,0.4);
-          background: #071a2e;
+          width: 52px; height: 52px; border-radius: 50%;
+          overflow: hidden; border: 2px solid #e2e8f0;
+          background: #edf2f7;
           display: flex; align-items: center; justify-content: center;
-          font-size: 1.6rem;
+          font-size: 1.4rem; color: #a0aec0;
         }
         .profile-avatar-wrap svg { width: 100%; height: 100%; display: block; }
         .profile-card-name {
-          font-size: 0.8rem; color: #bae6fd; text-align: center;
+          font-size: 0.78rem; color: #4a5568; text-align: center; font-weight: 600;
           max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         .profile-del-btn {
-          position: absolute; top: 3px; right: 3px;
-          width: 18px; height: 18px; border-radius: 50%;
-          background: rgba(200,40,40,0.8); color: white;
-          border: none; cursor: pointer; font-size: 0.6rem;
+          position: absolute; top: 2px; right: 2px;
+          width: 20px; height: 20px; border-radius: 50%;
+          background: #fc8181; color: white;
+          border: none; cursor: pointer; font-size: 0.65rem;
           opacity: 0; transition: opacity 0.2s;
           display: flex; align-items: center; justify-content: center;
         }
         .profile-card:hover .profile-del-btn { opacity: 1; }
         #btn-new-profile {
-          width: 100%; padding: 0.7rem; border: 2px dashed rgba(56,189,248,0.4);
-          border-radius: 12px; background: transparent; color: #7dd3fc;
-          font-size: 1rem; cursor: pointer; transition: all 0.2s;
+          width: 100%; padding: 0.7rem;
+          border: 2px dashed #cbd5e0; border-radius: 12px;
+          background: transparent; color: #718096;
+          font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
         }
-        #btn-new-profile:hover {
-          background: rgba(14,165,233,0.15); border-color: rgba(56,189,248,0.8);
-          color: #e0f2fe;
-        }
-        /* New profile form */
+        #btn-new-profile:hover { background: #f7fafc; border-color: #4299e1; color: #4299e1; }
         #profile-new-view { display: flex; flex-direction: column; gap: 1rem; align-items: center; width: 100%; }
         #input-profile-name {
           width: 100%; padding: 0.7rem 1rem;
-          background: rgba(3,30,60,0.8); border: 2px solid rgba(56,189,248,0.4);
-          border-radius: 10px; color: #e0f2fe; font-size: 1.1rem; outline: none;
-          text-align: center;
+          background: #f7fafc; border: 2px solid #e2e8f0;
+          border-radius: 10px; color: #2d3748; font-size: 1.1rem;
+          outline: none; text-align: center;
         }
-        #input-profile-name:focus { border-color: rgba(56,189,248,0.9); }
-        #input-profile-name::placeholder { color: rgba(186,230,253,0.4); }
+        #input-profile-name:focus { border-color: #4299e1; }
+        #input-profile-name::placeholder { color: #a0aec0; }
         .profile-form-btns { display: flex; gap: 0.7rem; width: 100%; }
         #btn-profile-cancel {
-          flex: 1; padding: 0.65rem; background: transparent;
-          border: 1px solid rgba(56,189,248,0.3); border-radius: 10px;
-          color: #7dd3fc; cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+          flex: 1; padding: 0.65rem; background: #f7fafc;
+          border: 1px solid #e2e8f0; border-radius: 10px;
+          color: #718096; cursor: pointer; font-size: 0.9rem;
         }
-        #btn-profile-cancel:hover { background: rgba(56,189,248,0.1); }
         #btn-profile-create {
           flex: 2; padding: 0.65rem;
-          background: linear-gradient(135deg, rgba(14,165,233,0.9), rgba(56,189,248,0.9));
-          border: none; border-radius: 10px; color: white;
-          font-size: 1rem; font-weight: bold; cursor: pointer; transition: filter 0.2s;
+          background: #4299e1; border: none; border-radius: 10px;
+          color: white; font-size: 1rem; font-weight: bold; cursor: pointer;
         }
-        #btn-profile-create:hover { filter: brightness(1.1); }
+        #btn-profile-create:hover { background: #3182ce; }
 
-        /* ── Rollenauswahl ── */
+        /* ── Role overlay ── */
         #role-overlay {
           position: fixed; inset: 0; z-index: 9999;
-          background: rgba(0,5,15,0.95);
-          backdrop-filter: blur(16px);
+          background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
           display: flex; align-items: center; justify-content: center;
         }
         #role-overlay.hidden { display: none; }
         #role-box {
-          display: flex; flex-direction: column; align-items: center; gap: 1.6rem;
-          padding: 2.5rem 2rem;
-          background: rgba(4,20,45,0.9);
-          border: 1px solid rgba(56,189,248,0.35);
-          border-radius: 22px;
-          box-shadow: 0 0 50px rgba(14,165,233,0.3);
-          max-width: 360px; width: 90vw;
+          display: flex; flex-direction: column; align-items: center; gap: 1.4rem;
+          padding: 2rem 1.5rem;
+          background: white; border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+          max-width: 380px; width: 92vw;
         }
-        #role-box h2 {
-          margin: 0; font-size: 1.5rem; color: #e0f2fe;
-          text-align: center;
-          text-shadow: 0 0 20px rgba(56,189,248,0.8);
-        }
-        #role-box p {
-          margin: 0; font-size: 0.95rem; color: #7dd3fc;
-          text-align: center; line-height: 1.5;
-        }
-        .role-btns { display: flex; gap: 1rem; width: 100%; }
+        #role-box h2 { margin: 0; font-size: 1.4rem; color: #1a202c; }
+        #role-box p { margin: 0; font-size: 0.9rem; color: #718096; text-align: center; }
+        .role-btns { display: flex; gap: 0.8rem; width: 100%; }
         .role-btn {
           flex: 1; padding: 1rem 0.5rem;
-          border: 2px solid rgba(56,189,248,0.4);
-          border-radius: 14px; cursor: pointer;
-          background: rgba(3,60,110,0.6);
-          color: #bae6fd; font-size: 1rem; font-weight: bold;
-          display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-          transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+          border: 2px solid #e2e8f0; border-radius: 14px;
+          cursor: pointer; background: #f7fafc;
+          color: #4a5568; font-size: 0.95rem; font-weight: bold;
+          display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+          transition: all 0.2s; font-family: inherit;
         }
-        .role-btn:hover {
-          background: rgba(3,105,161,0.8);
-          border-color: rgba(56,189,248,0.8);
-          transform: translateY(-3px);
-          box-shadow: 0 0 24px rgba(56,189,248,0.5);
-        }
-        .role-btn .role-icon { font-size: 2.5rem; }
-        .role-btn .role-sub { font-size: 0.75rem; color: #7dd3fc; font-weight: normal; }
+        .role-btn:hover { border-color: #4299e1; background: #ebf8ff; transform: translateY(-2px); }
+        .role-btn .role-icon { font-size: 2.2rem; }
 
-        /* ── Background theme overrides ── */
-        /* ocean */
-        #bg[data-theme="ocean"] { animation-name: bgShift-ocean; }
-        #bg[data-theme="ocean"] .orb1 { background: #0e7490; }
-        #bg[data-theme="ocean"] .orb2 { background: #06b6d4; }
-        #bg[data-theme="ocean"] .orb3 { background: #0891b2; }
-        #bg[data-theme="ocean"] .orb4 { background: #67e8f9; }
-        #bg[data-theme="ocean"] .orb5 { background: #a5f3fc; }
-        @keyframes bgShift-ocean {
-          0%   { background: radial-gradient(ellipse at 20% 30%, #083344 0%, #021a22 60%, #01080f 100%); }
-          50%  { background: radial-gradient(ellipse at 70% 60%, #0d3a4a 0%, #031f2a 60%, #01080f 100%); }
-          100% { background: radial-gradient(ellipse at 40% 80%, #052535 0%, #021a22 60%, #010810 100%); }
+        /* ── Hidden helpers ── */
+        [hidden] { display: none !important; }
+
+        /* ── Streak animations (kept for PointsManager) ── */
+        .streak-10 #ship { transform: scale(1.3); }
+        .streak-15 #ship { transform: scale(1.5) rotate(15deg); }
+        .streak-20 #ship { transform: scale(1.8) rotate(360deg); }
+        .streak-broken #ship { animation: shake 0.5s; }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-4px); }
+          75% { transform: translateX(4px); }
         }
 
-        /* purple */
-        #bg[data-theme="purple"] { animation-name: bgShift-purple; }
-        #bg[data-theme="purple"] .orb1 { background: #7c3aed; }
-        #bg[data-theme="purple"] .orb2 { background: #a855f7; }
-        #bg[data-theme="purple"] .orb3 { background: #6d28d9; }
-        #bg[data-theme="purple"] .orb4 { background: #c084fc; }
-        #bg[data-theme="purple"] .orb5 { background: #e879f9; }
-        @keyframes bgShift-purple {
-          0%   { background: radial-gradient(ellipse at 20% 30%, #1e0838 0%, #0f0520 60%, #060210 100%); }
-          50%  { background: radial-gradient(ellipse at 70% 60%, #250a45 0%, #130628 60%, #060210 100%); }
-          100% { background: radial-gradient(ellipse at 40% 80%, #180630 0%, #0f0520 60%, #040108 100%); }
-        }
+        #treasure { cursor: pointer; transition: transform 0.2s; }
+        #treasure.disabled { opacity: 0.3; cursor: default; }
+        #treasure:not(.disabled):hover { transform: scale(1.2); }
 
-        /* forest */
-        #bg[data-theme="forest"] { animation-name: bgShift-forest; }
-        #bg[data-theme="forest"] .orb1 { background: #166534; }
-        #bg[data-theme="forest"] .orb2 { background: #22c55e; }
-        #bg[data-theme="forest"] .orb3 { background: #15803d; }
-        #bg[data-theme="forest"] .orb4 { background: #4ade80; }
-        #bg[data-theme="forest"] .orb5 { background: #86efac; }
-        @keyframes bgShift-forest {
-          0%   { background: radial-gradient(ellipse at 20% 30%, #0a2e10 0%, #041505 60%, #010c02 100%); }
-          50%  { background: radial-gradient(ellipse at 70% 60%, #0d3512 0%, #051a06 60%, #010c02 100%); }
-          100% { background: radial-gradient(ellipse at 40% 80%, #08220c 0%, #041505 60%, #010802 100%); }
-        }
-
-        /* sunset */
-        #bg[data-theme="sunset"] { animation-name: bgShift-sunset; }
-        #bg[data-theme="sunset"] .orb1 { background: #c2410c; }
-        #bg[data-theme="sunset"] .orb2 { background: #f97316; }
-        #bg[data-theme="sunset"] .orb3 { background: #b91c1c; }
-        #bg[data-theme="sunset"] .orb4 { background: #fb923c; }
-        #bg[data-theme="sunset"] .orb5 { background: #fcd34d; }
-        @keyframes bgShift-sunset {
-          0%   { background: radial-gradient(ellipse at 20% 30%, #2e1008 0%, #1a0805 60%, #0c0302 100%); }
-          50%  { background: radial-gradient(ellipse at 70% 60%, #381208 0%, #200a04 60%, #0c0302 100%); }
-          100% { background: radial-gradient(ellipse at 40% 80%, #250e06 0%, #1a0805 60%, #080201 100%); }
-        }
-
-        /* rose */
-        #bg[data-theme="rose"] { animation-name: bgShift-rose; }
-        #bg[data-theme="rose"] .orb1 { background: #be185d; }
-        #bg[data-theme="rose"] .orb2 { background: #ec4899; }
-        #bg[data-theme="rose"] .orb3 { background: #9d174d; }
-        #bg[data-theme="rose"] .orb4 { background: #f472b6; }
-        #bg[data-theme="rose"] .orb5 { background: #f9a8d4; }
-        @keyframes bgShift-rose {
-          0%   { background: radial-gradient(ellipse at 20% 30%, #2e0818 0%, #1a0510 60%, #0c0208 100%); }
-          50%  { background: radial-gradient(ellipse at 70% 60%, #38091e 0%, #200610 60%, #0c0208 100%); }
-          100% { background: radial-gradient(ellipse at 40% 80%, #250614 0%, #1a0510 60%, #080206 100%); }
-        }
-
-        /* gold */
-        #bg[data-theme="gold"] { animation-name: bgShift-gold; }
-        #bg[data-theme="gold"] .orb1 { background: #b45309; }
-        #bg[data-theme="gold"] .orb2 { background: #eab308; }
-        #bg[data-theme="gold"] .orb3 { background: #92400e; }
-        #bg[data-theme="gold"] .orb4 { background: #fbbf24; }
-        #bg[data-theme="gold"] .orb5 { background: #fde68a; }
-        @keyframes bgShift-gold {
-          0%   { background: radial-gradient(ellipse at 20% 30%, #2a1a00 0%, #1a1000 60%, #0c0800 100%); }
-          50%  { background: radial-gradient(ellipse at 70% 60%, #331f00 0%, #201400 60%, #0c0800 100%); }
-          100% { background: radial-gradient(ellipse at 40% 80%, #221500 0%, #1a1000 60%, #080600 100%); }
-        }
-
-        /* ice */
-        #bg[data-theme="ice"] { animation-name: bgShift-ice; }
-        #bg[data-theme="ice"] .orb1 { background: #60a5fa; }
-        #bg[data-theme="ice"] .orb2 { background: #93c5fd; }
-        #bg[data-theme="ice"] .orb3 { background: #3b82f6; }
-        #bg[data-theme="ice"] .orb4 { background: #bfdbfe; }
-        #bg[data-theme="ice"] .orb5 { background: #dbeafe; }
-        @keyframes bgShift-ice {
-          0%   { background: radial-gradient(ellipse at 20% 30%, #c8dff8 0%, #dbeafe 60%, #eff6ff 100%); }
-          50%  { background: radial-gradient(ellipse at 70% 60%, #bdd7f7 0%, #dbeafe 60%, #eff6ff 100%); }
-          100% { background: radial-gradient(ellipse at 40% 80%, #cae3fc 0%, #dbeafe 60%, #f0f8ff 100%); }
-        }
-
+        /* Hide points/streak spans the PointsManager targets */
+        #points, #streak, #streak-record { /* visible in topbar stats */ }
       </style>
 
-      <!-- Profilauswahl -->
+      <!-- Profile overlay -->
       <div id="profile-overlay" class="hidden">
         <div id="profile-box">
           <div id="profile-pick-view">
-            <h2>👤 Wer spielt?</h2>
+            <h2>Wer bist du?</h2>
             <div id="profile-grid"></div>
-            <button id="btn-new-profile">+ Neues Profil erstellen</button>
+            <button id="btn-new-profile">+ Neues Profil</button>
           </div>
           <div id="profile-new-view" hidden>
-            <h2>✨ Neues Profil</h2>
+            <h2>Neues Profil</h2>
             <input id="input-profile-name" type="text" placeholder="Dein Name..."
                    autocomplete="off" autocorrect="off" spellcheck="false"/>
             <div class="profile-form-btns">
-              <button id="btn-profile-cancel">← Zurück</button>
-              <button id="btn-profile-create">Erstellen ✓</button>
+              <button id="btn-profile-cancel">Zurück</button>
+              <button id="btn-profile-create">Erstellen</button>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Role overlay -->
       <div id="role-overlay" class="hidden">
         <div id="role-box">
-          <h2>🎓 Wer bist du?</h2>
-          <p>Wähle deine Rolle – sie bestimmt was du siehst.</p>
+          <h2>Wer bist du?</h2>
+          <p>Wähle deine Rolle.</p>
           <div class="role-btns">
             <button class="role-btn" data-role="student">
-              <span class="role-icon">🎒</span>
-              <span>Schüler</span>
+              <span class="role-icon">🎒</span><span>Schüler</span>
             </button>
             <button class="role-btn" data-role="teacher">
-              <span class="role-icon">👩‍🏫</span>
-              <span>Lehrer</span>
+              <span class="role-icon">👩‍🏫</span><span>Lehrer</span>
             </button>
             <button class="role-btn" data-role="developer">
-              <span class="role-icon">💻</span>
-              <span>Entwickler</span>
+              <span class="role-icon">💻</span><span>Entwickler</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div id="bg">
-        <div class="orb orb1"></div>
-        <div class="orb orb2"></div>
-        <div class="orb orb3"></div>
-        <div class="orb orb4"></div>
-        <div class="orb orb5"></div>
+      <!-- Top bar -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-avatar" id="avatar-btn" title="Avatar bearbeiten">
+            <div id="avatar-mini"></div>
+          </div>
+          <span class="topbar-name" id="profile-switcher" title="Profil wechseln">
+            <span id="profile-switcher-name">–</span> ▾
+          </span>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-stats">
+            ⭐ <span id="points">0</span>
+            &nbsp;🔥 <span id="streak">0</span>
+            <span id="ship">🚀</span>
+          </div>
+          <span id="streak-record" style="display:none">0</span>
+          <span id="treasure" title="Spiele">🎮</span>
+          <button class="topbar-btn" id="group-btn" title="Gruppen">👥</button>
+          <button class="topbar-btn" id="info-btn" title="Hilfe">?</button>
+        </div>
       </div>
 
-      <div class="top-right-btns">
-        <button id="info-btn">ⓘ Hilfe</button>
-        <button id="edit-vocab-btn">✏️ Vokabeln</button>
-        <button id="group-btn">👥 Gruppen</button>
-      </div>
-      <div id="avatar-btn" title="Avatar bearbeiten">
-        <div id="avatar-mini"></div>
-      </div>
-      <div id="profile-switcher" title="Profil wechseln">
-        <span id="profile-switcher-name">–</span> ▾
-      </div>
       <vocab-help></vocab-help>
       <avatar-builder></avatar-builder>
       <vocab-editor></vocab-editor>
       <group-board></group-board>
+      <game-lobby></game-lobby>
 
-      <div id="quiz-container">
-        <h1>🎓 Lerntrainer</h1>
-
-        <div class="info-grid">
-          <div id="score">
-            Punkte: <span id="points">0</span>
-            <span id="treasure" title="Fun-Spiele">🎮</span>
+      <!-- Home / Dashboard -->
+      <div id="home-screen">
+        <div class="stats-banner">
+          <div class="stat-box">
+            <div class="stat-value" id="home-points">0</div>
+            <div class="stat-label">Punkte</div>
           </div>
-
-          <div id="streak-box">
-            Streak: <span id="streak">0</span>&nbsp;
-            Rekord: <span id="streak-record">0</span>
-            <span id="ship">🚀</span>
+          <div class="stat-box">
+            <div class="stat-value" id="home-streak">0</div>
+            <div class="stat-label">Streak-Rekord</div>
           </div>
         </div>
 
-        <div class="subject-tabs">
-          <button class="subject-tab active" data-subject="englisch">🇬🇧 Englisch</button>
-          <button class="subject-tab" data-subject="mathe">🔢 Mathe</button>
-          <button class="subject-tab" data-subject="deutsch">📖 Deutsch</button>
+        <p class="welcome" id="welcome-text">Hallo!</p>
+        <p class="welcome-sub">Was möchtest du heute lernen?</p>
+
+        <div class="subject-cards">
+          <button class="subject-card" data-subject="englisch">
+            <div class="card-icon englisch">🇬🇧</div>
+            <div class="card-info">
+              <p class="card-title">Englisch</p>
+              <p class="card-desc">Vokabeln lernen, hören & schreiben</p>
+            </div>
+            <span class="card-arrow">›</span>
+          </button>
+          <button class="subject-card" data-subject="mathe">
+            <div class="card-icon mathe">🔢</div>
+            <div class="card-info">
+              <p class="card-title">Mathe</p>
+              <p class="card-desc">Rechnen, Geometrie, Brüche & mehr</p>
+            </div>
+            <span class="card-arrow">›</span>
+          </button>
+          <button class="subject-card" data-subject="deutsch">
+            <div class="card-icon deutsch">📖</div>
+            <div class="card-info">
+              <p class="card-title">Deutsch</p>
+              <p class="card-desc">Grammatik, Rechtschreibung & Wortarten</p>
+            </div>
+            <span class="card-arrow">›</span>
+          </button>
         </div>
 
-        <div class="trainer-container active" data-subject="englisch">
-          <vocab-trainer></vocab-trainer>
-        </div>
-        <div class="trainer-container" data-subject="mathe">
-          <math-trainer></math-trainer>
-        </div>
-        <div class="trainer-container" data-subject="deutsch">
-          <deutsch-trainer></deutsch-trainer>
+        <div class="home-actions">
+          <button class="action-card" id="home-games">
+            <span class="action-icon">🎮</span>
+            <span class="action-label">Spiele</span>
+          </button>
+          <button class="action-card" id="home-groups">
+            <span class="action-icon">👥</span>
+            <span class="action-label">Gruppen</span>
+          </button>
+          <button class="action-card" id="home-vocab-edit">
+            <span class="action-icon">✏️</span>
+            <span class="action-label">Vokabeln</span>
+          </button>
+          <button class="action-card" id="home-avatar">
+            <span class="action-icon">😊</span>
+            <span class="action-label">Avatar</span>
+          </button>
         </div>
       </div>
 
-      <game-lobby></game-lobby>
+      <!-- Trainer view (shown when subject is selected) -->
+      <div id="trainer-screen">
+        <button class="back-btn" id="back-btn">← Zurück</button>
+        <h2 class="trainer-title" id="trainer-title"></h2>
+        <div id="trainer-slot"></div>
+      </div>
     `;
 
+        // Trainers are created lazily when needed
+        this._trainers = {};
         this._startup();
     }
 
-    // ── Startup: profile selection → role selection → app ─────────────────────
+    // ── Startup ──────────────────────────────────────────────────────────────
 
     _startup() {
         const profiles = getProfiles();
         const activeId = getActiveId();
-        const active   = profiles.find(p => p.id === activeId);
+        const active = profiles.find(p => p.id === activeId);
 
         if (profiles.length === 0) {
-            // First launch — show new-profile form directly
             this._showProfileOverlay(true);
         } else if (!active) {
-            // Profiles exist but none selected — show picker
             this._showProfileOverlay(false);
         } else {
-            // Already have an active profile — load it and start
             activateProfile(activeId);
             this.init();
         }
     }
 
     _showProfileOverlay(forceNew = false) {
-        const overlay   = this.shadowRoot.getElementById("profile-overlay");
-        const pickView  = this.shadowRoot.getElementById("profile-pick-view");
-        const newView   = this.shadowRoot.getElementById("profile-new-view");
-        const grid      = this.shadowRoot.getElementById("profile-grid");
+        const overlay = this.shadowRoot.getElementById("profile-overlay");
+        const pickView = this.shadowRoot.getElementById("profile-pick-view");
+        const newView = this.shadowRoot.getElementById("profile-new-view");
+        const grid = this.shadowRoot.getElementById("profile-grid");
         const nameInput = this.shadowRoot.getElementById("input-profile-name");
 
         const showPick = () => {
             pickView.hidden = false;
-            newView.hidden  = true;
+            newView.hidden = true;
             this._renderProfileGrid(grid, (id) => {
                 activateProfile(id);
                 overlay.classList.add("hidden");
                 this.init();
             });
         };
-
         const showNew = () => {
             pickView.hidden = true;
-            newView.hidden  = false;
+            newView.hidden = false;
             nameInput.value = "";
             setTimeout(() => nameInput.focus(), 50);
         };
@@ -607,7 +493,7 @@ class AppShell extends HTMLElement {
         overlay.classList.remove("hidden");
         if (forceNew) showNew(); else showPick();
 
-        this.shadowRoot.getElementById("btn-new-profile").onclick  = () => showNew();
+        this.shadowRoot.getElementById("btn-new-profile").onclick = () => showNew();
         this.shadowRoot.getElementById("btn-profile-cancel").onclick = () => showPick();
 
         const doCreate = () => {
@@ -626,7 +512,6 @@ class AppShell extends HTMLElement {
         grid.innerHTML = "";
         const profiles = getProfiles();
         const canDelete = profiles.length > 1;
-
         profiles.forEach(p => {
             const card = document.createElement("div");
             card.className = "profile-card";
@@ -642,7 +527,7 @@ class AppShell extends HTMLElement {
             if (canDelete) {
                 card.querySelector(".profile-del-btn").onclick = (e) => {
                     e.stopPropagation();
-                    if (confirm(`Profil „${p.name}" wirklich löschen?`)) {
+                    if (confirm(`Profil „${p.name}" löschen?`)) {
                         deleteProfile(p.id);
                         this._renderProfileGrid(grid, onPick);
                     }
@@ -652,82 +537,38 @@ class AppShell extends HTMLElement {
         });
     }
 
-    // ── Background theme ──────────────────────────────────────────────────────
-
-    _applyBgTheme(key) {
-        const bg = this.shadowRoot.getElementById("bg");
-        if (!bg) return;
-        if (!key || key === "dark") {
-            bg.removeAttribute("data-theme");
-        } else {
-            bg.setAttribute("data-theme", key);
-        }
-    }
-
-    // ── App init (called only after a profile is active) ──────────────────────
+    // ── Init ─────────────────────────────────────────────────────────────────
 
     init() {
         const treasureEl = this.shadowRoot.getElementById("treasure");
         const pointsManager = new PointsManager(this.shadowRoot);
+        this._pointsManager = pointsManager;
 
         const help = this.shadowRoot.querySelector("vocab-help");
 
-        // ── Rollenauswahl ──
+        // Role
         const roleOverlay = this.shadowRoot.getElementById("role-overlay");
-        const savedRole   = localStorage.getItem("userRole");
+        const savedRole = localStorage.getItem("userRole");
         const applyRole = (role) => {
             const isFirst = !localStorage.getItem("userRole");
             localStorage.setItem("userRole", role);
             roleOverlay.classList.add("hidden");
             treasureEl.style.display = role === "teacher" ? "none" : "";
-            // Hilfe starten wenn Rolle zum ersten Mal gewählt wird
             if (isFirst && !localStorage.getItem("vocabHelpSeen")) {
                 setTimeout(() => this.startHelp(help), 500);
             }
         };
-        if (savedRole) {
-            applyRole(savedRole);
-        } else {
-            roleOverlay.classList.remove("hidden");
-        }
+        if (savedRole) applyRole(savedRole);
+        else roleOverlay.classList.remove("hidden");
         roleOverlay.querySelectorAll(".role-btn").forEach(btn => {
             btn.onclick = () => applyRole(btn.dataset.role);
         });
 
-        // Connect trainers with points manager
-        const trainer = this.shadowRoot.querySelector("vocab-trainer");
-        trainer.points = pointsManager;
-
-        const mathTrainer = this.shadowRoot.querySelector("math-trainer");
-        mathTrainer.points = pointsManager;
-
-        const deutschTrainer = this.shadowRoot.querySelector("deutsch-trainer");
-        deutschTrainer.points = pointsManager;
-
-        // Subject tabs
-        const tabs = this.shadowRoot.querySelectorAll(".subject-tab");
-        const containers = this.shadowRoot.querySelectorAll(".trainer-container");
-        tabs.forEach(tab => {
-            tab.onclick = () => {
-                const subj = tab.dataset.subject;
-                tabs.forEach(t => t.classList.toggle("active", t === tab));
-                containers.forEach(c => c.classList.toggle("active", c.dataset.subject === subj));
-            };
-        });
-
-        // Connect game lobby with points manager
+        // Game lobby
         const gameLobby = this.shadowRoot.querySelector("game-lobby");
         gameLobby.pointsManager = pointsManager;
-
         treasureEl.addEventListener("click", () => {
-            if (treasureEl.classList.contains("disabled")) return;
-            gameLobby.open();
-        });
-
-        // App background theme
-        this._applyBgTheme(localStorage.getItem("appBg") || "dark");
-        this.shadowRoot.addEventListener("bg-changed", e => {
-            this._applyBgTheme(e.detail.theme);
+            if (!treasureEl.classList.contains("disabled")) gameLobby.open();
         });
 
         // Avatar
@@ -742,89 +583,138 @@ class AppShell extends HTMLElement {
         avatarBuilder.pointsManager = pointsManager;
         this.shadowRoot.getElementById("avatar-btn").onclick = () => avatarBuilder.open();
         this.shadowRoot.addEventListener("avatar-saved", refreshAvatar);
-        this.shadowRoot.addEventListener("show-role-select", () => {
-            roleOverlay.classList.remove("hidden");
-        });
+        this.shadowRoot.addEventListener("show-role-select", () => roleOverlay.classList.remove("hidden"));
 
-        // Profile switcher under avatar
+        // Profile switcher
         const profile = getActiveProfile();
         const switcherName = this.shadowRoot.getElementById("profile-switcher-name");
         if (switcherName && profile) switcherName.textContent = profile.name;
         this.shadowRoot.getElementById("profile-switcher").onclick = () => {
             saveSnapshot();
-            // Reshow profile picker (wired to reload when new profile picked)
             const overlay = this.shadowRoot.getElementById("profile-overlay");
-            const grid    = this.shadowRoot.getElementById("profile-grid");
+            const grid = this.shadowRoot.getElementById("profile-grid");
             this.shadowRoot.getElementById("profile-pick-view").hidden = false;
-            this.shadowRoot.getElementById("profile-new-view").hidden  = true;
-            this._renderProfileGrid(grid, (id) => {
-                activateProfile(id);
-                location.reload();
-            });
+            this.shadowRoot.getElementById("profile-new-view").hidden = true;
+            this._renderProfileGrid(grid, (id) => { activateProfile(id); location.reload(); });
             overlay.classList.remove("hidden");
         };
-
-        // Save snapshot on page unload
         window.addEventListener("beforeunload", () => saveSnapshot());
 
-        // Group board
+        // Welcome text
+        if (profile) {
+            this.shadowRoot.getElementById("welcome-text").textContent = `Hallo, ${profile.name}!`;
+        }
+
+        // Update home stats
+        this._updateHomeStats();
+
+        // Subject cards → open trainer
+        this.shadowRoot.querySelectorAll(".subject-card").forEach(card => {
+            card.onclick = () => this._openSubject(card.dataset.subject);
+        });
+
+        // Back button
+        this.shadowRoot.getElementById("back-btn").onclick = () => this._showHome();
+
+        // Home action buttons
+        this.shadowRoot.getElementById("home-games").onclick = () => gameLobby.open();
         const groupBoard = this.shadowRoot.querySelector("group-board");
+        this.shadowRoot.getElementById("home-groups").onclick = () => groupBoard.open();
         this.shadowRoot.getElementById("group-btn").onclick = () => groupBoard.open();
 
-        // Vocab editor
         const vocabEditor = this.shadowRoot.querySelector("vocab-editor");
-        this.shadowRoot.getElementById("edit-vocab-btn").onclick = () => vocabEditor.open();
+        this.shadowRoot.getElementById("home-vocab-edit").onclick = () => vocabEditor.open();
         vocabEditor.onSaved = () => {
-            trainer.reload();
-            trainer.togglePopup(true);
+            if (this._trainers.englisch) {
+                this._trainers.englisch.reload();
+                this._trainers.englisch.togglePopup?.(true);
+            }
         };
-        vocabEditor.addEventListener("vocab-updated", () => trainer.reload());
+        vocabEditor.addEventListener("vocab-updated", () => {
+            if (this._trainers.englisch) this._trainers.englisch.reload();
+        });
 
-        const infoBtn = this.shadowRoot.getElementById("info-btn");
-        infoBtn.onclick = () => this.startHelp(help);
+        this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
+        this.shadowRoot.getElementById("info-btn").onclick = () => this.startHelp(help);
 
-        // Hilfe beim ersten Start (wenn Rolle schon gesetzt war, z.B. nach Reload)
         if (savedRole && !localStorage.getItem("vocabHelpSeen")) {
             setTimeout(() => this.startHelp(help), 500);
         }
+
+        // Observe points changes to update home stats
+        const observer = new MutationObserver(() => this._updateHomeStats());
+        const pointsEl = this.shadowRoot.getElementById("points");
+        if (pointsEl) observer.observe(pointsEl, { childList: true, characterData: true, subtree: true });
     }
 
+    _updateHomeStats() {
+        const pts = localStorage.getItem("points") || "0";
+        const sr = localStorage.getItem("streakRecord") || "0";
+        const hp = this.shadowRoot.getElementById("home-points");
+        const hs = this.shadowRoot.getElementById("home-streak");
+        if (hp) hp.textContent = pts;
+        if (hs) hs.textContent = sr;
+    }
+
+    // ── Navigation ───────────────────────────────────────────────────────────
+
+    _openSubject(subject) {
+        const home = this.shadowRoot.getElementById("home-screen");
+        const trainer = this.shadowRoot.getElementById("trainer-screen");
+        const slot = this.shadowRoot.getElementById("trainer-slot");
+        const title = this.shadowRoot.getElementById("trainer-title");
+
+        home.style.display = "none";
+        trainer.style.display = "block";
+
+        const subjects = {
+            englisch: { title: "🇬🇧 Englisch", tag: "vocab-trainer" },
+            mathe:    { title: "🔢 Mathe", tag: "math-trainer" },
+            deutsch:  { title: "📖 Deutsch", tag: "deutsch-trainer" },
+        };
+        const s = subjects[subject];
+        title.textContent = s.title;
+
+        // Lazy create trainer or reuse
+        if (!this._trainers[subject]) {
+            const el = document.createElement(s.tag);
+            if (el.points !== undefined || subject !== "englisch") {
+                el.points = this._pointsManager;
+            } else {
+                // vocab-trainer uses .points setter
+                el.points = this._pointsManager;
+            }
+            this._trainers[subject] = el;
+        }
+
+        slot.innerHTML = "";
+        slot.appendChild(this._trainers[subject]);
+    }
+
+    _showHome() {
+        this.shadowRoot.getElementById("home-screen").style.display = "";
+        this.shadowRoot.getElementById("trainer-screen").style.display = "none";
+        this._updateHomeStats();
+    }
+
+    // ── Help ─────────────────────────────────────────────────────────────────
+
     async startHelp(help) {
+        // Open English trainer first so elements exist
+        this._openSubject("englisch");
 
-        // Warten bis vocab-trainer im Shadow DOM sichtbar ist
-        const trainer = await this.waitFor(() =>
-            this.shadowRoot.querySelector("vocab-trainer")
-        );
-        if (!trainer) return console.warn("Tutorial: Kein vocab-trainer gefunden");
-
-        // Warten bis ShadowRoot existiert
+        const trainer = await this.waitFor(() => this._trainers.englisch);
+        if (!trainer) return;
         await this.waitFor(() => trainer.shadowRoot);
-
-        // jetzt im inneren Shadow warten:
         await this.waitFor(() => trainer.shadowRoot.querySelector(".lesson-header"));
         await this.waitFor(() => trainer.shadowRoot.querySelector("#question"));
         await this.waitFor(() => trainer.shadowRoot.querySelector("#answer"));
 
         help.start([
-            {
-                selector: () =>
-                    trainer.shadowRoot.querySelector(".lesson-header"),
-                text: "Hier kannst du die Lesson auswählen."
-            },
-            {
-                selector: () =>
-                    trainer.shadowRoot.querySelector("#question"),
-                text: "Hier steht die Aufgabe."
-            },
-            {
-                selector: () =>
-                    trainer.shadowRoot.querySelector("#answer"),
-                text: "Hier gibst du deine Antwort ein."
-            },
-            {
-                selector: () => this.shadowRoot.querySelector("#treasure"),
-                text: "Hier findest du den Taler. Sobald du 5 Punkte hast, kannst du damit das Spiel starten!"
-            },
+            { selector: () => trainer.shadowRoot.querySelector(".lesson-header"), text: "Hier wählst du die Lektion aus." },
+            { selector: () => trainer.shadowRoot.querySelector("#question"), text: "Hier steht die Aufgabe." },
+            { selector: () => trainer.shadowRoot.querySelector("#answer"), text: "Hier gibst du deine Antwort ein." },
+            { selector: () => this.shadowRoot.querySelector("#treasure"), text: "Hier öffnest du die Spiele!" },
         ]);
     }
 
@@ -833,7 +723,6 @@ class AppShell extends HTMLElement {
             const start = performance.now();
             const tick = () => {
                 const result = fn();
-                console.log("waitFor tick:", result);
                 if (result) return resolve(result);
                 if (performance.now() - start > timeout) return resolve(null);
                 setTimeout(tick, interval);
