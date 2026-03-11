@@ -19,55 +19,58 @@ import "./breakout-game.js";
 import "./catcher-game.js";
 import "./tetris-game.js";
 import "./invaders-game.js";
+import "./pong-game.js";
+import "./whack-game.js";
+import "./colormatch-game.js";
 
 const HS_KEY = "gameHighscores";
 
 const GAMES = [
     {
         id: "reaction", label: "Reaktion",      emoji: "⚡",
-        cost: 1,  maxEarn: 10,
+        cost: 1,  maxEarn: 0,
         component: "reaction-game",
         desc: "Treffe 30s lang alle Ziele!",
         scoreLabel: "Treffer",
     },
     {
         id: "memory",   label: "Memory",         emoji: "🃏",
-        cost: 1,  maxEarn: 12,
+        cost: 1,  maxEarn: 0,
         component: "memory-game",
         desc: "Finde alle Emoji-Paare!",
         scoreLabel: "Züge",
     },
     {
         id: "jump",     label: "Endless Run",    emoji: "🏃",
-        cost: 1,  maxEarn: 15,
+        cost: 1,  maxEarn: 0,
         component: "jump-game",
         desc: "Überspringe Hindernisse!",
         scoreLabel: "Sekunden",
     },
     {
         id: "flappy",   label: "Flappy Bird",    emoji: "🐦",
-        cost: 1,  maxEarn: 20,
+        cost: 1,  maxEarn: 0,
         component: "flappy-game",
         desc: "Fliege durch die Rohre!",
         scoreLabel: "Rohre",
     },
     {
         id: "snake",    label: "Snake",            emoji: "🐍",
-        cost: 1,  maxEarn: 15,
+        cost: 1,  maxEarn: 0,
         component: "snake-game",
         desc: "Iss Äpfel, weiche dir selbst aus!",
         scoreLabel: "Äpfel",
     },
     {
         id: "breakout", label: "Breakout",          emoji: "🧱",
-        cost: 1,  maxEarn: 15,
+        cost: 1,  maxEarn: 0,
         component: "breakout-game",
         desc: "Zerstöre alle Blöcke!",
         scoreLabel: "Blöcke",
     },
     {
         id: "catcher",  label: "Fänger",            emoji: "🧺",
-        cost: 2,  maxEarn: 10,
+        cost: 2,  maxEarn: 0,
         component: "catcher-game",
         desc: "Fange Sterne, meide Bomben!",
         scoreLabel: "Gefangen",
@@ -80,18 +83,39 @@ const GAMES = [
         scoreLabel: null,
     },
     {
-        id: "tetris",   label: "Tetris",             emoji: "🟦",
-        cost: 2,  maxEarn: 25,
+        id: "tetris",   label: "Blöcke Stapeln",      emoji: "🟦",
+        cost: 2,  maxEarn: 0,
         component: "tetris-game",
         desc: "Stapele Blöcke & räume Reihen!",
         scoreLabel: "Punkte",
     },
     {
         id: "invaders", label: "Space Invaders",     emoji: "👾",
-        cost: 2,  maxEarn: 30,
+        cost: 2,  maxEarn: 0,
         component: "invaders-game",
         desc: "Vernichte die Alien-Flotte!",
         scoreLabel: "Punkte",
+    },
+    {
+        id: "pong",     label: "Pong",               emoji: "🏓",
+        cost: 1,  maxEarn: 0,
+        component: "pong-game",
+        desc: "Klassisches Pong gegen den Computer!",
+        scoreLabel: "Tore",
+    },
+    {
+        id: "whack",    label: "Maulwurf Klopfen",   emoji: "🔨",
+        cost: 1,  maxEarn: 0,
+        component: "whack-game",
+        desc: "Triff die Maulwürfe bevor sie verschwinden!",
+        scoreLabel: "Treffer",
+    },
+    {
+        id: "colormatch", label: "Farben-Rätsel",    emoji: "🎨",
+        cost: 1,  maxEarn: 0,
+        component: "colormatch-game",
+        desc: "Tippe die Farbe der Schrift, nicht das Wort!",
+        scoreLabel: "Richtige",
     },
 ];
 
@@ -421,10 +445,9 @@ class GameLobby extends HTMLElement {
 
     _handleGameOver(e) {
         if (!this._activeGame) return;
-        const { score, pointsEarned } = e.detail ?? {};
+        const { score } = e.detail ?? {};
         const isNew = saveHighscore(this._activeGame.id, score ?? 0);
-        if (pointsEarned > 0) this._pm()?.updatePoints(pointsEarned);
-        this._showResult(score ?? null, pointsEarned ?? 0, isNew);
+        this._showResult(score ?? null, 0, isNew);
     }
 
     _handleCloseGame() {
