@@ -304,6 +304,63 @@ class AppShell extends HTMLElement {
 
         /* Hide points/streak spans the PointsManager targets */
         #points, #streak, #streak-record { /* visible in topbar stats */ }
+
+        /* ── Theme picker ── */
+        .theme-section {
+          margin-top: 0.5rem;
+        }
+        .theme-section-title {
+          font-size: 0.85rem; font-weight: 700; color: #718096;
+          margin: 0 0 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .theme-grid {
+          display: flex; flex-wrap: wrap; gap: 0.5rem;
+        }
+        .theme-dot {
+          width: 40px; height: 40px; border-radius: 12px;
+          border: 3px solid transparent;
+          cursor: pointer;
+          transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+          position: relative;
+        }
+        .theme-dot:hover { transform: scale(1.12); }
+        .theme-dot.active {
+          border-color: #2d3748;
+          box-shadow: 0 0 0 2px white, 0 0 0 4px #4299e1;
+        }
+        .theme-dot::after {
+          content: ""; position: absolute; inset: 0;
+          border-radius: 9px;
+        }
+
+        /* ── Background themes ── */
+        :host([data-bg="light"])   { background: #f0f4f8; }
+        :host([data-bg="blue"])    { background: #dbeafe; }
+        :host([data-bg="green"])   { background: #d1fae5; }
+        :host([data-bg="purple"])  { background: #ede9fe; }
+        :host([data-bg="pink"])    { background: #fce7f3; }
+        :host([data-bg="yellow"])  { background: #fef9c3; }
+        :host([data-bg="orange"])  { background: #ffedd5; }
+        :host([data-bg="dark"])    { background: #1a202c; color: #e2e8f0; }
+
+        :host([data-bg="dark"]) .topbar { background: #2d3748; border-bottom-color: #4a5568; }
+        :host([data-bg="dark"]) .topbar-name { color: #e2e8f0; }
+        :host([data-bg="dark"]) .topbar-stats { background: #4a5568; color: #e2e8f0; }
+        :host([data-bg="dark"]) .topbar-btn { color: #e2e8f0; }
+        :host([data-bg="dark"]) .topbar-btn:hover { background: #4a5568; }
+        :host([data-bg="dark"]) .subject-card { background: #2d3748; }
+        :host([data-bg="dark"]) .card-title { color: #e2e8f0; }
+        :host([data-bg="dark"]) .card-desc { color: #a0aec0; }
+        :host([data-bg="dark"]) .card-arrow { color: #4a5568; }
+        :host([data-bg="dark"]) .action-card { background: #2d3748; }
+        :host([data-bg="dark"]) .action-label { color: #e2e8f0; }
+        :host([data-bg="dark"]) .stat-box { background: #2d3748; }
+        :host([data-bg="dark"]) .stat-value { color: #e2e8f0; }
+        :host([data-bg="dark"]) .welcome { color: #e2e8f0; }
+        :host([data-bg="dark"]) .back-btn { background: #2d3748; border-color: #4a5568; color: #e2e8f0; }
+        :host([data-bg="dark"]) .back-btn:hover { background: #4a5568; }
+        :host([data-bg="dark"]) .trainer-title { color: #e2e8f0; }
+        :host([data-bg="dark"]) .theme-section-title { color: #a0aec0; }
       </style>
 
       <!-- Profile overlay -->
@@ -348,23 +405,23 @@ class AppShell extends HTMLElement {
       <!-- Top bar -->
       <div class="topbar">
         <div class="topbar-left">
-          <div class="topbar-avatar" id="avatar-btn" title="Avatar bearbeiten">
-            <div id="avatar-mini"></div>
-          </div>
           <span class="topbar-name" id="profile-switcher" title="Profil wechseln">
             <span id="profile-switcher-name">–</span> ▾
           </span>
-        </div>
-        <div class="topbar-right">
           <div class="topbar-stats">
             ⭐ <span id="points">0</span>
             &nbsp;🔥 <span id="streak">0</span>
             <span id="ship">🚀</span>
           </div>
           <span id="streak-record" style="display:none">0</span>
+        </div>
+        <div class="topbar-right">
           <span id="treasure" title="Spiele">🎮</span>
           <button class="topbar-btn" id="group-btn" title="Gruppen">👥</button>
           <button class="topbar-btn" id="info-btn" title="Hilfe">?</button>
+          <div class="topbar-avatar" id="avatar-btn" title="Avatar bearbeiten">
+            <div id="avatar-mini"></div>
+          </div>
         </div>
       </div>
 
@@ -434,6 +491,20 @@ class AppShell extends HTMLElement {
             <span class="action-icon">😊</span>
             <span class="action-label">Avatar</span>
           </button>
+        </div>
+
+        <div class="theme-section">
+          <p class="theme-section-title">Hintergrund</p>
+          <div class="theme-grid">
+            <div class="theme-dot" data-theme="light" style="background:#f0f4f8" title="Hell"></div>
+            <div class="theme-dot" data-theme="blue" style="background:#dbeafe" title="Blau"></div>
+            <div class="theme-dot" data-theme="green" style="background:#d1fae5" title="Grün"></div>
+            <div class="theme-dot" data-theme="purple" style="background:#ede9fe" title="Lila"></div>
+            <div class="theme-dot" data-theme="pink" style="background:#fce7f3" title="Rosa"></div>
+            <div class="theme-dot" data-theme="yellow" style="background:#fef9c3" title="Gelb"></div>
+            <div class="theme-dot" data-theme="orange" style="background:#ffedd5" title="Orange"></div>
+            <div class="theme-dot" data-theme="dark" style="background:#1a202c" title="Dunkel"></div>
+          </div>
         </div>
       </div>
 
@@ -640,6 +711,25 @@ class AppShell extends HTMLElement {
         if (savedRole && !localStorage.getItem("vocabHelpSeen")) {
             setTimeout(() => this.startHelp(help), 500);
         }
+
+        // Theme picker
+        const savedTheme = localStorage.getItem("appBg") || "light";
+        this.setAttribute("data-bg", savedTheme);
+        document.body.style.background = getComputedStyle(this).background;
+        this.shadowRoot.querySelectorAll(".theme-dot").forEach(dot => {
+            if (dot.dataset.theme === savedTheme) dot.classList.add("active");
+            dot.onclick = () => {
+                this.shadowRoot.querySelectorAll(".theme-dot").forEach(d => d.classList.remove("active"));
+                dot.classList.add("active");
+                const theme = dot.dataset.theme;
+                this.setAttribute("data-bg", theme);
+                localStorage.setItem("appBg", theme);
+                // Sync body background
+                requestAnimationFrame(() => {
+                    document.body.style.background = getComputedStyle(this).background;
+                });
+            };
+        });
 
         // Observe points changes to update home stats
         const observer = new MutationObserver(() => this._updateHomeStats());
