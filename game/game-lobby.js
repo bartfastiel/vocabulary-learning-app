@@ -22,6 +22,10 @@ import "./invaders-game.js";
 import "./pong-game.js";
 import "./whack-game.js";
 import "./colormatch-game.js";
+import "./maze-game.js";
+import "./bubble-game.js";
+import "./numbertap-game.js";
+import "./dodge-game.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -34,35 +38,35 @@ const GAMES = [
         scoreLabel: "Treffer",
     },
     {
-        id: "memory",   label: "Memory",         emoji: "🃏",
+        id: "memory",   label: "Paare Finden",   emoji: "🃏",
         cost: 1,  maxEarn: 0,
         component: "memory-game",
         desc: "Finde alle Emoji-Paare!",
         scoreLabel: "Züge",
     },
     {
-        id: "jump",     label: "Endless Run",    emoji: "🏃",
+        id: "jump",     label: "Endlos Lauf",    emoji: "🏃",
         cost: 1,  maxEarn: 0,
         component: "jump-game",
         desc: "Überspringe Hindernisse!",
         scoreLabel: "Sekunden",
     },
     {
-        id: "flappy",   label: "Flappy Bird",    emoji: "🐦",
+        id: "flappy",   label: "Flatter Vogel",  emoji: "🐦",
         cost: 1,  maxEarn: 0,
         component: "flappy-game",
         desc: "Fliege durch die Rohre!",
         scoreLabel: "Rohre",
     },
     {
-        id: "snake",    label: "Snake",            emoji: "🐍",
+        id: "snake",    label: "Schlange",         emoji: "🐍",
         cost: 1,  maxEarn: 0,
         component: "snake-game",
         desc: "Iss Äpfel, weiche dir selbst aus!",
         scoreLabel: "Äpfel",
     },
     {
-        id: "breakout", label: "Breakout",          emoji: "🧱",
+        id: "breakout", label: "Mauer Brecher",     emoji: "🧱",
         cost: 1,  maxEarn: 0,
         component: "breakout-game",
         desc: "Zerstöre alle Blöcke!",
@@ -90,14 +94,14 @@ const GAMES = [
         scoreLabel: "Punkte",
     },
     {
-        id: "invaders", label: "Space Invaders",     emoji: "👾",
+        id: "invaders", label: "Weltraum Angriff",   emoji: "👾",
         cost: 2,  maxEarn: 0,
         component: "invaders-game",
         desc: "Vernichte die Alien-Flotte!",
         scoreLabel: "Punkte",
     },
     {
-        id: "pong",     label: "Pong",               emoji: "🏓",
+        id: "pong",     label: "Tischtennis",        emoji: "🏓",
         cost: 1,  maxEarn: 0,
         component: "pong-game",
         desc: "Klassisches Pong gegen den Computer!",
@@ -116,6 +120,34 @@ const GAMES = [
         component: "colormatch-game",
         desc: "Tippe die Farbe der Schrift, nicht das Wort!",
         scoreLabel: "Richtige",
+    },
+    {
+        id: "maze",     label: "Labyrinth",          emoji: "🧩",
+        cost: 1,  maxEarn: 0,
+        component: "maze-game",
+        desc: "Finde den Weg durch 5 Labyrinthe!",
+        scoreLabel: "Sekunden",
+    },
+    {
+        id: "bubble",   label: "Blasen Platzen",     emoji: "🫧",
+        cost: 1,  maxEarn: 0,
+        component: "bubble-game",
+        desc: "Platze die Blasen bevor sie entwischen!",
+        scoreLabel: "Geplatzt",
+    },
+    {
+        id: "numbertap", label: "Zahlen Tippen",     emoji: "🔢",
+        cost: 1,  maxEarn: 0,
+        component: "numbertap-game",
+        desc: "Tippe 1 bis 25 so schnell du kannst!",
+        scoreLabel: "Sekunden",
+    },
+    {
+        id: "dodge",    label: "Ausweichen",         emoji: "🛡️",
+        cost: 1,  maxEarn: 0,
+        component: "dodge-game",
+        desc: "Weiche den Hindernissen aus!",
+        scoreLabel: "Sekunden",
     },
 ];
 
