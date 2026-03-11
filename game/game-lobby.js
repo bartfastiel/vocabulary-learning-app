@@ -27,6 +27,11 @@ import "./bubble-game.js";
 import "./numbertap-game.js";
 import "./dodge-game.js";
 import "./platformer-game.js";
+import "./pacman-game.js";
+import "./doodlejump-game.js";
+import "./2048-game.js";
+import "./minesweeper-game.js";
+import "./asteroids-game.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -155,6 +160,41 @@ const GAMES = [
         cost: 2,  maxEarn: 0,
         component: "platformer-game",
         desc: "Sammle Münzen, besiege Gegner, erreiche die Flagge!",
+        scoreLabel: "Punkte",
+    },
+    {
+        id: "pacman",   label: "Punktefresser",      emoji: "🟡",
+        cost: 2,  maxEarn: 0,
+        component: "pacman-game",
+        desc: "Friss alle Punkte, weiche den Geistern aus!",
+        scoreLabel: "Punkte",
+    },
+    {
+        id: "doodlejump", label: "Hoch Springer",    emoji: "🐸",
+        cost: 1,  maxEarn: 0,
+        component: "doodlejump-game",
+        desc: "Spring so hoch wie möglich!",
+        scoreLabel: "Meter",
+    },
+    {
+        id: "2048",     label: "Zahlen Schieben",    emoji: "🔢",
+        cost: 1,  maxEarn: 0,
+        component: "game-2048",
+        desc: "Schiebe Zahlen zusammen bis 2048!",
+        scoreLabel: "Punkte",
+    },
+    {
+        id: "minesweeper", label: "Minenfeld",       emoji: "💣",
+        cost: 1,  maxEarn: 0,
+        component: "minesweeper-game",
+        desc: "Finde alle Minen ohne zu explodieren!",
+        scoreLabel: "Sekunden",
+    },
+    {
+        id: "asteroids", label: "Weltraum Pilot",    emoji: "☄️",
+        cost: 2,  maxEarn: 0,
+        component: "asteroids-game",
+        desc: "Zerstöre Asteroiden mit deinem Raumschiff!",
         scoreLabel: "Punkte",
     },
 ];
