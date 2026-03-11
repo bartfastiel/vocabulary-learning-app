@@ -333,6 +333,55 @@ class AppShell extends HTMLElement {
           border-radius: 9px;
         }
 
+        /* Custom color picker */
+        .theme-custom {
+          width: 40px; height: 40px; border-radius: 12px;
+          border: 3px dashed #cbd5e0;
+          cursor: pointer; position: relative;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 1.1rem; color: #718096;
+          transition: transform 0.15s, border-color 0.15s;
+          overflow: hidden;
+        }
+        .theme-custom:hover { transform: scale(1.12); border-color: #4299e1; }
+        .theme-custom.active {
+          border-style: solid; border-color: #2d3748;
+          box-shadow: 0 0 0 2px white, 0 0 0 4px #4299e1;
+        }
+        .theme-custom input[type="color"] {
+          position: absolute; inset: -10px;
+          width: 60px; height: 60px;
+          opacity: 0; cursor: pointer;
+        }
+
+        /* ── Animated backgrounds ── */
+        .anim-section-title {
+          font-size: 0.85rem; font-weight: 700; color: #718096;
+          margin: 0.8rem 0 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .anim-grid {
+          display: flex; flex-wrap: wrap; gap: 0.5rem;
+        }
+        .anim-chip {
+          padding: 0.4rem 0.9rem; border-radius: 20px;
+          border: 2px solid #e2e8f0; background: white;
+          cursor: pointer; font-size: 0.82rem; font-weight: 600;
+          color: #4a5568; transition: all 0.15s;
+        }
+        .anim-chip:hover { border-color: #4299e1; color: #4299e1; }
+        .anim-chip.active { border-color: #4299e1; background: #ebf8ff; color: #2b6cb0; }
+
+        :host([data-bg="dark"]) .anim-chip { background: #2d3748; color: #e2e8f0; border-color: #4a5568; }
+        :host([data-bg="dark"]) .anim-chip.active { background: #2c5282; border-color: #63b3ed; color: #bee3f8; }
+        :host([data-bg="dark"]) .anim-section-title { color: #a0aec0; }
+
+        /* Animation canvas */
+        #anim-canvas {
+          position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        }
+        .topbar { position: relative; z-index: 100; }
+        #home-screen, #trainer-screen { position: relative; z-index: 1; }
+
         /* ── Background themes ── */
         :host([data-bg="light"])   { background: #f0f4f8; }
         :host([data-bg="blue"])    { background: #dbeafe; }
@@ -504,9 +553,25 @@ class AppShell extends HTMLElement {
             <div class="theme-dot" data-theme="yellow" style="background:#fef9c3" title="Gelb"></div>
             <div class="theme-dot" data-theme="orange" style="background:#ffedd5" title="Orange"></div>
             <div class="theme-dot" data-theme="dark" style="background:#1a202c" title="Dunkel"></div>
+            <div class="theme-custom" id="theme-custom-wrap" title="Eigene Farbe">
+              🎨
+              <input type="color" id="custom-color-input" value="#f0f4f8" />
+            </div>
+          </div>
+
+          <p class="anim-section-title">Animation</p>
+          <div class="anim-grid">
+            <div class="anim-chip" data-anim="none">Keine</div>
+            <div class="anim-chip" data-anim="bubbles">Blasen</div>
+            <div class="anim-chip" data-anim="stars">Sterne</div>
+            <div class="anim-chip" data-anim="confetti">Konfetti</div>
+            <div class="anim-chip" data-anim="snow">Schnee</div>
+            <div class="anim-chip" data-anim="hearts">Herzen</div>
           </div>
         </div>
       </div>
+
+      <canvas id="anim-canvas"></canvas>
 
       <!-- Trainer view (shown when subject is selected) -->
       <div id="trainer-screen">
@@ -714,22 +779,197 @@ class AppShell extends HTMLElement {
 
         // Theme picker
         const savedTheme = localStorage.getItem("appBg") || "light";
-        this.setAttribute("data-bg", savedTheme);
-        document.body.style.background = getComputedStyle(this).background;
+        const savedCustomColor = localStorage.getItem("appBgCustom") || "#f0f4f8";
+        const customWrap = this.shadowRoot.getElementById("theme-custom-wrap");
+        const customInput = this.shadowRoot.getElementById("custom-color-input");
+
+        const clearActive = () => {
+            this.shadowRoot.querySelectorAll(".theme-dot").forEach(d => d.classList.remove("active"));
+            customWrap.classList.remove("active");
+        };
+        const applyBg = (color) => {
+            this.style.background = color;
+            document.body.style.background = color;
+        };
+
+        if (savedTheme === "custom") {
+            customWrap.classList.add("active");
+            customWrap.style.background = savedCustomColor;
+            customInput.value = savedCustomColor;
+            this.removeAttribute("data-bg");
+            applyBg(savedCustomColor);
+        } else {
+            this.setAttribute("data-bg", savedTheme);
+            requestAnimationFrame(() => {
+                document.body.style.background = getComputedStyle(this).background;
+            });
+            this.shadowRoot.querySelectorAll(".theme-dot").forEach(dot => {
+                if (dot.dataset.theme === savedTheme) dot.classList.add("active");
+            });
+        }
+
         this.shadowRoot.querySelectorAll(".theme-dot").forEach(dot => {
-            if (dot.dataset.theme === savedTheme) dot.classList.add("active");
             dot.onclick = () => {
-                this.shadowRoot.querySelectorAll(".theme-dot").forEach(d => d.classList.remove("active"));
+                clearActive();
                 dot.classList.add("active");
                 const theme = dot.dataset.theme;
                 this.setAttribute("data-bg", theme);
+                this.style.background = "";
                 localStorage.setItem("appBg", theme);
-                // Sync body background
                 requestAnimationFrame(() => {
                     document.body.style.background = getComputedStyle(this).background;
                 });
             };
         });
+
+        customInput.oninput = () => {
+            const color = customInput.value;
+            clearActive();
+            customWrap.classList.add("active");
+            customWrap.style.background = color;
+            this.removeAttribute("data-bg");
+            applyBg(color);
+            localStorage.setItem("appBg", "custom");
+            localStorage.setItem("appBgCustom", color);
+        };
+
+        // Animation picker
+        const canvas = this.shadowRoot.getElementById("anim-canvas");
+        const ctx = canvas.getContext("2d");
+        let animId = null;
+        let particles = [];
+
+        const resizeCanvas = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        const ANIMS = {
+            none: null,
+            bubbles: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height + 20,
+                    r: 4 + Math.random() * 12,
+                    speed: 0.3 + Math.random() * 0.7,
+                    wobble: Math.random() * Math.PI * 2,
+                    opacity: 0.15 + Math.random() * 0.25,
+                    color: `hsla(${200 + Math.random() * 40}, 70%, 70%, `,
+                }),
+                update: (p) => { p.y -= p.speed; p.x += Math.sin(p.wobble += 0.01) * 0.3; return p.y + p.r > -20; },
+                draw: (p) => { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = p.color + p.opacity + ")"; ctx.fill(); },
+                rate: 3,
+            },
+            stars: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width,
+                    y: -10,
+                    size: 3 + Math.random() * 6,
+                    speed: 0.2 + Math.random() * 0.5,
+                    opacity: 0.2 + Math.random() * 0.3,
+                    rot: Math.random() * Math.PI * 2,
+                    rotSpeed: (Math.random() - 0.5) * 0.02,
+                }),
+                update: (p) => { p.y += p.speed; p.rot += p.rotSpeed; return p.y < canvas.height + 20; },
+                draw: (p) => {
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+                    ctx.globalAlpha = p.opacity; ctx.fillStyle = "#fbbf24";
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) { ctx.lineTo(Math.cos((i * 4 * Math.PI) / 5) * p.size, Math.sin((i * 4 * Math.PI) / 5) * p.size); }
+                    ctx.closePath(); ctx.fill(); ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 2,
+            },
+            confetti: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width,
+                    y: -10,
+                    w: 4 + Math.random() * 4, h: 6 + Math.random() * 6,
+                    speed: 0.5 + Math.random() * 1.5,
+                    drift: (Math.random() - 0.5) * 0.5,
+                    rot: Math.random() * Math.PI * 2,
+                    rotSpeed: (Math.random() - 0.5) * 0.06,
+                    color: `hsl(${Math.random() * 360}, 80%, 60%)`,
+                    opacity: 0.5 + Math.random() * 0.4,
+                }),
+                update: (p) => { p.y += p.speed; p.x += p.drift; p.rot += p.rotSpeed; return p.y < canvas.height + 20; },
+                draw: (p) => {
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+                    ctx.globalAlpha = p.opacity; ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 4,
+            },
+            snow: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width,
+                    y: -10,
+                    r: 2 + Math.random() * 4,
+                    speed: 0.3 + Math.random() * 0.6,
+                    wobble: Math.random() * Math.PI * 2,
+                    opacity: 0.3 + Math.random() * 0.4,
+                }),
+                update: (p) => { p.y += p.speed; p.x += Math.sin(p.wobble += 0.008) * 0.4; return p.y < canvas.height + 20; },
+                draw: (p) => { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,255,255,${p.opacity})`; ctx.fill(); },
+                rate: 3,
+            },
+            hearts: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height + 20,
+                    size: 6 + Math.random() * 10,
+                    speed: 0.3 + Math.random() * 0.6,
+                    wobble: Math.random() * Math.PI * 2,
+                    opacity: 0.15 + Math.random() * 0.25,
+                    color: `hsl(${340 + Math.random() * 30}, 80%, 65%)`,
+                }),
+                update: (p) => { p.y -= p.speed; p.x += Math.sin(p.wobble += 0.01) * 0.3; return p.y + p.size > -20; },
+                draw: (p) => {
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.globalAlpha = p.opacity;
+                    ctx.fillStyle = p.color; ctx.font = `${p.size * 2}px serif`;
+                    ctx.fillText("\u2764", -p.size, p.size);
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 2,
+            },
+        };
+
+        let currentAnim = null;
+        const startAnim = (name) => {
+            if (animId) cancelAnimationFrame(animId);
+            animId = null;
+            particles = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            currentAnim = ANIMS[name];
+            if (!currentAnim) return;
+            let frame = 0;
+            const loop = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (frame++ % Math.max(1, Math.round(60 / currentAnim.rate)) === 0) {
+                    particles.push(currentAnim.spawn());
+                }
+                particles = particles.filter(p => currentAnim.update(p));
+                particles.forEach(p => currentAnim.draw(p));
+                if (particles.length > 150) particles.splice(0, particles.length - 150);
+                animId = requestAnimationFrame(loop);
+            };
+            loop();
+        };
+
+        const savedAnim = localStorage.getItem("appAnim") || "none";
+        this.shadowRoot.querySelectorAll(".anim-chip").forEach(chip => {
+            if (chip.dataset.anim === savedAnim) chip.classList.add("active");
+            chip.onclick = () => {
+                this.shadowRoot.querySelectorAll(".anim-chip").forEach(c => c.classList.remove("active"));
+                chip.classList.add("active");
+                localStorage.setItem("appAnim", chip.dataset.anim);
+                startAnim(chip.dataset.anim);
+            };
+        });
+        startAnim(savedAnim);
 
         // Observe points changes to update home stats
         const observer = new MutationObserver(() => this._updateHomeStats());
