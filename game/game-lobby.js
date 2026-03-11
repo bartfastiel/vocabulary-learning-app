@@ -26,6 +26,7 @@ import "./maze-game.js";
 import "./bubble-game.js";
 import "./numbertap-game.js";
 import "./dodge-game.js";
+import "./platformer-game.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -148,6 +149,13 @@ const GAMES = [
         component: "dodge-game",
         desc: "Weiche den Hindernissen aus!",
         scoreLabel: "Sekunden",
+    },
+    {
+        id: "platformer", label: "Hüpf Held",       emoji: "🦸",
+        cost: 2,  maxEarn: 0,
+        component: "platformer-game",
+        desc: "Sammle Münzen, besiege Gegner, erreiche die Flagge!",
+        scoreLabel: "Punkte",
     },
 ];
 
