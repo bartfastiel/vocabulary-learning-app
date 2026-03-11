@@ -5,6 +5,7 @@
 //
 
 import "./help-overlay.js";
+import "./group-board.js";
 import "../vocab/vocab.js";
 import "../vocab/vocab-editor.js";
 import "../game/game-lobby.js";
@@ -177,7 +178,7 @@ class AppShell extends HTMLElement {
           position: absolute; top: 10px; right: 12px; z-index: 2;
           display: flex; flex-direction: column; gap: 6px;
         }
-        #info-btn, #edit-vocab-btn {
+        #info-btn, #edit-vocab-btn, #group-btn {
           font-size: 0.95rem;
           background: rgba(3,105,161,0.7);
           backdrop-filter: blur(10px);
@@ -187,7 +188,7 @@ class AppShell extends HTMLElement {
           box-shadow: 0 0 14px rgba(14,165,233,0.4);
           transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
         }
-        #info-btn:hover, #edit-vocab-btn:hover {
+        #info-btn:hover, #edit-vocab-btn:hover, #group-btn:hover {
           background: rgba(2,132,199,0.9);
           box-shadow: 0 0 24px rgba(56,189,248,0.8);
           transform: translateY(-2px);
@@ -507,6 +508,7 @@ class AppShell extends HTMLElement {
       <div class="top-right-btns">
         <button id="info-btn">ⓘ Hilfe</button>
         <button id="edit-vocab-btn">✏️ Vokabeln</button>
+        <button id="group-btn">👥 Gruppen</button>
       </div>
       <div id="avatar-btn" title="Avatar bearbeiten">
         <div id="avatar-mini"></div>
@@ -517,6 +519,7 @@ class AppShell extends HTMLElement {
       <vocab-help></vocab-help>
       <avatar-builder></avatar-builder>
       <vocab-editor></vocab-editor>
+      <group-board></group-board>
 
       <div id="quiz-container">
         <h1>🎓 Lerntrainer</h1>
@@ -763,6 +766,10 @@ class AppShell extends HTMLElement {
 
         // Save snapshot on page unload
         window.addEventListener("beforeunload", () => saveSnapshot());
+
+        // Group board
+        const groupBoard = this.shadowRoot.querySelector("group-board");
+        this.shadowRoot.getElementById("group-btn").onclick = () => groupBoard.open();
 
         // Vocab editor
         const vocabEditor = this.shadowRoot.querySelector("vocab-editor");
