@@ -8,6 +8,8 @@ import "./help-overlay.js";
 import "../vocab/vocab.js";
 import "../vocab/vocab-editor.js";
 import "../game/game-lobby.js";
+import "../math/math-trainer.js";
+import "../deutsch/deutsch-trainer.js";
 import { PointsManager } from "../vocab/points.js";
 import { getAvatarSVG } from "./avatar-builder.js";
 import { getProfiles, getActiveId, getActiveProfile, createProfile, deleteProfile,
@@ -74,6 +76,36 @@ class AppShell extends HTMLElement {
           33%       { transform: translate(35px, -50px) scale(1.1); }
           66%       { transform: translate(-25px, 25px) scale(0.93); }
         }
+
+        /* ── Subject tabs ── */
+        .subject-tabs {
+          display: flex; gap: 0.5rem; margin-bottom: 0.6rem;
+          z-index: 1; position: relative;
+        }
+        .subject-tab {
+          padding: 0.5rem 1.1rem;
+          border: 2px solid rgba(56,189,248,0.3);
+          border-radius: 12px;
+          background: rgba(3,30,60,0.5);
+          color: #7dd3fc;
+          font-size: 0.95rem; font-weight: bold;
+          cursor: pointer;
+          transition: all 0.2s;
+          backdrop-filter: blur(10px);
+        }
+        .subject-tab:hover {
+          background: rgba(3,60,110,0.7);
+          border-color: rgba(56,189,248,0.6);
+          transform: translateY(-2px);
+        }
+        .subject-tab.active {
+          background: linear-gradient(135deg, rgba(14,165,233,0.8), rgba(56,189,248,0.8));
+          border-color: rgba(56,189,248,0.9);
+          color: white;
+          box-shadow: 0 0 20px rgba(14,165,233,0.5);
+        }
+        .trainer-container { display: none; width: 100%; }
+        .trainer-container.active { display: block; }
 
         /* ── Layout ── */
         #quiz-container {
@@ -487,7 +519,7 @@ class AppShell extends HTMLElement {
       <vocab-editor></vocab-editor>
 
       <div id="quiz-container">
-        <h1>🎓 Vokabeltrainer</h1>
+        <h1>🎓 Lerntrainer</h1>
 
         <div class="info-grid">
           <div id="score">
@@ -502,7 +534,21 @@ class AppShell extends HTMLElement {
           </div>
         </div>
 
-        <vocab-trainer></vocab-trainer>
+        <div class="subject-tabs">
+          <button class="subject-tab active" data-subject="englisch">🇬🇧 Englisch</button>
+          <button class="subject-tab" data-subject="mathe">🔢 Mathe</button>
+          <button class="subject-tab" data-subject="deutsch">📖 Deutsch</button>
+        </div>
+
+        <div class="trainer-container active" data-subject="englisch">
+          <vocab-trainer></vocab-trainer>
+        </div>
+        <div class="trainer-container" data-subject="mathe">
+          <math-trainer></math-trainer>
+        </div>
+        <div class="trainer-container" data-subject="deutsch">
+          <deutsch-trainer></deutsch-trainer>
+        </div>
       </div>
 
       <game-lobby></game-lobby>
@@ -645,9 +691,26 @@ class AppShell extends HTMLElement {
             btn.onclick = () => applyRole(btn.dataset.role);
         });
 
-        // Connect trainer with points manager
+        // Connect trainers with points manager
         const trainer = this.shadowRoot.querySelector("vocab-trainer");
         trainer.points = pointsManager;
+
+        const mathTrainer = this.shadowRoot.querySelector("math-trainer");
+        mathTrainer.points = pointsManager;
+
+        const deutschTrainer = this.shadowRoot.querySelector("deutsch-trainer");
+        deutschTrainer.points = pointsManager;
+
+        // Subject tabs
+        const tabs = this.shadowRoot.querySelectorAll(".subject-tab");
+        const containers = this.shadowRoot.querySelectorAll(".trainer-container");
+        tabs.forEach(tab => {
+            tab.onclick = () => {
+                const subj = tab.dataset.subject;
+                tabs.forEach(t => t.classList.toggle("active", t === tab));
+                containers.forEach(c => c.classList.toggle("active", c.dataset.subject === subj));
+            };
+        });
 
         // Connect game lobby with points manager
         const gameLobby = this.shadowRoot.querySelector("game-lobby");
