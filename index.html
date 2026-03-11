@@ -35,11 +35,13 @@
 <audio src="assets/audio/ding.mp3" preload="auto"></audio>
 <audio src="assets/audio/buzz.mp3" preload="auto"></audio>
 
-<!-- main entrypoint — cache-busting via timestamp -->
+<!-- main entrypoint — cache-busting via timestamp, design switcher -->
 <script>
+    const design = localStorage.getItem("appDesign") || "modern";
+    const file = design === "classic" ? "app-shell-classic.js" : "app-shell.js";
     const s = document.createElement("script");
     s.type = "module";
-    s.src = "./core/app-shell.js?v=" + Date.now();
+    s.src = "./core/" + file + "?v=" + Date.now();
     document.currentScript.replaceWith(s);
 </script>
 <div id="version">Entwicklungsversion</div>

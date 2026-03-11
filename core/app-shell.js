@@ -540,6 +540,10 @@ class AppShell extends HTMLElement {
             <span class="action-icon">😊</span>
             <span class="action-label">Avatar</span>
           </button>
+          <button class="action-card" id="home-design">
+            <span class="action-icon">🚀</span>
+            <span class="action-label">Klassisch</span>
+          </button>
         </div>
 
         <div class="theme-section">
@@ -771,6 +775,10 @@ class AppShell extends HTMLElement {
         });
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
+        this.shadowRoot.getElementById("home-design").onclick = () => {
+            localStorage.setItem("appDesign", "classic");
+            location.reload();
+        };
         this.shadowRoot.getElementById("info-btn").onclick = () => this.startHelp(help);
 
         if (savedRole && !localStorage.getItem("vocabHelpSeen")) {
