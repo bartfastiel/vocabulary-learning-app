@@ -1399,6 +1399,112 @@
         "de": "beenden, zu Ende machen",
         "en": "finish",
         "allowImage": false
+      },
+      {
+        "de": "die dort, jene (dort)",
+        "en": "those",
+        "allowImage": false
+      },
+      {
+        "de": "Vortrag, Rede; Gespräch",
+        "en": "talk",
+        "allowImage": false
+      },
+      {
+        "de": "einen Vortrag halten",
+        "en": "give a talk",
+        "allowImage": false
+      },
+      {
+        "de": "geben",
+        "en": "give",
+        "allowImage": false
+      },
+      {
+        "de": "Ich würde gern über … sprechen.",
+        "en": "I'd like to talk about ...",
+        "en_info": "(= I would like to)",
+        "allowImage": false
+      },
+      {
+        "de": "weil",
+        "en": "because",
+        "allowImage": false
+      },
+      {
+        "de": "Ende, Schluss",
+        "en": "end",
+        "allowImage": false
+      },
+      {
+        "de": "schnell",
+        "en": "fast",
+        "allowImage": false
+      },
+      {
+        "de": "lächeln",
+        "en": "smile",
+        "allowImage": true
+      },
+      {
+        "de": "Land",
+        "en": "country",
+        "allowImage": true
+      },
+      {
+        "de": "Markt",
+        "en": "market",
+        "allowImage": true
+      },
+      {
+        "de": "Woche",
+        "en": "week",
+        "allowImage": false
+      },
+      {
+        "de": "Wie viel?",
+        "en": "How much?",
+        "allowImage": false
+      },
+      {
+        "de": "235 Euro ausgeben (für); Zeit verbringen",
+        "en": "spend",
+        "allowImage": false
+      },
+      {
+        "de": "Euro",
+        "en": "euro",
+        "allowImage": true
+      },
+      {
+        "de": "(Kartoffel-)Chips",
+        "en": "crisps",
+        "allowImage": true
+      },
+      {
+        "de": "Reis",
+        "en": "rice",
+        "allowImage": true
+      },
+      {
+        "de": "Speck",
+        "en": "bacon",
+        "allowImage": true
+      },
+      {
+        "de": "planen",
+        "en": "plan",
+        "allowImage": false
+      },
+      {
+        "de": "deutsch; Deutsch; Deutsche/r",
+        "en": "German",
+        "allowImage": false
+      },
+      {
+        "de": "(Speise-)Eis",
+        "en": "ice cream",
+        "allowImage": true
       }
     ]
   },
