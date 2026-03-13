@@ -1399,7 +1399,12 @@
         "de": "beenden, zu Ende machen",
         "en": "finish",
         "allowImage": false
-      },
+      }
+    ]
+  },
+  {
+    "name": "Unit 3",
+    "words": [
       {
         "de": "die dort, jene (dort)",
         "en": "those",
