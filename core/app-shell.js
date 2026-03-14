@@ -611,21 +611,23 @@ class AppShell extends HTMLElement {
         }
     }
 
-    _showProfileOverlay(forceNew = false) {
+    _showProfileOverlay(forceNew = false, onDone = null) {
         const overlay = this.shadowRoot.getElementById("profile-overlay");
         const pickView = this.shadowRoot.getElementById("profile-pick-view");
         const newView = this.shadowRoot.getElementById("profile-new-view");
         const grid = this.shadowRoot.getElementById("profile-grid");
         const nameInput = this.shadowRoot.getElementById("input-profile-name");
 
+        const finish = (id) => {
+            activateProfile(id);
+            overlay.classList.add("hidden");
+            if (onDone) onDone(); else this.init();
+        };
+
         const showPick = () => {
             pickView.hidden = false;
             newView.hidden = true;
-            this._renderProfileGrid(grid, (id) => {
-                activateProfile(id);
-                overlay.classList.add("hidden");
-                this.init();
-            });
+            this._renderProfileGrid(grid, finish);
         };
         const showNew = () => {
             pickView.hidden = true;
@@ -644,9 +646,7 @@ class AppShell extends HTMLElement {
             const name = nameInput.value.trim();
             if (!name) { nameInput.focus(); return; }
             const id = createProfile(name);
-            activateProfile(id);
-            overlay.classList.add("hidden");
-            this.init();
+            finish(id);
         };
         this.shadowRoot.getElementById("btn-profile-create").onclick = doCreate;
         nameInput.onkeydown = e => { if (e.key === "Enter") doCreate(); };
@@ -735,12 +735,7 @@ class AppShell extends HTMLElement {
         if (switcherName && profile) switcherName.textContent = profile.name;
         this.shadowRoot.getElementById("profile-switcher").onclick = () => {
             saveSnapshot();
-            const overlay = this.shadowRoot.getElementById("profile-overlay");
-            const grid = this.shadowRoot.getElementById("profile-grid");
-            this.shadowRoot.getElementById("profile-pick-view").hidden = false;
-            this.shadowRoot.getElementById("profile-new-view").hidden = true;
-            this._renderProfileGrid(grid, (id) => { activateProfile(id); location.reload(); });
-            overlay.classList.remove("hidden");
+            this._showProfileOverlay(false, () => location.reload());
         };
         window.addEventListener("beforeunload", () => saveSnapshot());
 
@@ -794,12 +789,7 @@ class AppShell extends HTMLElement {
         };
         this.shadowRoot.getElementById("home-profile").onclick = () => {
             saveSnapshot();
-            const overlay = this.shadowRoot.getElementById("profile-overlay");
-            const grid = this.shadowRoot.getElementById("profile-grid");
-            this.shadowRoot.getElementById("profile-pick-view").hidden = false;
-            this.shadowRoot.getElementById("profile-new-view").hidden = true;
-            this._renderProfileGrid(grid, (id) => { activateProfile(id); location.reload(); });
-            overlay.classList.remove("hidden");
+            this._showProfileOverlay(false, () => location.reload());
         };
         this.shadowRoot.getElementById("info-btn").onclick = () => this.startHelp(help);
 
