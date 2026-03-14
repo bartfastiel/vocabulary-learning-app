@@ -124,9 +124,24 @@ class InviteQR extends HTMLElement {
           display: inline-block; box-shadow: 0 2px 12px rgba(0,0,0,0.15);
         }
         .qr-wrap img {
-          width: 180px; height: 180px; display: block; border-radius: 4px;
+          width: 180px; height: 180px; display: block; border-radius: 8px;
           image-rendering: pixelated;
+          object-fit: contain;
         }
+        .img-upload-btn {
+          margin-top: 0.7rem; padding: 0.5rem 1rem; border: 2px dashed #cbd5e0;
+          border-radius: 10px; background: #f7fafc; color: #555;
+          font-size: 0.82rem; font-weight: 600; cursor: pointer;
+          transition: all 0.2s; display: inline-block;
+        }
+        .img-upload-btn:hover { border-color: #4299e1; color: #4299e1; background: #ebf8ff; }
+        .img-actions { display: flex; gap: 0.4rem; justify-content: center; margin-top: 0.5rem; }
+        .img-reset-btn {
+          padding: 0.3rem 0.8rem; border: none; border-radius: 8px;
+          background: rgba(255,255,255,0.2); color: white; font-size: 0.75rem;
+          cursor: pointer; font-weight: 600; transition: background 0.2s;
+        }
+        .img-reset-btn:hover { background: rgba(255,255,255,0.35); }
         .avatar-mini {
           position: absolute; top: 0.8rem; right: 0.8rem;
           width: 42px; height: 42px; border-radius: 50%;
@@ -227,11 +242,18 @@ class InviteQR extends HTMLElement {
             <div class="name">${myName}</div>
             <div class="code">${myCode}</div>
             <div class="qr-wrap">
-              <img src="assets/qr-invite.svg" alt="QR Code" />
+              <img id="qr-img" src="${localStorage.getItem("inviteCardImage") || "assets/qr-invite.svg"}" alt="QR Code" />
+            </div>
+            <div class="img-actions">
+              ${localStorage.getItem("inviteCardImage") ? '<button class="img-reset-btn" id="btn-reset-img">Zurücksetzen</button>' : ""}
             </div>
             <div class="stats">\u2B50 ${points} Punkte \u00b7 \uD83D\uDD25 ${streak} Streak</div>
           </div>
 
+          <label class="img-upload-btn" id="upload-label">
+            \uD83D\uDDBC\uFE0F Eigenes Bild einfügen
+            <input type="file" accept="image/*" id="img-input" style="display:none" />
+          </label>
           <p class="hint">Scanne diesen QR-Code, um zur App zu kommen!</p>
 
           <div class="color-row" id="color-row">
@@ -276,6 +298,29 @@ class InviteQR extends HTMLElement {
                 this.shadowRoot.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
                 tab.classList.add("active");
                 this.shadowRoot.getElementById("tab-" + tab.dataset.tab).classList.add("active");
+            };
+        }
+
+        // Image upload
+        const imgInput = this.shadowRoot.getElementById("img-input");
+        const qrImg = this.shadowRoot.getElementById("qr-img");
+        imgInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const dataURL = reader.result;
+                localStorage.setItem("inviteCardImage", dataURL);
+                qrImg.src = dataURL;
+                this._render(); // re-render to show reset button
+            };
+            reader.readAsDataURL(file);
+        };
+        const resetBtn = this.shadowRoot.getElementById("btn-reset-img");
+        if (resetBtn) {
+            resetBtn.onclick = () => {
+                localStorage.removeItem("inviteCardImage");
+                this._render();
             };
         }
 
