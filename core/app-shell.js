@@ -3,7 +3,7 @@
 
 import "./help-overlay.js";
 import "./group-board.js";
-import { checkIncomingFriend, addFriend } from "./invite-qr.js";
+import "./invite-qr.js";
 import "../vocab/vocab.js";
 import "../vocab/vocab-editor.js";
 import "../game/game-lobby.js";
@@ -965,17 +965,6 @@ class AppShell extends HTMLElement {
 
         const inviteQR = this.shadowRoot.querySelector("invite-qr");
         this.shadowRoot.getElementById("home-friends").onclick = () => inviteQR.open();
-
-        // Check for incoming friend link
-        const incoming = checkIncomingFriend();
-        if (incoming) {
-            addFriend(incoming);
-            inviteQR.open();
-            setTimeout(() => {
-                const listTab = inviteQR.shadowRoot?.querySelector('[data-tab="list"]');
-                if (listTab) listTab.click();
-            }, 100);
-        }
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
         // Background settings overlay
