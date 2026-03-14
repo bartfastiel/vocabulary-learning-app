@@ -32,6 +32,7 @@ import "./doodlejump-game.js";
 import "./2048-game.js";
 import "./minesweeper-game.js";
 import "./asteroids-game.js";
+import "./racing-game.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -195,6 +196,13 @@ const GAMES = [
         cost: 2,  maxEarn: 0,
         component: "asteroids-game",
         desc: "Zerstöre Asteroiden mit deinem Raumschiff!",
+        scoreLabel: "Punkte",
+    },
+    {
+        id: "racing", label: "Turbo Racer",          emoji: "🏎️",
+        cost: 2,  maxEarn: 0,
+        component: "racing-game",
+        desc: "Rase über die Autobahn und weiche dem Verkehr aus!",
         scoreLabel: "Punkte",
     },
 ];
