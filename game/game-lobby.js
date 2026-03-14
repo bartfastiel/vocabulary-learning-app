@@ -156,7 +156,7 @@ const GAMES = [
         scoreLabel: "Sekunden",
     },
     {
-        id: "platformer", label: "Hüpf Held",       emoji: "🦸",
+        id: "platformer", label: "Hüpfelt",          emoji: "🦸",
         cost: 2,  maxEarn: 0,
         component: "platformer-game",
         desc: "Sammle Münzen, besiege Gegner, erreiche die Flagge!",
