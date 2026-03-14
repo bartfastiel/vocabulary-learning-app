@@ -33,6 +33,7 @@ import "./2048-game.js";
 import "./minesweeper-game.js";
 import "./asteroids-game.js";
 import "./racing-game.js";
+import "./quiz-game.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -204,6 +205,13 @@ const GAMES = [
         component: "racing-game",
         desc: "Rase über die Autobahn und weiche dem Verkehr aus!",
         scoreLabel: "Punkte",
+    },
+    {
+        id: "quiz", label: "Vokabel-Million\u00e4r",   emoji: "\uD83C\uDFC6",
+        cost: 2,  maxEarn: 0,
+        component: "quiz-game",
+        desc: "Beantworte 15 Vokabelfragen und werde Million\u00e4r!",
+        scoreLabel: "Fragen",
     },
 ];
 
