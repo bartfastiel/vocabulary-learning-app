@@ -4,6 +4,7 @@
 
 import { getActiveProfile, getProfiles, saveSnapshot } from "./profiles.js";
 import { getAvatarSVG } from "./avatar-builder.js";
+import { generateQR } from "./qr-code.js";
 
 const FRIENDS_KEY = "friendsList";
 
@@ -34,14 +35,17 @@ function getMyCode() {
 function buildShareData() {
     saveSnapshot();
     const prof = getActiveProfile();
-    const data = {
+    return {
         code: getMyCode(),
         name: prof?.name || "Unbekannt",
         points: parseInt(localStorage.getItem("points") || "0"),
         streak: parseInt(localStorage.getItem("streakRecord") || "0"),
-        avatar: prof?.avatarSvg || "",
     };
-    return data;
+}
+
+function getLocalAvatar() {
+    const prof = getActiveProfile();
+    return prof?.avatarSvg || "";
 }
 
 function encodeShareURL(data) {
@@ -84,7 +88,8 @@ class InviteQR extends HTMLElement {
     _render() {
         const myData = buildShareData();
         const shareURL = encodeShareURL(myData);
-        const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareURL)}&color=2d3748&bgcolor=ffffff&margin=8`;
+        const qrSVG = generateQR(shareURL, 160);
+        const avatar = getLocalAvatar();
         const friends = loadFriends();
 
         this.shadowRoot.innerHTML = `
@@ -139,7 +144,7 @@ class InviteQR extends HTMLElement {
           background: white; border-radius: 12px; padding: 8px;
           display: inline-block;
         }
-        .qr-img-wrap img { width: 160px; height: 160px; display: block; border-radius: 4px; }
+        .qr-img-wrap svg { width: 160px; height: 160px; display: block; border-radius: 4px; }
         .avatar-mini {
           position: absolute; top: 0.8rem; right: 0.8rem;
           width: 40px; height: 40px; border-radius: 50%;
@@ -236,11 +241,11 @@ class InviteQR extends HTMLElement {
         <div class="tab-content active" id="tab-qr">
           <div class="qr-section">
             <div class="qr-card" id="qr-card">
-              ${myData.avatar ? `<div class="avatar-mini">${myData.avatar}</div>` : ""}
+              ${avatar ? `<div class="avatar-mini">${avatar}</div>` : ""}
               <div class="name">${myData.name}</div>
               <div class="code">${myData.code}</div>
               <div class="qr-img-wrap">
-                <img id="qr-img" src="${qrURL}" alt="QR Code" />
+                ${qrSVG}
               </div>
               <div class="stats">\u2B50 ${myData.points} Punkte \u00b7 \uD83D\uDD25 ${myData.streak} Streak</div>
             </div>
