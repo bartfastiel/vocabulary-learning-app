@@ -843,9 +843,14 @@ class PlatformerGame extends HTMLElement {
         // power-up items
         for (const pu of this._powerupItems) {
             const bob = Math.sin(pu.bobPhase) * 3;
-            // glow
+            // glow (no shadowBlur for performance)
             ctx.save();
-            ctx.shadowColor = pu.color; ctx.shadowBlur = 10;
+            ctx.globalAlpha = 0.3;
+            ctx.fillStyle = pu.color;
+            ctx.beginPath();
+            ctx.roundRect(pu.x - 3, pu.y + bob - 3, pu.w + 6, pu.h + 6, 8);
+            ctx.fill();
+            ctx.globalAlpha = 1;
             ctx.fillStyle = pu.color;
             ctx.beginPath();
             ctx.roundRect(pu.x, pu.y + bob, pu.w, pu.h, 6);
@@ -916,15 +921,17 @@ class PlatformerGame extends HTMLElement {
             ctx.fill();
         }
 
-        // player power-up aura
+        // player power-up aura (no shadowBlur for performance)
         if (this._activePower) {
             ctx.save();
-            ctx.globalAlpha = 0.2 + Math.sin(now / 200) * 0.1;
-            ctx.shadowColor = this._activePower.color;
-            ctx.shadowBlur = 20;
+            ctx.globalAlpha = 0.18 + Math.sin(now / 200) * 0.08;
             ctx.fillStyle = this._activePower.color;
             ctx.beginPath();
-            ctx.arc(this._px + 10, this._py + 12, 18, 0, Math.PI * 2);
+            ctx.arc(this._px + 10, this._py + 12, 20, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 0.1;
+            ctx.beginPath();
+            ctx.arc(this._px + 10, this._py + 12, 26, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
 
