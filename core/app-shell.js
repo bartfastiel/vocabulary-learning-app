@@ -473,16 +473,74 @@ class AppShell extends HTMLElement {
         #grad-anim-layer {
           position: fixed; inset: 0; z-index: -1; pointer-events: none;
           background-size: 300% 300%;
-          animation: gradientFlow 8s ease infinite;
           opacity: 0; transition: opacity 0.5s;
         }
         #grad-anim-layer.active { opacity: 1; }
+
+        /* ── Live background animations ── */
+        .live-bg-grid {
+          display: flex; flex-wrap: wrap; gap: 0.5rem;
+        }
+        .live-bg-chip {
+          width: 62px; height: 42px; border-radius: 10px;
+          border: 3px solid transparent; cursor: pointer;
+          position: relative; overflow: hidden;
+          transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+          display: flex; align-items: flex-end; justify-content: center;
+          padding-bottom: 3px;
+        }
+        .live-bg-chip span {
+          font-size: 0.55rem; font-weight: 700; color: white;
+          text-shadow: 0 1px 3px rgba(0,0,0,0.7); line-height: 1;
+          position: relative; z-index: 1;
+        }
+        .live-bg-chip:hover { transform: scale(1.08); }
+        .live-bg-chip.active {
+          border-color: #fbbf24;
+          box-shadow: 0 0 0 2px white, 0 0 0 4px #fbbf24;
+        }
+
         @keyframes gradientFlow {
           0%   { background-position: 0% 50%; }
           25%  { background-position: 100% 0%; }
           50%  { background-position: 100% 100%; }
           75%  { background-position: 0% 100%; }
           100% { background-position: 0% 50%; }
+        }
+        @keyframes lavaFlow {
+          0%   { background-position: 0% 0%; }
+          33%  { background-position: 100% 50%; }
+          66%  { background-position: 50% 100%; }
+          100% { background-position: 0% 0%; }
+        }
+        @keyframes auroraShift {
+          0%   { background-position: 0% 50%; filter: hue-rotate(0deg); }
+          50%  { background-position: 100% 50%; filter: hue-rotate(30deg); }
+          100% { background-position: 0% 50%; filter: hue-rotate(0deg); }
+        }
+        @keyframes oceanWave {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 80%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes sunsetPulse {
+          0%   { background-position: 0% 50%; filter: brightness(1); }
+          50%  { background-position: 100% 50%; filter: brightness(1.1); }
+          100% { background-position: 0% 50%; filter: brightness(1); }
+        }
+        @keyframes neonPulse {
+          0%   { background-position: 0% 50%; filter: saturate(1) brightness(1); }
+          25%  { background-position: 50% 0%; filter: saturate(1.3) brightness(1.1); }
+          50%  { background-position: 100% 50%; filter: saturate(1) brightness(1); }
+          75%  { background-position: 50% 100%; filter: saturate(1.3) brightness(1.1); }
+          100% { background-position: 0% 50%; filter: saturate(1) brightness(1); }
+        }
+        @keyframes cosmicDrift {
+          0%   { background-position: 0% 0%; }
+          25%  { background-position: 100% 30%; }
+          50%  { background-position: 60% 100%; }
+          75%  { background-position: 30% 60%; }
+          100% { background-position: 0% 0%; }
         }
 
         /* Animation canvas */
@@ -706,6 +764,40 @@ class AppShell extends HTMLElement {
               <div class="theme-dot gradient-dot" data-theme="grad-mint" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0,#6ee7b7,#34d399)" title="Minze"></div>
               <div class="theme-dot gradient-dot" data-theme="grad-peach" style="background:linear-gradient(135deg,#fed7aa,#fdba74,#fb923c,#f97316)" title="Pfirsich"></div>
               <div class="theme-dot gradient-dot" data-theme="grad-night" style="background:linear-gradient(180deg,#0f172a,#1e293b,#334155)" title="Nacht"></div>
+            </div>
+
+            <p class="anim-section-title">Animierte Hintergr\u00fcnde</p>
+            <div class="live-bg-grid" id="live-bg-grid">
+              <div class="live-bg-chip" data-livebg="lava"
+                style="background: linear-gradient(135deg,#dc2626,#f97316,#fbbf24,#dc2626);background-size:300% 300%">
+                <span>Lava</span></div>
+              <div class="live-bg-chip" data-livebg="aurora"
+                style="background: linear-gradient(135deg,#064e3b,#10b981,#06b6d4,#8b5cf6,#064e3b);background-size:400% 400%">
+                <span>Nordlicht</span></div>
+              <div class="live-bg-chip" data-livebg="ocean"
+                style="background: linear-gradient(180deg,#0c4a6e,#0284c7,#22d3ee,#0284c7);background-size:300% 300%">
+                <span>Ozean</span></div>
+              <div class="live-bg-chip" data-livebg="sunset"
+                style="background: linear-gradient(180deg,#1e1b4b,#7c3aed,#f97316,#fbbf24);background-size:300% 300%">
+                <span>Abendrot</span></div>
+              <div class="live-bg-chip" data-livebg="neon"
+                style="background: linear-gradient(135deg,#0f172a,#7c3aed,#ec4899,#06b6d4,#0f172a);background-size:400% 400%">
+                <span>Neon</span></div>
+              <div class="live-bg-chip" data-livebg="cosmic"
+                style="background: linear-gradient(135deg,#0f0520,#581c87,#1e1b4b,#0ea5e9,#0f0520);background-size:400% 400%">
+                <span>Kosmos</span></div>
+              <div class="live-bg-chip" data-livebg="forest"
+                style="background: linear-gradient(180deg,#052e16,#166534,#4ade80,#166534);background-size:300% 300%">
+                <span>Wald</span></div>
+              <div class="live-bg-chip" data-livebg="candy"
+                style="background: linear-gradient(135deg,#ec4899,#c084fc,#60a5fa,#34d399,#ec4899);background-size:400% 400%">
+                <span>Candy</span></div>
+              <div class="live-bg-chip" data-livebg="fire"
+                style="background: linear-gradient(180deg,#1c1917,#dc2626,#f97316,#fbbf24,#dc2626);background-size:300% 300%">
+                <span>Feuer</span></div>
+              <div class="live-bg-chip" data-livebg="ice"
+                style="background: linear-gradient(135deg,#e0f2fe,#7dd3fc,#38bdf8,#0ea5e9,#e0f2fe);background-size:400% 400%">
+                <span>Eis</span></div>
             </div>
 
             <p class="anim-section-title">Eigener Farbverlauf</p>
@@ -991,7 +1083,8 @@ class AppShell extends HTMLElement {
             this.shadowRoot.querySelectorAll(".theme-dot").forEach(d => d.classList.remove("active"));
             customWrap.classList.remove("active");
             const gal = this.shadowRoot.getElementById("grad-anim-layer");
-            if (gal) gal.classList.remove("active");
+            if (gal) { gal.classList.remove("active"); gal.style.animation = ""; }
+            this.shadowRoot.querySelectorAll(".live-bg-chip").forEach(c => c.classList.remove("active"));
         };
         const applyBg = (color) => {
             this.style.background = color;
@@ -1147,6 +1240,7 @@ class AppShell extends HTMLElement {
                 // Apply to animated layer with flowing effect
                 gradAnimLayer.style.background = css;
                 gradAnimLayer.style.backgroundSize = "300% 300%";
+                gradAnimLayer.style.animation = "gradientFlow 8s ease infinite";
                 gradAnimLayer.classList.add("active");
                 this.style.background = "transparent";
                 document.body.style.background = gradColors[0];
@@ -1168,9 +1262,82 @@ class AppShell extends HTMLElement {
 
         gradApply.onclick = applyCustomGrad;
 
+        // ── Live animated backgrounds ──
+        const LIVE_BGS = {
+            lava: {
+                bg: "linear-gradient(135deg,#dc2626,#f97316,#fbbf24,#dc2626)",
+                size: "300% 300%", anim: "lavaFlow 10s ease infinite", dark: false,
+            },
+            aurora: {
+                bg: "linear-gradient(135deg,#064e3b,#10b981,#06b6d4,#8b5cf6,#064e3b)",
+                size: "400% 400%", anim: "auroraShift 12s ease infinite", dark: true,
+            },
+            ocean: {
+                bg: "linear-gradient(180deg,#0c4a6e,#0284c7,#22d3ee,#0284c7)",
+                size: "300% 300%", anim: "oceanWave 8s ease infinite", dark: true,
+            },
+            sunset: {
+                bg: "linear-gradient(180deg,#1e1b4b,#7c3aed,#f97316,#fbbf24)",
+                size: "300% 300%", anim: "sunsetPulse 10s ease infinite", dark: true,
+            },
+            neon: {
+                bg: "linear-gradient(135deg,#0f172a,#7c3aed,#ec4899,#06b6d4,#0f172a)",
+                size: "400% 400%", anim: "neonPulse 6s ease infinite", dark: true,
+            },
+            cosmic: {
+                bg: "linear-gradient(135deg,#0f0520,#581c87,#1e1b4b,#0ea5e9,#0f0520)",
+                size: "400% 400%", anim: "cosmicDrift 15s ease infinite", dark: true,
+            },
+            forest: {
+                bg: "linear-gradient(180deg,#052e16,#166534,#4ade80,#166534)",
+                size: "300% 300%", anim: "oceanWave 10s ease infinite", dark: true,
+            },
+            candy: {
+                bg: "linear-gradient(135deg,#ec4899,#c084fc,#60a5fa,#34d399,#ec4899)",
+                size: "400% 400%", anim: "neonPulse 8s ease infinite", dark: false,
+            },
+            fire: {
+                bg: "linear-gradient(180deg,#1c1917,#dc2626,#f97316,#fbbf24,#dc2626)",
+                size: "300% 300%", anim: "lavaFlow 6s ease infinite", dark: true,
+            },
+            ice: {
+                bg: "linear-gradient(135deg,#e0f2fe,#7dd3fc,#38bdf8,#0ea5e9,#e0f2fe)",
+                size: "400% 400%", anim: "auroraShift 10s ease infinite", dark: false,
+            },
+        };
+
+        const clearLiveBg = () => {
+            this.shadowRoot.querySelectorAll(".live-bg-chip").forEach(c => c.classList.remove("active"));
+        };
+
+        const applyLiveBg = (key) => {
+            const cfg = LIVE_BGS[key];
+            if (!cfg) return;
+            clearActive();
+            clearLiveBg();
+            this.shadowRoot.querySelector(`[data-livebg="${key}"]`)?.classList.add("active");
+            gradAnimLayer.style.background = cfg.bg;
+            gradAnimLayer.style.backgroundSize = cfg.size;
+            gradAnimLayer.style.animation = cfg.anim;
+            gradAnimLayer.classList.add("active");
+            this.style.background = "transparent";
+            document.body.style.background = "#0a0a0a";
+            this.removeAttribute("data-bg");
+            if (cfg.dark) this.setAttribute("data-bg", "dark");
+            localStorage.setItem("appBg", "livebg");
+            localStorage.setItem("liveBgKey", key);
+        };
+
+        this.shadowRoot.querySelectorAll(".live-bg-chip").forEach(chip => {
+            chip.onclick = () => applyLiveBg(chip.dataset.livebg);
+        });
+
         // Restore custom gradient on load
         if (savedTheme === "customGrad") {
             applyCustomGrad();
+        } else if (savedTheme === "livebg") {
+            const key = localStorage.getItem("liveBgKey");
+            if (LIVE_BGS[key]) applyLiveBg(key);
         }
 
         // Animation picker
