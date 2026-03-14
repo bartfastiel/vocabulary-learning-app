@@ -189,22 +189,79 @@ class VocabTrainer extends HTMLElement {
           border: 1px solid rgba(56,189,248,0.3);
           border-radius: 12px; padding: 0.5rem 0.8rem;
           margin-bottom: 0.8rem; min-height: 48px;
-          transition: all 0.3s ease;
+          transition: background 0.4s ease, border-color 0.4s ease, transform 0.3s ease;
         }
         .mascot-face {
-          font-size: 2rem; flex-shrink: 0;
-          animation: mascot-bounce 0.6s ease;
+          font-size: 2.2rem; flex-shrink: 0;
+          animation: mascot-idle 2.5s ease-in-out infinite;
+          display: inline-block;
         }
         .mascot-bubble {
           font-size: 0.85rem; color: #bae6fd;
           line-height: 1.3; text-align: left;
+          animation: bubble-fade 0.4s ease;
         }
-        .mascot.correct { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.4); }
+        @keyframes bubble-fade {
+          from { opacity: 0; transform: translateX(-8px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Idle: gentle floating */
+        @keyframes mascot-idle {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          25% { transform: translateY(-3px) rotate(2deg); }
+          75% { transform: translateY(2px) rotate(-2deg); }
+        }
+
+        /* Correct: happy jump + spin */
+        .mascot.correct { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.4); transform: scale(1.03); }
+        .mascot.correct .mascot-face {
+          animation: mascot-happy 0.7s ease, mascot-idle 2.5s ease-in-out 0.7s infinite;
+        }
+        @keyframes mascot-happy {
+          0% { transform: scale(1) translateY(0) rotate(0deg); }
+          20% { transform: scale(1.3) translateY(-14px) rotate(-10deg); }
+          40% { transform: scale(1.1) translateY(-8px) rotate(10deg); }
+          60% { transform: scale(1.2) translateY(-10px) rotate(-5deg); }
+          80% { transform: scale(1.05) translateY(-3px) rotate(3deg); }
+          100% { transform: scale(1) translateY(0) rotate(0deg); }
+        }
+
+        /* Wrong: shake + shrink */
         .mascot.wrong { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); }
-        .mascot.streak { background: rgba(251,191,36,0.2); border-color: rgba(251,191,36,0.4); }
-        @keyframes mascot-bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
+        .mascot.wrong .mascot-face {
+          animation: mascot-sad 0.6s ease, mascot-idle 2.5s ease-in-out 0.6s infinite;
+        }
+        @keyframes mascot-sad {
+          0%, 100% { transform: translateX(0) rotate(0deg) scale(1); }
+          15% { transform: translateX(-8px) rotate(-8deg) scale(0.9); }
+          30% { transform: translateX(8px) rotate(8deg) scale(0.9); }
+          45% { transform: translateX(-6px) rotate(-5deg) scale(0.95); }
+          60% { transform: translateX(6px) rotate(5deg) scale(0.95); }
+          75% { transform: translateX(-3px) rotate(-2deg) scale(1); }
+          90% { transform: translateX(2px) rotate(1deg) scale(1); }
+        }
+
+        /* Streak: excited bounce + glow */
+        .mascot.streak {
+          background: rgba(251,191,36,0.25); border-color: rgba(251,191,36,0.5);
+          box-shadow: 0 0 20px rgba(251,191,36,0.3);
+          transform: scale(1.05);
+        }
+        .mascot.streak .mascot-face {
+          animation: mascot-streak 1s ease, mascot-idle 2.5s ease-in-out 1s infinite;
+        }
+        @keyframes mascot-streak {
+          0% { transform: scale(1) rotate(0deg); }
+          10% { transform: scale(1.4) rotate(-15deg) translateY(-12px); }
+          20% { transform: scale(1.2) rotate(15deg) translateY(-8px); }
+          30% { transform: scale(1.5) rotate(-10deg) translateY(-16px); }
+          40% { transform: scale(1.2) rotate(10deg) translateY(-6px); }
+          50% { transform: scale(1.3) rotate(0deg) translateY(-10px); }
+          60% { transform: scale(1.1) rotate(-5deg) translateY(-4px); }
+          70% { transform: scale(1.15) rotate(5deg) translateY(-6px); }
+          80% { transform: scale(1.05) rotate(-2deg) translateY(-2px); }
+          100% { transform: scale(1) rotate(0deg) translateY(0); }
         }
 
         /* Progress bar */
@@ -238,7 +295,24 @@ class VocabTrainer extends HTMLElement {
           color: #38bdf8;
         }
         .summary-sub { color: #7dd3fc; font-size: 0.9rem; margin: 0 0 1.2rem; }
-        .summary-trophy { font-size: 4rem; margin-bottom: 0.8rem; }
+        .summary-trophy {
+          font-size: 4rem; margin-bottom: 0.8rem;
+          animation: trophy-entrance 1s ease;
+          display: inline-block;
+        }
+        @keyframes trophy-entrance {
+          0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+          50% { transform: scale(1.3) rotate(10deg); opacity: 1; }
+          70% { transform: scale(0.9) rotate(-5deg); }
+          100% { transform: scale(1) rotate(0deg); }
+        }
+        .summary-box h2 { animation: summary-slide 0.6s ease 0.3s both; }
+        .summary-stats { animation: summary-slide 0.6s ease 0.5s both; }
+        .summary-btn { animation: summary-slide 0.6s ease 0.7s both; }
+        @keyframes summary-slide {
+          from { opacity: 0; transform: translateY(15px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         .summary-stats {
           display: flex; gap: 0.6rem; justify-content: center;
           margin-bottom: 1.2rem;
@@ -546,13 +620,17 @@ class VocabTrainer extends HTMLElement {
         const mascot = this.shadowRoot.getElementById("mascot");
         const faceEl = this.shadowRoot.getElementById("mascot-face");
         const bubbleEl = this.shadowRoot.getElementById("mascot-bubble");
+        // Reset animations by removing class, forcing reflow, then re-adding
+        mascot.className = "mascot";
+        faceEl.style.animation = "none";
+        bubbleEl.style.animation = "none";
+        faceEl.offsetHeight; // force reflow
+        faceEl.style.animation = "";
+        bubbleEl.style.animation = "";
+        // Apply new state
         mascot.className = "mascot" + (mood ? ` ${mood}` : "");
         faceEl.textContent = face;
         bubbleEl.textContent = text;
-        // re-trigger bounce animation
-        faceEl.style.animation = "none";
-        faceEl.offsetHeight; // reflow
-        faceEl.style.animation = "";
     }
 
     _updateProgress() {
