@@ -309,8 +309,30 @@ class PlatformerGame extends HTMLElement {
         this._doubleJumpUsed = false;
         this._jumpHeld = false;
         this._camX = 0;
+        this._camY = 0;
         this._walkFrame = 0;
         this._levelTransition = 1.5;
+
+        // Generate cloud world above the level
+        this._cloudPlatforms = [];
+        this._cloudCoins = [];
+        const skyTop = -TILE * 12; // how high the cloud world goes
+        this._skyTop = skyTop;
+        for (let cx = 0; cx < this._levelW; cx += TILE * 3 + Math.floor(Math.random() * TILE * 3)) {
+            const cy = -TILE * 2 - Math.floor(Math.random() * TILE * 8);
+            const pw = TILE * (2 + Math.floor(Math.random() * 3));
+            this._cloudPlatforms.push({ x: cx, y: cy, w: pw, h: TILE, type: "cloud" });
+            // Bonus coins on cloud platforms
+            for (let i = 0; i < pw / TILE; i++) {
+                if (Math.random() < 0.6) {
+                    this._cloudCoins.push({
+                        x: cx + i * TILE + 4, y: cy - TILE + 4,
+                        w: 16, h: 16, collected: false, star: Math.random() < 0.3,
+                        bobOffset: Math.random() * Math.PI * 2,
+                    });
+                }
+            }
+        }
 
         // Apply equipped power-up (permanent, timer = Infinity)
         if (this._equippedPower) {
@@ -576,10 +598,54 @@ class PlatformerGame extends HTMLElement {
             }
         }
 
-        // camera (smooth follow)
+        // ceiling: can't fly above the sky top
+        if (this._py < this._skyTop) {
+            this._py = this._skyTop;
+            this._pvy = 0;
+        }
+
+        // cloud platform collisions
+        for (const cp of this._cloudPlatforms) {
+            if (this._overlaps(this._px, this._py, pw, ph, cp.x, cp.y, cp.w, cp.h)) {
+                if (this._pvy > 0 && this._py + ph - 8 < cp.y + cp.h / 2) {
+                    this._py = cp.y - ph;
+                    this._pvy = 0;
+                    this._onGround = true;
+                    this._doubleJumpUsed = false;
+                }
+            }
+        }
+
+        // cloud coins
+        for (const cc of this._cloudCoins) {
+            if (cc.collected) continue;
+            if (hasMagnet) {
+                const dx = (this._px + pw / 2) - (cc.x + cc.w / 2);
+                const dy = (this._py + ph / 2) - (cc.y + cc.h / 2);
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120 && dist > 2) {
+                    const pull = 150 * dt / dist;
+                    cc.x += dx * pull;
+                    cc.y += dy * pull;
+                }
+            }
+            if (this._overlaps(this._px, this._py, pw, ph, cc.x, cc.y, cc.w, cc.h)) {
+                cc.collected = true;
+                this._score += cc.star ? 30 : 10;
+                this._coins++;
+                this._spawnCoinParticles(cc.x + cc.w / 2, cc.y);
+                this._popups.push({ x: cc.x, y: cc.y, text: cc.star ? "+30" : "+10", life: 1 });
+            }
+        }
+
+        // camera (smooth follow X and Y)
         const targetCam = this._px - PF_W / 3;
         this._camX += (targetCam - this._camX) * 0.08;
         this._camX = Math.max(0, Math.min(this._levelW - PF_W, this._camX));
+
+        const targetCamY = this._py - PF_H / 2;
+        this._camY += (targetCamY - this._camY) * 0.08;
+        this._camY = Math.max(this._skyTop - TILE * 2, Math.min(this._levelH - PF_H, this._camY));
     }
 
     _resolveCollisionsX() {
@@ -739,29 +805,56 @@ class PlatformerGame extends HTMLElement {
     _draw() {
         const ctx = this._ctx;
         const cx = Math.floor(this._camX);
+        const cy = Math.floor(this._camY);
         const now = performance.now();
 
-        // sky gradient
+        // sky gradient — shifts color when high up
+        const skyProgress = Math.max(0, Math.min(1, -cy / (TILE * 10)));
         const sky = ctx.createLinearGradient(0, 0, 0, PF_H);
-        sky.addColorStop(0, COL_SKY_TOP);
-        sky.addColorStop(1, COL_SKY_BOT);
+        if (skyProgress > 0.3) {
+            // Cloud world: lighter, dreamier sky
+            sky.addColorStop(0, "#c4e0ff");
+            sky.addColorStop(1, "#87ceeb");
+        } else {
+            sky.addColorStop(0, COL_SKY_TOP);
+            sky.addColorStop(1, COL_SKY_BOT);
+        }
         ctx.fillStyle = sky;
         ctx.fillRect(0, 0, PF_W, PF_H);
 
-        // background hills
-        ctx.fillStyle = "#4a8c3f";
-        for (let i = 0; i < 8; i++) {
-            const hx = i * 130 - (cx * 0.2) % 130;
-            ctx.beginPath();
-            ctx.ellipse(hx, PF_H - 30, 60 + i * 5, 30 + (i % 3) * 10, 0, Math.PI, 0);
-            ctx.fill();
+        // Stars/sparkles in cloud world
+        if (skyProgress > 0.2) {
+            ctx.fillStyle = `rgba(255,255,200,${skyProgress * 0.5})`;
+            for (let i = 0; i < 20; i++) {
+                const sx = (i * 137 + Math.sin(now / 2000 + i) * 15) % PF_W;
+                const sy = (i * 89 + Math.cos(now / 3000 + i * 2) * 10) % PF_H;
+                const sz = 1 + Math.sin(now / 500 + i * 3) * 0.8;
+                ctx.beginPath();
+                ctx.arc(sx, sy, sz, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
-        // clouds (parallax)
+        // background hills (only visible when near ground)
+        if (cy > -TILE * 4) {
+            ctx.fillStyle = "#4a8c3f";
+            for (let i = 0; i < 8; i++) {
+                const hx = i * 130 - (cx * 0.2) % 130;
+                const hillY = PF_H - 30 - cy * 0.3;
+                if (hillY < PF_H + 40) {
+                    ctx.beginPath();
+                    ctx.ellipse(hx, hillY, 60 + i * 5, 30 + (i % 3) * 10, 0, Math.PI, 0);
+                    ctx.fill();
+                }
+            }
+        }
+
+        // background clouds (parallax, move with both X and Y)
         ctx.fillStyle = "rgba(255,255,255,0.7)";
-        for (let i = 0; i < 6; i++) {
-            const cloudX = (i * 180 + 40) - cx * 0.15;
-            const cloudY = 20 + (i % 3) * 25;
+        for (let i = 0; i < 10; i++) {
+            const cloudX = (i * 160 + 40) - cx * 0.15;
+            const cloudY = (20 + (i % 3) * 25 - i * 50) - cy * 0.4;
+            if (cloudY < -30 || cloudY > PF_H + 30) continue;
             ctx.beginPath();
             ctx.ellipse(cloudX, cloudY, 28, 11, 0, 0, Math.PI * 2);
             ctx.ellipse(cloudX + 18, cloudY - 4, 18, 9, 0, 0, Math.PI * 2);
@@ -770,11 +863,12 @@ class PlatformerGame extends HTMLElement {
         }
 
         ctx.save();
-        ctx.translate(-cx, 0);
+        ctx.translate(-cx, -cy);
 
         // tiles
         for (const t of this._tiles) {
             if (t.x + t.w < cx - 10 || t.x > cx + PF_W + 10) continue;
+            if (t.y + t.h < cy - 10 || t.y > cy + PF_H + 10) continue;
             if (t.type === "#") {
                 // ground block with grass
                 ctx.fillStyle = COL_GROUND;
@@ -800,6 +894,7 @@ class PlatformerGame extends HTMLElement {
         // question blocks
         for (const qb of this._qBlocks) {
             if (qb.x + qb.w < cx - 10 || qb.x > cx + PF_W + 10) continue;
+            if (qb.y + qb.h < cy - 10 || qb.y > cy + PF_H + 10) continue;
             const by = qb.y - qb.bounceY;
             if (qb.hit) {
                 ctx.fillStyle = "#8b7355";
@@ -835,6 +930,46 @@ class PlatformerGame extends HTMLElement {
             ctx.ellipse(c.x + c.w / 2, c.y + c.h / 2 + bobY, c.w / 2 * Math.max(0.3, stretch), c.h / 2, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.fillStyle = "#ffed4a";
+            ctx.beginPath();
+            ctx.ellipse(c.x + c.w / 2, c.y + c.h / 2 + bobY, c.w / 3 * Math.max(0.3, stretch), c.h / 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // cloud platforms
+        for (const cp of this._cloudPlatforms) {
+            if (cp.x + cp.w < cx - 10 || cp.x > cx + PF_W + 10) continue;
+            if (cp.y + cp.h < cy - 10 || cp.y > cy + PF_H + 10) continue;
+            // fluffy cloud shape
+            ctx.fillStyle = "rgba(255,255,255,0.85)";
+            const cpCx = cp.x + cp.w / 2, cpCy = cp.y + cp.h / 2;
+            ctx.beginPath();
+            // main body
+            ctx.ellipse(cpCx, cpCy, cp.w / 2 + 4, cp.h / 2 + 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // bumps on top
+            ctx.beginPath();
+            for (let b = 0; b < cp.w / TILE; b++) {
+                const bx = cp.x + b * TILE + TILE / 2;
+                ctx.ellipse(bx, cp.y - 2, 12, 8, 0, 0, Math.PI * 2);
+            }
+            ctx.fill();
+            // subtle bottom shadow
+            ctx.fillStyle = "rgba(180,210,240,0.4)";
+            ctx.beginPath();
+            ctx.ellipse(cpCx, cpCy + 4, cp.w / 2, cp.h / 2 + 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // cloud coins
+        for (const c of this._cloudCoins) {
+            if (c.collected) continue;
+            const bobY = Math.sin(now / 300 + c.bobOffset) * 3;
+            const stretch = Math.abs(Math.cos(now / 200 + c.bobOffset));
+            ctx.fillStyle = c.star ? "#ff69b4" : "#ffd700";
+            ctx.beginPath();
+            ctx.ellipse(c.x + c.w / 2, c.y + c.h / 2 + bobY, c.w / 2 * Math.max(0.3, stretch), c.h / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = c.star ? "#ffb6c1" : "#ffed4a";
             ctx.beginPath();
             ctx.ellipse(c.x + c.w / 2, c.y + c.h / 2 + bobY, c.w / 3 * Math.max(0.3, stretch), c.h / 3, 0, 0, Math.PI * 2);
             ctx.fill();
