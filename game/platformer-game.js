@@ -76,6 +76,16 @@ const LEVELS = [
     ],
 ];
 
+// Power-up types
+const POWERUPS = [
+    { type: "wings",  emoji: "\u{1F985}", label: "Flügel",       color: "#60a5fa", duration: 8  },
+    { type: "star",   emoji: "\u2B50",    label: "Stern",        color: "#fbbf24", duration: 6  },
+    { type: "speed",  emoji: "\u26A1",    label: "Blitz",        color: "#f472b6", duration: 7  },
+    { type: "shield", emoji: "\u{1F6E1}", label: "Schild",       color: "#34d399", duration: 10 },
+    { type: "magnet", emoji: "\u{1F9F2}", label: "Magnet",       color: "#a78bfa", duration: 8  },
+    { type: "tiny",   emoji: "\u{1F30D}", label: "Mini",         color: "#fb923c", duration: 8  },
+];
+
 // Colors
 const COL_SKY_TOP = "#5c94fc";
 const COL_SKY_BOT = "#87ceeb";
@@ -164,6 +174,8 @@ class PlatformerGame extends HTMLElement {
         this._coinItems = [];
         this._enemies = [];
         this._qBlocks = [];
+        this._powerupItems = [];   // power-ups bouncing out of blocks
+        this._activePower = null;  // current active power-up { type, timer }
         this._flag = null;
         this._playerStart = { x: 0, y: 0 };
 
@@ -193,6 +205,8 @@ class PlatformerGame extends HTMLElement {
         this._onGround = false;
         this._facingRight = true;
         this._invincible = 0;
+        this._doubleJumpUsed = false;
+        this._jumpHeld = false;
         this._camX = 0;
         this._walkFrame = 0;
         this._levelTransition = 1.5;
@@ -250,22 +264,43 @@ class PlatformerGame extends HTMLElement {
 
     _update(dt) {
         // horizontal movement
+        const speedMul = (this._activePower?.type === "speed") ? 1.7 : 1;
+        const sizeMul = (this._activePower?.type === "tiny") ? 0.6 : 1;
         this._pvx = 0;
-        if (this._keys.left) { this._pvx = -MOVE_SPEED; this._facingRight = false; }
-        if (this._keys.right) { this._pvx = MOVE_SPEED; this._facingRight = true; }
+        if (this._keys.left) { this._pvx = -MOVE_SPEED * speedMul; this._facingRight = false; }
+        if (this._keys.right) { this._pvx = MOVE_SPEED * speedMul; this._facingRight = true; }
 
-        if (this._pvx !== 0) this._walkFrame += dt * 8;
+        if (this._pvx !== 0) this._walkFrame += dt * 8 * speedMul;
         else this._walkFrame = 0;
 
-        // jump (more forgiving)
-        if (this._keys.jump && this._onGround) {
-            this._pvy = JUMP_VEL;
+        // jump
+        const hasWings = this._activePower?.type === "wings";
+        const jumpPressed = this._keys.jump && !this._jumpHeld;
+        if (this._keys.jump) this._jumpHeld = true;
+        else this._jumpHeld = false;
+
+        if (jumpPressed && this._onGround) {
+            this._pvy = JUMP_VEL * (hasWings ? 1.3 : 1);
             this._onGround = false;
+            this._doubleJumpUsed = false;
+        } else if (jumpPressed && hasWings && !this._onGround && !this._doubleJumpUsed) {
+            // Wings: double jump
+            this._pvy = JUMP_VEL * 0.9;
+            this._doubleJumpUsed = true;
+            // Wing flap particles
+            for (let i = 0; i < 4; i++) {
+                this._particles.push({
+                    x: this._px + 10, y: this._py + 12,
+                    vx: (Math.random() - 0.5) * 40, vy: 20 + Math.random() * 30,
+                    life: 0.5, color: "#93c5fd", size: 2,
+                });
+            }
         }
 
-        // gravity (lighter = easier jumps)
-        this._pvy += GRAVITY * dt;
-        if (this._pvy > 500) this._pvy = 500;
+        // gravity (wings = floatier)
+        const gravMul = hasWings ? 0.6 : 1;
+        this._pvy += GRAVITY * gravMul * dt;
+        if (this._pvy > (hasWings ? 200 : 500)) this._pvy = hasWings ? 200 : 500;
 
         // move X
         this._px += this._pvx * dt;
@@ -288,8 +323,20 @@ class PlatformerGame extends HTMLElement {
 
         // coins
         const pw = 20, ph = 24;
+        const hasMagnet = this._activePower?.type === "magnet";
         for (const coin of this._coinItems) {
             if (coin.collected) continue;
+            // Magnet effect: pull coins toward player
+            if (hasMagnet) {
+                const dx = (this._px + pw / 2) - (coin.x + coin.w / 2);
+                const dy = (this._py + ph / 2) - (coin.y + coin.h / 2);
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120 && dist > 2) {
+                    const pull = 150 * dt / dist;
+                    coin.x += dx * pull;
+                    coin.y += dy * pull;
+                }
+            }
             if (this._overlaps(this._px, this._py, pw, ph, coin.x, coin.y, coin.w, coin.h)) {
                 coin.collected = true;
                 this._score += coin.star ? 30 : 10;
@@ -307,13 +354,63 @@ class PlatformerGame extends HTMLElement {
                 if (this._py + ph > qb.y + qb.h * 0.5) {
                     qb.hit = true;
                     qb.bounceY = 8;
-                    this._score += 10;
-                    this._coins++;
-                    this._spawnCoinParticles(qb.x + qb.w / 2, qb.y - 10);
-                    this._popups.push({ x: qb.x, y: qb.y - 15, text: "+10", life: 1 });
-                    this._pvy = 40; // small bounce down
+                    this._pvy = 40;
+
+                    if (Math.random() < 0.35) {
+                        // Spawn a power-up!
+                        const pu = POWERUPS[Math.floor(Math.random() * POWERUPS.length)];
+                        this._powerupItems.push({
+                            x: qb.x + 2, y: qb.y - TILE, w: 20, h: 20,
+                            vy: -80, onGround: false,
+                            type: pu.type, emoji: pu.emoji, label: pu.label,
+                            color: pu.color, duration: pu.duration,
+                            bobPhase: 0,
+                        });
+                        this._popups.push({ x: qb.x, y: qb.y - 20, text: pu.label + "!", life: 1.5 });
+                    } else {
+                        // Normal coin
+                        this._score += 10;
+                        this._coins++;
+                        this._spawnCoinParticles(qb.x + qb.w / 2, qb.y - 10);
+                        this._popups.push({ x: qb.x, y: qb.y - 15, text: "+10", life: 1 });
+                    }
                 }
             }
+        }
+
+        // power-up items physics
+        for (const pu of this._powerupItems) {
+            pu.vy += GRAVITY * 0.5 * dt;
+            pu.y += pu.vy * dt;
+            pu.bobPhase += dt * 4;
+            // land on tiles
+            for (const t of this._tiles) {
+                if (this._overlaps(pu.x, pu.y, pu.w, pu.h, t.x, t.y, t.w, t.h)) {
+                    if (pu.vy > 0) { pu.y = t.y - pu.h; pu.vy = 0; pu.onGround = true; }
+                }
+            }
+            // collect
+            if (this._overlaps(this._px, this._py, pw, ph, pu.x, pu.y, pu.w, pu.h)) {
+                this._activePower = { type: pu.type, timer: pu.duration, label: pu.label, emoji: pu.emoji, color: pu.color };
+                this._popups.push({ x: pu.x, y: pu.y - 10, text: pu.emoji + " " + pu.label, life: 1.5 });
+                this._score += 25;
+                pu.collected = true;
+                // Spawn sparkle particles
+                for (let i = 0; i < 10; i++) {
+                    this._particles.push({
+                        x: pu.x + 10, y: pu.y + 10,
+                        vx: (Math.random() - 0.5) * 100, vy: -50 - Math.random() * 50,
+                        life: 0.8, color: pu.color, size: 2 + Math.random() * 2,
+                    });
+                }
+            }
+        }
+        this._powerupItems = this._powerupItems.filter(p => !p.collected && p.y < this._levelH + 50);
+
+        // active power-up timer
+        if (this._activePower) {
+            this._activePower.timer -= dt;
+            if (this._activePower.timer <= 0) this._activePower = null;
         }
 
         // enemies
@@ -332,14 +429,26 @@ class PlatformerGame extends HTMLElement {
             }
 
             if (this._invincible > 0) continue;
+            const isStar = this._activePower?.type === "star";
             if (this._overlaps(this._px, this._py, pw, ph, en.x, en.y, en.w, en.h)) {
-                // stomp from above (very generous detection)
-                if (this._pvy > 0 && this._py + ph - 10 < en.y + en.h / 2) {
+                if (isStar) {
+                    // Star power: auto-defeat enemies on contact
+                    en.alive = false;
+                    this._score += 20;
+                    this._popups.push({ x: en.x, y: en.y - 10, text: "+20", life: 1 });
+                    this._spawnStompParticles(en.x + en.w / 2, en.y + en.h);
+                } else if (this._pvy > 0 && this._py + ph - 10 < en.y + en.h / 2) {
+                    // stomp from above
                     en.alive = false;
                     this._pvy = JUMP_VEL * 0.5;
                     this._score += 20;
                     this._popups.push({ x: en.x, y: en.y - 10, text: "+20", life: 1 });
                     this._spawnStompParticles(en.x + en.w / 2, en.y + en.h);
+                } else if (this._activePower?.type === "shield") {
+                    // Shield absorbs the hit
+                    this._activePower = null;
+                    this._invincible = 1.5;
+                    this._popups.push({ x: this._px, y: this._py - 15, text: "Schild!", life: 1 });
                 } else {
                     this._die();
                     return;
@@ -581,6 +690,23 @@ class PlatformerGame extends HTMLElement {
             ctx.fill();
         }
 
+        // power-up items
+        for (const pu of this._powerupItems) {
+            const bob = Math.sin(pu.bobPhase) * 3;
+            // glow
+            ctx.save();
+            ctx.shadowColor = pu.color; ctx.shadowBlur = 10;
+            ctx.fillStyle = pu.color;
+            ctx.beginPath();
+            ctx.roundRect(pu.x, pu.y + bob, pu.w, pu.h, 6);
+            ctx.fill();
+            ctx.restore();
+            // emoji
+            ctx.font = "14px serif";
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.fillText(pu.emoji, pu.x + pu.w / 2, pu.y + pu.h / 2 + bob);
+        }
+
         // enemies (Goomba-style)
         for (const en of this._enemies) {
             if (!en.alive) continue;
@@ -640,10 +766,79 @@ class PlatformerGame extends HTMLElement {
             ctx.fill();
         }
 
+        // player power-up aura
+        if (this._activePower) {
+            ctx.save();
+            ctx.globalAlpha = 0.2 + Math.sin(now / 200) * 0.1;
+            ctx.shadowColor = this._activePower.color;
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = this._activePower.color;
+            ctx.beginPath();
+            ctx.arc(this._px + 10, this._py + 12, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // Wings visual
+            if (this._activePower.type === "wings") {
+                const wingFlap = Math.sin(now / 100) * 8;
+                ctx.fillStyle = "rgba(147,197,253,0.6)";
+                // left wing
+                ctx.beginPath();
+                ctx.ellipse(this._px - 2, this._py + 6, 10, 5 + wingFlap, -0.3, 0, Math.PI * 2);
+                ctx.fill();
+                // right wing
+                ctx.beginPath();
+                ctx.ellipse(this._px + 22, this._py + 6, 10, 5 + wingFlap, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Star sparkle trail
+            if (this._activePower.type === "star" && Math.random() < 0.3) {
+                this._particles.push({
+                    x: this._px + 10 + (Math.random() - 0.5) * 20,
+                    y: this._py + 12 + (Math.random() - 0.5) * 20,
+                    vx: (Math.random() - 0.5) * 30, vy: -20 - Math.random() * 20,
+                    life: 0.5, color: "#fbbf24", size: 1.5 + Math.random(),
+                });
+            }
+
+            // Shield bubble
+            if (this._activePower.type === "shield") {
+                ctx.save();
+                ctx.globalAlpha = 0.25 + Math.sin(now / 300) * 0.1;
+                ctx.strokeStyle = "#34d399"; ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(this._px + 10, this._py + 10, 16, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Speed trail
+            if (this._activePower.type === "speed" && Math.abs(this._pvx) > 0) {
+                this._particles.push({
+                    x: this._px + (this._facingRight ? 0 : 20),
+                    y: this._py + 10 + Math.random() * 10,
+                    vx: this._facingRight ? -40 : 40, vy: (Math.random() - 0.5) * 10,
+                    life: 0.3, color: "#f472b6", size: 2,
+                });
+            }
+
+            // Magnet lines
+            if (this._activePower.type === "magnet" && Math.random() < 0.15) {
+                this._particles.push({
+                    x: this._px + 10 + (Math.random() - 0.5) * 60,
+                    y: this._py + 12 + (Math.random() - 0.5) * 60,
+                    vx: 0, vy: 0,
+                    life: 0.3, color: "#a78bfa", size: 1.5,
+                });
+            }
+        }
+
         // player
         const blink = this._invincible > 0 && Math.floor(now / 80) % 2;
         if (!blink) {
-            this._drawPlayer(ctx, this._px, this._py, this._facingRight, this._walkFrame, this._onGround, this._pvy);
+            const tinyScale = (this._activePower?.type === "tiny") ? 0.6 : 1;
+            this._drawPlayer(ctx, this._px, this._py, this._facingRight, this._walkFrame, this._onGround, this._pvy, tinyScale);
         }
 
         // particles
@@ -683,6 +878,27 @@ class PlatformerGame extends HTMLElement {
         const hearts = Array(this._lives).fill("\u2764").join("");
         ctx.fillText("  " + this._score + "   \uD83E\uDE99 " + this._coins + "   " + hearts + "   Welt " + (this._currentLevel + 1) + "/" + LEVELS.length, 12, 22);
 
+        // Power-up HUD (right side)
+        if (this._activePower) {
+            const barW = 60, barH = 8;
+            const barX = PF_W - barW - 10, barY = 8;
+            const pct = this._activePower.timer / (POWERUPS.find(p => p.type === this._activePower.type)?.duration || 8);
+            // background
+            ctx.fillStyle = "rgba(0,0,0,0.55)";
+            ctx.beginPath(); ctx.roundRect(barX - 22, barY - 2, barW + 26, barH + 16, 8); ctx.fill();
+            // emoji
+            ctx.font = "12px serif"; ctx.textAlign = "left"; ctx.textBaseline = "top";
+            ctx.fillText(this._activePower.emoji, barX - 18, barY);
+            // label
+            ctx.fillStyle = "white"; ctx.font = "bold 9px sans-serif";
+            ctx.fillText(this._activePower.label, barX - 2, barY - 1);
+            // timer bar
+            ctx.fillStyle = "rgba(255,255,255,0.2)";
+            ctx.fillRect(barX, barY + 10, barW, barH);
+            ctx.fillStyle = this._activePower.color;
+            ctx.fillRect(barX, barY + 10, barW * Math.max(0, pct), barH);
+        }
+
         // game over / win overlay
         if (!this._alive || this._won) {
             ctx.fillStyle = "rgba(0,0,0,0.6)";
@@ -697,9 +913,17 @@ class PlatformerGame extends HTMLElement {
         }
     }
 
-    _drawPlayer(ctx, x, y, right, walkFrame, onGround, vy) {
+    _drawPlayer(ctx, x, y, right, walkFrame, onGround, vy, scale = 1) {
         const pw = 20, ph = 24;
         const dir = right ? 1 : -1;
+
+        if (scale !== 1) {
+            ctx.save();
+            ctx.translate(x + pw / 2, y + ph);
+            ctx.scale(scale, scale);
+            ctx.translate(-(x + pw / 2), -(y + ph));
+        }
+
         const cx = x + pw / 2;
 
         // legs walk animation
@@ -744,6 +968,8 @@ class PlatformerGame extends HTMLElement {
         ctx.fillStyle = COL_PLAYER_BROWN;
         ctx.fillRect(x + 3 - legSwing * 0.3, y + 21, 7, 3);
         ctx.fillRect(x + 10 + legSwing * 0.3, y + 21, 7, 3);
+
+        if (scale !== 1) ctx.restore();
     }
 }
 
