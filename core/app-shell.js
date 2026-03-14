@@ -332,6 +332,9 @@ class AppShell extends HTMLElement {
           content: ""; position: absolute; inset: 0;
           border-radius: 9px;
         }
+        .gradient-dot {
+          background-size: 100% 100% !important;
+        }
 
         /* Custom color picker */
         .theme-custom {
@@ -551,7 +554,7 @@ class AppShell extends HTMLElement {
         </div>
 
         <div class="theme-section">
-          <p class="theme-section-title">Hintergrund</p>
+          <p class="theme-section-title">Farben</p>
           <div class="theme-grid">
             <div class="theme-dot" data-theme="light" style="background:#f0f4f8" title="Hell"></div>
             <div class="theme-dot" data-theme="blue" style="background:#dbeafe" title="Blau"></div>
@@ -565,6 +568,22 @@ class AppShell extends HTMLElement {
               🎨
               <input type="color" id="custom-color-input" value="#f0f4f8" />
             </div>
+          </div>
+
+          <p class="anim-section-title">Farbverläufe</p>
+          <div class="theme-grid">
+            <div class="theme-dot gradient-dot" data-theme="grad-sunset" style="background:linear-gradient(135deg,#f97316,#ec4899,#8b5cf6)" title="Sonnenuntergang"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-ocean" style="background:linear-gradient(135deg,#06b6d4,#3b82f6,#6366f1)" title="Ozean"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-aurora" style="background:linear-gradient(135deg,#10b981,#06b6d4,#8b5cf6)" title="Aurora"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-candy" style="background:linear-gradient(135deg,#f472b6,#c084fc,#60a5fa)" title="Candy"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-forest" style="background:linear-gradient(135deg,#065f46,#059669,#34d399)" title="Wald"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-fire" style="background:linear-gradient(135deg,#dc2626,#f97316,#fbbf24)" title="Feuer"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-sky" style="background:linear-gradient(180deg,#bfdbfe,#60a5fa,#2563eb)" title="Himmel"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-galaxy" style="background:linear-gradient(135deg,#0f172a,#581c87,#7c3aed,#0ea5e9)" title="Galaxie"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-rainbow" style="background:linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)" title="Regenbogen"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-mint" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0,#6ee7b7,#34d399)" title="Minze"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-peach" style="background:linear-gradient(135deg,#fed7aa,#fdba74,#fb923c,#f97316)" title="Pfirsich"></div>
+            <div class="theme-dot gradient-dot" data-theme="grad-night" style="background:linear-gradient(180deg,#0f172a,#1e293b,#334155)" title="Nacht"></div>
           </div>
 
           <p class="anim-section-title">Animation</p>
@@ -812,6 +831,39 @@ class AppShell extends HTMLElement {
             document.body.style.background = color;
         };
 
+        // Gradient map for gradient themes
+        const GRADIENTS = {
+            "grad-sunset":  "linear-gradient(135deg,#f97316,#ec4899,#8b5cf6)",
+            "grad-ocean":   "linear-gradient(135deg,#06b6d4,#3b82f6,#6366f1)",
+            "grad-aurora":  "linear-gradient(135deg,#10b981,#06b6d4,#8b5cf6)",
+            "grad-candy":   "linear-gradient(135deg,#f472b6,#c084fc,#60a5fa)",
+            "grad-forest":  "linear-gradient(135deg,#065f46,#059669,#34d399)",
+            "grad-fire":    "linear-gradient(135deg,#dc2626,#f97316,#fbbf24)",
+            "grad-sky":     "linear-gradient(180deg,#bfdbfe,#60a5fa,#2563eb)",
+            "grad-galaxy":  "linear-gradient(135deg,#0f172a,#581c87,#7c3aed,#0ea5e9)",
+            "grad-rainbow": "linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)",
+            "grad-mint":    "linear-gradient(135deg,#d1fae5,#a7f3d0,#6ee7b7,#34d399)",
+            "grad-peach":   "linear-gradient(135deg,#fed7aa,#fdba74,#fb923c,#f97316)",
+            "grad-night":   "linear-gradient(180deg,#0f172a,#1e293b,#334155)",
+        };
+        const DARK_THEMES = ["dark", "grad-galaxy", "grad-night", "grad-forest"];
+
+        const applyTheme = (theme) => {
+            if (GRADIENTS[theme]) {
+                this.removeAttribute("data-bg");
+                if (DARK_THEMES.includes(theme)) this.setAttribute("data-bg", "dark");
+                applyBg(GRADIENTS[theme]);
+                document.body.style.background = GRADIENTS[theme];
+                document.body.style.minHeight = "100vh";
+            } else {
+                this.setAttribute("data-bg", theme);
+                this.style.background = "";
+                requestAnimationFrame(() => {
+                    document.body.style.background = getComputedStyle(this).background;
+                });
+            }
+        };
+
         if (savedTheme === "custom") {
             customWrap.classList.add("active");
             customWrap.style.background = savedCustomColor;
@@ -819,10 +871,7 @@ class AppShell extends HTMLElement {
             this.removeAttribute("data-bg");
             applyBg(savedCustomColor);
         } else {
-            this.setAttribute("data-bg", savedTheme);
-            requestAnimationFrame(() => {
-                document.body.style.background = getComputedStyle(this).background;
-            });
+            applyTheme(savedTheme);
             this.shadowRoot.querySelectorAll(".theme-dot").forEach(dot => {
                 if (dot.dataset.theme === savedTheme) dot.classList.add("active");
             });
@@ -833,12 +882,8 @@ class AppShell extends HTMLElement {
                 clearActive();
                 dot.classList.add("active");
                 const theme = dot.dataset.theme;
-                this.setAttribute("data-bg", theme);
-                this.style.background = "";
                 localStorage.setItem("appBg", theme);
-                requestAnimationFrame(() => {
-                    document.body.style.background = getComputedStyle(this).background;
-                });
+                applyTheme(theme);
             };
         });
 
