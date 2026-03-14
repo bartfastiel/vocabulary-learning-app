@@ -3,6 +3,7 @@
 
 import "./help-overlay.js";
 import "./group-board.js";
+import { checkIncomingFriend, addFriend } from "./invite-qr.js";
 import "../vocab/vocab.js";
 import "../vocab/vocab-editor.js";
 import "../game/game-lobby.js";
@@ -588,6 +589,7 @@ class AppShell extends HTMLElement {
       <vocab-editor></vocab-editor>
       <group-board></group-board>
       <game-lobby></game-lobby>
+      <invite-qr></invite-qr>
 
       <!-- Home / Dashboard -->
       <div id="home-screen">
@@ -652,6 +654,10 @@ class AppShell extends HTMLElement {
           <button class="action-card" id="home-bg">
             <span class="action-icon">🎨</span>
             <span class="action-label">Hintergrund</span>
+          </button>
+          <button class="action-card" id="home-friends">
+            <span class="action-icon">📲</span>
+            <span class="action-label">Freunde</span>
           </button>
           <button class="action-card" id="home-profile">
             <span class="action-icon">🔄</span>
@@ -956,6 +962,20 @@ class AppShell extends HTMLElement {
                 }
             }
         });
+
+        const inviteQR = this.shadowRoot.querySelector("invite-qr");
+        this.shadowRoot.getElementById("home-friends").onclick = () => inviteQR.open();
+
+        // Check for incoming friend link
+        const incoming = checkIncomingFriend();
+        if (incoming) {
+            addFriend(incoming);
+            inviteQR.open();
+            setTimeout(() => {
+                const listTab = inviteQR.shadowRoot?.querySelector('[data-tab="list"]');
+                if (listTab) listTab.click();
+            }, 100);
+        }
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
         // Background settings overlay
