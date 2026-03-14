@@ -1,9 +1,14 @@
 // game/racing-game.js
-// Turbo Racer: endless pseudo-3D highway racing game.
-// Dodge traffic, collect coins, go as far as possible!
+// Turbo Racer: OutRun-style pseudo-3D racing with hills and curves.
 // Fires CustomEvent("game-over", { bubbles: true, detail: { score } })
 
 const RC_W = 400, RC_H = 300;
+const SEG_LEN = 200;      // world-space length of each road segment
+const DRAW_DIST = 120;    // how many segments to draw
+const ROAD_W = 2000;      // half-width of road in world units
+const CAM_HEIGHT = 1500;  // camera height above road
+const CAM_DEPTH = 1 / Math.tan((80 / 2) * Math.PI / 180); // camera depth (FOV 80)
+const LANES = 3;
 
 class RacingGame extends HTMLElement {
     constructor() {
@@ -25,9 +30,7 @@ class RacingGame extends HTMLElement {
           display: block; max-height: 80vh; max-width: 96vw;
           aspect-ratio: ${RC_W}/${RC_H}; image-rendering: auto; touch-action: none;
         }
-        #mobile-controls {
-          display: none; margin-top: 0.5rem; gap: 0.8rem;
-        }
+        #mobile-controls { display: none; margin-top: 0.5rem; gap: 0.8rem; }
         @media (pointer: coarse) { #mobile-controls { display: flex; } }
         .ctrl-btn {
           width: 56px; height: 56px; border-radius: 50%;
@@ -57,84 +60,123 @@ class RacingGame extends HTMLElement {
         this._controller.abort();
     }
 
+    // ── Initialization ───────────────────────────────────────────
+
     _init() {
         this._alive = true;
         this._score = 0;
-        this._distance = 0;
-        this._speed = 180;       // pixels/sec scrolling speed
-        this._maxSpeed = 500;
-        this._playerX = RC_W / 2; // center of player car
-        this._playerLane = 0;     // -1 to 1 smooth
-        this._steerSpeed = 220;
-
-        // Road geometry
-        this._roadWidth = 200;
-        this._laneCount = 3;
-        this._roadCurve = 0;     // current curve amount
-        this._targetCurve = 0;
-        this._curveTimer = 0;
-
-        // Traffic cars
-        this._traffic = [];
-        this._trafficTimer = 0;
-        this._trafficInterval = 1.2;
-
-        // Coins
-        this._coins = [];
-        this._coinTimer = 0;
+        this._pos = 0;          // player Z position in world
+        this._speed = 0;
+        this._maxSpeed = SEG_LEN * 60;
+        this._accel = this._maxSpeed / 4;
+        this._decel = this._maxSpeed;
+        this._braking = this._maxSpeed * 1.5;
+        this._playerX = 0;      // -1 to +1 across road
+        this._steerSpeed = 3;
         this._coinCount = 0;
-
-        // Scenery (trees, buildings)
-        this._scenery = [];
-        for (let i = 0; i < 30; i++) {
-            this._scenery.push(this._makeScenery(Math.random() * RC_H));
-        }
-
-        // Particles (exhaust, sparks)
         this._particles = [];
         this._popups = [];
 
-        // Time of day
-        this._timeOfDay = 0; // 0-1, affects colors
+        // Build road segments
+        this._segments = [];
+        this._totalLen = 0;
+        this._buildRoad();
 
-        // Nitro boost
-        this._nitro = 0;
-        this._nitroFlash = 0;
+        // Sprinkle traffic and coins
+        this._traffic = [];
+        this._coins = [];
+        this._spawnObjects();
     }
 
-    _makeScenery(y) {
-        const side = Math.random() < 0.5 ? -1 : 1;
-        const types = ["tree", "tree", "tree", "bush", "rock", "sign", "building"];
-        const type = types[Math.floor(Math.random() * types.length)];
-        return { y, side, type, x: 0.6 + Math.random() * 0.4 }; // x = distance from road edge (0.6-1.0)
-    }
-
-    _makeTraffic() {
-        const lane = Math.floor(Math.random() * this._laneCount);
-        const colors = [
-            { body: "#e03020", roof: "#b01810", stripe: "#ff6050" },
-            { body: "#2060d0", roof: "#1040a0", stripe: "#60a0ff" },
-            { body: "#f0c020", roof: "#c09010", stripe: "#ffe060" },
-            { body: "#30b030", roof: "#208020", stripe: "#60e060" },
-            { body: "#8030c0", roof: "#601090", stripe: "#b060f0" },
-            { body: "#ff6600", roof: "#cc4400", stripe: "#ffaa44" },
-            { body: "#ffffff", roof: "#cccccc", stripe: "#eeeeee" },
-        ];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const isTruck = Math.random() < 0.2;
-        return {
-            lane, y: -60, color,
-            speed: 60 + Math.random() * 80,
-            w: isTruck ? 36 : 28,
-            h: isTruck ? 55 : 42,
-            isTruck,
+    _buildRoad() {
+        const n = 1600;
+        const addSegments = (count, curve, hill) => {
+            for (let i = 0; i < count; i++) {
+                this._segments.push({
+                    curve,
+                    y: hill ? Math.sin(i / count * Math.PI) * hill : 0,
+                    // scenery placed randomly
+                    sceneryL: Math.random() < 0.15 ? this._randScenery() : null,
+                    sceneryR: Math.random() < 0.15 ? this._randScenery() : null,
+                });
+            }
         };
+
+        // Intro straight
+        addSegments(50, 0, 0);
+        // Gentle curves and hills
+        addSegments(50, 2, 2000);
+        addSegments(30, -3, 0);
+        addSegments(60, 0, 4000);
+        addSegments(40, 4, 0);
+        addSegments(50, -2, 3000);
+        addSegments(30, 0, 0);
+        addSegments(60, 3, -2000);
+        addSegments(40, -4, 5000);
+        addSegments(50, 0, 0);
+        addSegments(60, 5, 3000);
+        addSegments(40, -3, -3000);
+        addSegments(50, 2, 4000);
+        addSegments(30, 0, 0);
+        addSegments(60, -5, 2000);
+        addSegments(40, 4, -2000);
+
+        // Fill up to n
+        while (this._segments.length < n) {
+            const c = (Math.random() - 0.5) * 8;
+            const h = (Math.random() - 0.5) * 6000;
+            addSegments(30 + Math.floor(Math.random() * 40), c, h);
+        }
+
+        // Accumulate Y positions
+        let curY = 0;
+        for (const s of this._segments) {
+            s.worldY = curY + s.y;
+            curY = s.worldY;
+        }
+
+        this._totalLen = this._segments.length * SEG_LEN;
     }
 
-    _makeCoin(y) {
-        const lane = Math.floor(Math.random() * this._laneCount);
-        return { lane, y: y || -20, collected: false, phase: Math.random() * Math.PI * 2 };
+    _randScenery() {
+        const types = ["tree", "tree", "pine", "pine", "bush", "rock", "sign", "building", "cactus"];
+        return { type: types[Math.floor(Math.random() * types.length)], offset: 1.2 + Math.random() * 2.5 };
     }
+
+    _spawnObjects() {
+        const total = this._segments.length;
+        // Traffic every ~20-40 segments
+        for (let i = 80; i < total - 50; i += 15 + Math.floor(Math.random() * 30)) {
+            const lane = Math.floor(Math.random() * LANES) - 1; // -1, 0, 1
+            const colors = [
+                { body: "#2060d0", roof: "#1040a0", win: "#8ac" },
+                { body: "#e03020", roof: "#b01810", win: "#eba" },
+                { body: "#f0c020", roof: "#c09010", win: "#fea" },
+                { body: "#30b030", roof: "#208020", win: "#afa" },
+                { body: "#8030c0", roof: "#601090", win: "#daf" },
+                { body: "#ff6600", roof: "#cc4400", win: "#fca" },
+                { body: "#fff",    roof: "#ccc",    win: "#def" },
+            ];
+            this._traffic.push({
+                segIdx: i,
+                lane,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speed: 0.3 + Math.random() * 0.4, // fraction of max speed
+                isTruck: Math.random() < 0.2,
+            });
+        }
+
+        // Coins
+        for (let i = 40; i < total - 50; i += 5 + Math.floor(Math.random() * 12)) {
+            this._coins.push({
+                segIdx: i,
+                lane: Math.floor(Math.random() * LANES) - 1,
+                collected: false,
+            });
+        }
+    }
+
+    // ── Input ────────────────────────────────────────────────────
 
     _bindInput() {
         const sig = { signal: this._controller.signal };
@@ -146,8 +188,6 @@ class RacingGame extends HTMLElement {
             if (e.key === "ArrowLeft" || e.key === "a") this._keys.left = false;
             if (e.key === "ArrowRight" || e.key === "d") this._keys.right = false;
         }, sig);
-
-        // Touch controls
         const wire = (id, key) => {
             const btn = this.shadowRoot.getElementById(id);
             btn.addEventListener("touchstart", e => { e.preventDefault(); this._keys[key] = true; }, { ...sig, passive: false });
@@ -155,25 +195,9 @@ class RacingGame extends HTMLElement {
         };
         wire("btn-left", "left");
         wire("btn-right", "right");
-
-        // Swipe / tilt support on canvas
-        let touchStartX = null;
-        this._cv.addEventListener("touchstart", e => {
-            touchStartX = e.touches[0].clientX;
-        }, sig);
-        this._cv.addEventListener("touchmove", e => {
-            if (touchStartX !== null) {
-                const dx = e.touches[0].clientX - touchStartX;
-                this._keys.left = dx < -15;
-                this._keys.right = dx > 15;
-            }
-        }, sig);
-        this._cv.addEventListener("touchend", () => {
-            touchStartX = null;
-            this._keys.left = false;
-            this._keys.right = false;
-        }, sig);
     }
+
+    // ── Game loop ────────────────────────────────────────────────
 
     _loop() {
         if (!this._alive) return;
@@ -186,126 +210,94 @@ class RacingGame extends HTMLElement {
     }
 
     _update(dt) {
-        // Increase speed over time
-        this._speed = Math.min(this._maxSpeed, this._speed + dt * 8);
-        this._distance += this._speed * dt;
-        this._score = Math.floor(this._distance / 10);
+        const seg = this._getSegment(this._pos);
+        const speedPct = this._speed / this._maxSpeed;
+        const curve = seg.curve;
 
-        // Time of day cycles
-        this._timeOfDay = (this._timeOfDay + dt * 0.01) % 1;
+        // Acceleration
+        this._speed += this._accel * dt;
+        this._speed = Math.min(this._speed, this._maxSpeed);
 
-        // Road curves
-        this._curveTimer -= dt;
-        if (this._curveTimer <= 0) {
-            this._targetCurve = (Math.random() - 0.5) * 100;
-            this._curveTimer = 2 + Math.random() * 4;
+        // Off-road slowdown
+        if (Math.abs(this._playerX) > 1) {
+            this._speed -= this._braking * dt * 2;
+            if (this._speed < this._maxSpeed * 0.1) this._speed = this._maxSpeed * 0.1;
+            // Rumble particles
+            if (Math.random() < 0.5) {
+                this._particles.push({
+                    x: RC_W / 2 + this._playerX * RC_W * 0.2 + (Math.random() - 0.5) * 20,
+                    y: RC_H - 20, vx: (Math.random() - 0.5) * 40, vy: -20 - Math.random() * 20,
+                    life: 0.3, size: 2, color: "#8a7a5a",
+                });
+            }
         }
-        this._roadCurve += (this._targetCurve - this._roadCurve) * dt * 1.5;
 
         // Steering
         if (this._keys.left) this._playerX -= this._steerSpeed * dt;
         if (this._keys.right) this._playerX += this._steerSpeed * dt;
 
-        // Road boundaries
-        const roadLeft = RC_W / 2 - this._roadWidth / 2 + this._roadCurve * 0.3;
-        const roadRight = RC_W / 2 + this._roadWidth / 2 + this._roadCurve * 0.3;
-        const margin = 18;
+        // Centrifugal force from curves
+        this._playerX -= curve * speedPct * dt * 0.8;
 
-        // Clamp to road with slight rumble if touching edge
-        if (this._playerX - margin < roadLeft) {
-            this._playerX = roadLeft + margin;
-            // Rumble particles
-            if (Math.random() < 0.5) this._spawnSparks(this._playerX - 10, RC_H - 55);
-        }
-        if (this._playerX + margin > roadRight) {
-            this._playerX = roadRight - margin;
-            if (Math.random() < 0.5) this._spawnSparks(this._playerX + 10, RC_H - 55);
-        }
+        // Clamp
+        if (this._playerX < -2.5) this._playerX = -2.5;
+        if (this._playerX > 2.5) this._playerX = 2.5;
 
-        // Exhaust particles
-        if (Math.random() < 0.3) {
+        // Move forward
+        this._pos += this._speed * dt;
+        if (this._pos >= this._totalLen) this._pos -= this._totalLen;
+
+        // Score
+        this._score = Math.floor(this._pos / SEG_LEN);
+
+        // Exhaust
+        if (speedPct > 0.3 && Math.random() < 0.4) {
             this._particles.push({
-                x: this._playerX - 4 + Math.random() * 8,
-                y: RC_H - 20,
+                x: RC_W / 2 + this._playerX * RC_W * 0.15,
+                y: RC_H - 15,
                 vx: (Math.random() - 0.5) * 15,
-                vy: 20 + Math.random() * 30,
-                life: 0.4 + Math.random() * 0.3,
+                vy: 15 + Math.random() * 20,
+                life: 0.3 + Math.random() * 0.2,
                 size: 2 + Math.random() * 2,
-                color: `rgba(180,180,180,`,
+                color: "#aaa",
             });
         }
 
-        // Traffic
-        this._trafficTimer -= dt;
-        if (this._trafficTimer <= 0) {
-            this._traffic.push(this._makeTraffic());
-            this._trafficTimer = this._trafficInterval * (0.6 + Math.random() * 0.8);
-            // Speed up traffic spawning
-            this._trafficInterval = Math.max(0.35, this._trafficInterval - 0.003);
-        }
-
-        const laneW = this._roadWidth / this._laneCount;
+        // Traffic collision
+        const playerSeg = Math.floor(this._pos / SEG_LEN) % this._segments.length;
         for (const car of this._traffic) {
-            car.y += (this._speed - car.speed) * dt;
-            // Car X position based on lane + curve
-            const curveFactor = (car.y / RC_H) * this._roadCurve * 0.3;
-            car.screenX = roadLeft + laneW * (car.lane + 0.5) + curveFactor;
-
-            // Collision with player
-            const playerW = 24, playerH = 40;
-            const playerY = RC_H - 65;
-            if (car.y > playerY - car.h && car.y < playerY + playerH &&
-                Math.abs(car.screenX - this._playerX) < (car.w / 2 + playerW / 2 - 4)) {
-                this._crash();
-                return;
+            const carSeg = car.segIdx % this._segments.length;
+            const dist = carSeg - playerSeg;
+            if (dist >= -1 && dist <= 1) {
+                const laneX = car.lane * 0.6;
+                if (Math.abs(this._playerX - laneX) < 0.5) {
+                    this._crash();
+                    return;
+                }
             }
         }
-        this._traffic = this._traffic.filter(c => c.y < RC_H + 80);
 
-        // Coins
-        this._coinTimer -= dt;
-        if (this._coinTimer <= 0) {
-            const count = 1 + Math.floor(Math.random() * 3);
-            for (let i = 0; i < count; i++) {
-                this._coins.push(this._makeCoin(-20 - i * 30));
-            }
-            this._coinTimer = 1.5 + Math.random() * 2;
-        }
-
-        for (const coin of this._coins) {
-            coin.y += this._speed * dt;
-            coin.phase += dt * 5;
-            const curveFactor = (coin.y / RC_H) * this._roadCurve * 0.3;
-            coin.screenX = roadLeft + laneW * (coin.lane + 0.5) + curveFactor;
-
-            if (!coin.collected) {
-                const playerY = RC_H - 65;
-                if (coin.y > playerY - 15 && coin.y < playerY + 30 &&
-                    Math.abs(coin.screenX - this._playerX) < 22) {
-                    coin.collected = true;
+        // Coin collection
+        for (const c of this._coins) {
+            if (c.collected) continue;
+            const cSeg = c.segIdx % this._segments.length;
+            const dist = cSeg - playerSeg;
+            if (dist >= -1 && dist <= 1) {
+                const laneX = c.lane * 0.6;
+                if (Math.abs(this._playerX - laneX) < 0.5) {
+                    c.collected = true;
                     this._coinCount++;
                     this._score += 50;
-                    this._popups.push({ x: coin.screenX, y: coin.y, text: "+50", life: 0.8 });
-                    // coin sparkle
+                    this._popups.push({ x: RC_W / 2, y: RC_H / 2, text: "+50", life: 0.8 });
                     for (let i = 0; i < 6; i++) {
                         this._particles.push({
-                            x: coin.screenX, y: coin.y,
-                            vx: (Math.random() - 0.5) * 80, vy: (Math.random() - 0.5) * 80,
-                            life: 0.5, size: 2, color: "rgba(255,215,0,",
+                            x: RC_W / 2, y: RC_H * 0.6,
+                            vx: (Math.random() - 0.5) * 100, vy: (Math.random() - 0.5) * 80,
+                            life: 0.5, size: 2.5, color: "#ffd700",
                         });
                     }
                 }
             }
-        }
-        this._coins = this._coins.filter(c => c.y < RC_H + 40 && !c.collected);
-
-        // Scenery scrolling
-        for (const s of this._scenery) {
-            s.y += this._speed * 0.7 * dt;
-        }
-        this._scenery = this._scenery.filter(s => s.y < RC_H + 60);
-        while (this._scenery.length < 30) {
-            this._scenery.push(this._makeScenery(-10 - Math.random() * 40));
         }
 
         // Particles
@@ -315,67 +307,70 @@ class RacingGame extends HTMLElement {
             p.life -= dt;
         }
         this._particles = this._particles.filter(p => p.life > 0);
-
-        // Popups
-        for (const p of this._popups) {
-            p.y -= 40 * dt;
-            p.life -= dt;
-        }
+        for (const p of this._popups) { p.y -= 40 * dt; p.life -= dt; }
         this._popups = this._popups.filter(p => p.life > 0);
 
-        // Nitro flash decay
-        if (this._nitroFlash > 0) this._nitroFlash -= dt;
+        // Move traffic forward
+        for (const car of this._traffic) {
+            car.segIdx += car.speed * (this._maxSpeed / SEG_LEN) * dt * 0.15;
+            if (car.segIdx * SEG_LEN > this._pos + DRAW_DIST * SEG_LEN) {
+                // wrap behind
+            }
+        }
     }
 
-    _spawnSparks(x, y) {
-        for (let i = 0; i < 3; i++) {
-            this._particles.push({
-                x, y,
-                vx: (Math.random() - 0.5) * 60,
-                vy: 20 + Math.random() * 40,
-                life: 0.3, size: 1.5, color: "rgba(255,200,50,",
-            });
-        }
+    _getSegment(z) {
+        const idx = Math.floor(z / SEG_LEN) % this._segments.length;
+        return this._segments[idx < 0 ? idx + this._segments.length : idx];
     }
 
     _crash() {
         this._alive = false;
         cancelAnimationFrame(this._raf);
-
-        // Explosion particles
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 40; i++) {
             this._particles.push({
-                x: this._playerX, y: RC_H - 50,
-                vx: (Math.random() - 0.5) * 200,
-                vy: (Math.random() - 0.5) * 200,
-                life: 1, size: 3 + Math.random() * 4,
-                color: Math.random() < 0.5 ? "rgba(255,100,0," : "rgba(255,50,0,",
+                x: RC_W / 2 + this._playerX * RC_W * 0.15,
+                y: RC_H - 50,
+                vx: (Math.random() - 0.5) * 250,
+                vy: (Math.random() - 1) * 200,
+                life: 1 + Math.random() * 0.5,
+                size: 3 + Math.random() * 5,
+                color: Math.random() < 0.5 ? "#ff6600" : "#ff2200",
             });
         }
-
-        // Animate explosion then fire event
-        const animateCrash = () => {
+        const animCrash = () => {
             for (const p of this._particles) {
-                p.x += p.vx * 0.016;
-                p.y += p.vy * 0.016;
-                p.vy += 200 * 0.016;
-                p.life -= 0.016;
+                p.x += p.vx * 0.016; p.y += p.vy * 0.016;
+                p.vy += 300 * 0.016; p.life -= 0.016;
             }
             this._particles = this._particles.filter(p => p.life > 0);
             this._draw();
             if (this._particles.length > 0) {
-                requestAnimationFrame(animateCrash);
+                requestAnimationFrame(animCrash);
             } else {
                 setTimeout(() => {
                     this.dispatchEvent(new CustomEvent("game-over", {
-                        bubbles: true,
-                        detail: { score: this._score },
+                        bubbles: true, detail: { score: this._score },
                     }));
                 }, 500);
             }
         };
         this._draw();
-        requestAnimationFrame(animateCrash);
+        requestAnimationFrame(animCrash);
+    }
+
+    // ── 3D Projection ────────────────────────────────────────────
+
+    _project(z, camZ, camY, worldX, worldY) {
+        const relZ = z - camZ;
+        if (relZ <= 0) return null;
+        const scale = CAM_DEPTH / relZ * RC_H;
+        return {
+            x: RC_W / 2 + (worldX * scale),
+            y: RC_H / 2 - ((worldY - camY) * scale),
+            w: ROAD_W * scale,
+            scale,
+        };
     }
 
     // ── Drawing ──────────────────────────────────────────────────
@@ -383,59 +378,178 @@ class RacingGame extends HTMLElement {
     _draw() {
         const ctx = this._ctx;
         const now = performance.now();
+        const baseSeg = Math.floor(this._pos / SEG_LEN);
+        const segOff = (this._pos % SEG_LEN) / SEG_LEN; // 0-1 within segment
+        const camZ = this._pos;
+        const startY = this._segments[baseSeg % this._segments.length].worldY;
+        const camY = CAM_HEIGHT + startY;
 
-        // Sky
-        const skyTop = this._getSkyColor(0);
-        const skyBot = this._getSkyColor(1);
-        const skyGrad = ctx.createLinearGradient(0, 0, 0, RC_H * 0.45);
-        skyGrad.addColorStop(0, skyTop);
-        skyGrad.addColorStop(1, skyBot);
+        // Sky gradient
+        ctx.fillStyle = "#2244aa";
+        ctx.fillRect(0, 0, RC_W, RC_H);
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, RC_H / 2);
+        skyGrad.addColorStop(0, "#112266");
+        skyGrad.addColorStop(0.5, "#3366bb");
+        skyGrad.addColorStop(1, "#88aadd");
         ctx.fillStyle = skyGrad;
-        ctx.fillRect(0, 0, RC_W, RC_H * 0.45);
+        ctx.fillRect(0, 0, RC_W, RC_H / 2 + 20);
 
-        // Horizon mountains
-        this._drawMountains(ctx, now);
+        // Sun
+        const sunX = RC_W * 0.75 + Math.sin(now / 10000) * 30;
+        const sunY = 40 + Math.cos(now / 15000) * 15;
+        ctx.fillStyle = "#ffdd44";
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,220,80,0.15)";
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 40, 0, Math.PI * 2);
+        ctx.fill();
 
-        // Grass
-        const grassGrad = ctx.createLinearGradient(0, RC_H * 0.4, 0, RC_H);
-        grassGrad.addColorStop(0, "#4a8c3f");
-        grassGrad.addColorStop(1, "#2d6b25");
-        ctx.fillStyle = grassGrad;
-        ctx.fillRect(0, RC_H * 0.4, RC_W, RC_H * 0.6);
+        // Clouds
+        ctx.fillStyle = "rgba(255,255,255,0.6)";
+        for (let i = 0; i < 6; i++) {
+            const cx = ((i * 130 + now * 0.005 + this._pos * 0.001) % (RC_W + 100)) - 50;
+            const cy = 25 + (i % 3) * 20;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, 30, 10, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx + 20, cy - 4, 18, 8, 0, 0, Math.PI * 2);
+            ctx.ellipse(cx - 15, cy + 2, 15, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
-        // Grass stripes (speed lines)
-        const stripePhase = (this._distance * 0.5) % 30;
-        ctx.fillStyle = "#3d7a34";
-        for (let y = RC_H * 0.45; y < RC_H; y += 30) {
-            const sy = y + stripePhase;
-            if (sy > RC_H * 0.4 && sy < RC_H) {
-                ctx.fillRect(0, sy, RC_W, 2);
+        // Far mountains
+        ctx.fillStyle = "#445577";
+        ctx.beginPath();
+        ctx.moveTo(0, RC_H / 2 + 10);
+        for (let x = 0; x <= RC_W; x += 4) {
+            const h = 20 + Math.sin(x * 0.02 + this._pos * 0.00003) * 15 + Math.sin(x * 0.05 + 1) * 8;
+            ctx.lineTo(x, RC_H / 2 + 10 - h);
+        }
+        ctx.lineTo(RC_W, RC_H / 2 + 10);
+        ctx.fill();
+
+        // Near hills
+        ctx.fillStyle = "#3a6a3a";
+        ctx.beginPath();
+        ctx.moveTo(0, RC_H / 2 + 10);
+        for (let x = 0; x <= RC_W; x += 4) {
+            const h = 10 + Math.sin(x * 0.03 + this._pos * 0.0001) * 10 + Math.sin(x * 0.07 + 2) * 5;
+            ctx.lineTo(x, RC_H / 2 + 10 - h);
+        }
+        ctx.lineTo(RC_W, RC_H / 2 + 10);
+        ctx.fill();
+
+        // Render road segments back-to-front
+        let maxY = RC_H; // clip to prevent drawing behind hills
+        let curCurve = 0;
+        let curX = 0;
+
+        // Pre-project all visible segments
+        const projected = [];
+        for (let i = DRAW_DIST; i >= 0; i--) {
+            const idx = (baseSeg + i) % this._segments.length;
+            const seg = this._segments[idx];
+            const segZ = (baseSeg + i) * SEG_LEN;
+            curCurve += seg.curve;
+            const worldX = curCurve * 0.005 - this._playerX * ROAD_W * 0.45;
+            const worldY = seg.worldY;
+            const p = this._project(segZ, camZ, camY, worldX, worldY);
+            if (p) {
+                projected[i] = { ...p, idx, seg, segZ, worldX };
             }
         }
 
-        // Road
-        this._drawRoad(ctx, now);
+        // Draw from far to near
+        for (let i = DRAW_DIST; i > 0; i--) {
+            const p1 = projected[i];
+            const p2 = projected[i - 1];
+            if (!p1 || !p2) continue;
+            if (p2.y >= maxY) continue;
 
-        // Scenery (behind traffic)
-        this._drawScenery(ctx);
+            const isEven = (Math.floor((baseSeg + i) / 3)) % 2 === 0;
+
+            // Grass
+            ctx.fillStyle = isEven ? "#3d8a3d" : "#358035";
+            ctx.fillRect(0, p2.y, RC_W, p1.y - p2.y + 1);
+
+            // Rumble strips
+            const rumbleW1 = p1.w * 1.15;
+            const rumbleW2 = p2.w * 1.15;
+            ctx.fillStyle = isEven ? "#dd2200" : "#fff";
+            this._drawTrapezoid(ctx, p1.x, p1.y, rumbleW1, p2.x, p2.y, rumbleW2);
+
+            // Road surface
+            ctx.fillStyle = isEven ? "#666" : "#6a6a6a";
+            this._drawTrapezoid(ctx, p1.x, p1.y, p1.w, p2.x, p2.y, p2.w);
+
+            // Center line
+            if (isEven) {
+                ctx.fillStyle = "#fff";
+                this._drawTrapezoid(ctx, p1.x, p1.y, p1.w * 0.02, p2.x, p2.y, p2.w * 0.02);
+            }
+
+            // Lane dashes
+            if (isEven) {
+                ctx.fillStyle = "rgba(255,255,255,0.5)";
+                for (let l = 1; l < LANES; l++) {
+                    const frac = (l / LANES - 0.5) * 2; // -0.66, 0, 0.66
+                    const lx1 = p1.x + p1.w * frac * 0.45;
+                    const lx2 = p2.x + p2.w * frac * 0.45;
+                    this._drawTrapezoid(ctx, lx1, p1.y, p1.w * 0.008, lx2, p2.y, p2.w * 0.008);
+                }
+            }
+
+            maxY = Math.min(maxY, p2.y);
+        }
+
+        // Draw scenery, traffic, coins (sorted by distance)
+        const sprites = [];
+
+        // Scenery
+        for (let i = DRAW_DIST; i > 2; i--) {
+            const p = projected[i];
+            if (!p) continue;
+            const seg = p.seg;
+            if (seg.sceneryL) {
+                sprites.push({ z: i, type: "scenery", p, side: -1, info: seg.sceneryL });
+            }
+            if (seg.sceneryR) {
+                sprites.push({ z: i, type: "scenery", p, side: 1, info: seg.sceneryR });
+            }
+        }
+
+        // Traffic
+        for (const car of this._traffic) {
+            const carSeg = Math.floor(car.segIdx) % this._segments.length;
+            const di = carSeg - baseSeg;
+            if (di < 1 || di >= DRAW_DIST) continue;
+            const p = projected[di];
+            if (!p) continue;
+            sprites.push({ z: di, type: "car", p, car });
+        }
 
         // Coins
         for (const coin of this._coins) {
             if (coin.collected) continue;
-            const stretch = Math.abs(Math.cos(coin.phase));
-            ctx.fillStyle = "#ffd700";
-            ctx.beginPath();
-            ctx.ellipse(coin.screenX, coin.y, 7 * Math.max(0.3, stretch), 7, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = "#ffed4a";
-            ctx.beginPath();
-            ctx.ellipse(coin.screenX, coin.y, 4 * Math.max(0.3, stretch), 4, 0, 0, Math.PI * 2);
-            ctx.fill();
+            const di = (coin.segIdx % this._segments.length) - baseSeg;
+            if (di < 1 || di >= DRAW_DIST) continue;
+            const p = projected[di];
+            if (!p) continue;
+            sprites.push({ z: di, type: "coin", p, coin });
         }
 
-        // Traffic cars
-        for (const car of this._traffic) {
-            this._drawCar(ctx, car.screenX, car.y, car.w, car.h, car.color, car.isTruck, false);
+        // Sort by distance (far first)
+        sprites.sort((a, b) => b.z - a.z);
+
+        for (const sp of sprites) {
+            if (sp.type === "scenery") {
+                this._drawScenerySprite(ctx, sp.p, sp.side, sp.info, now);
+            } else if (sp.type === "car") {
+                this._drawTrafficCar(ctx, sp.p, sp.car, now);
+            } else if (sp.type === "coin") {
+                this._drawCoinSprite(ctx, sp.p, sp.coin, now);
+            }
         }
 
         // Player car
@@ -446,7 +560,7 @@ class RacingGame extends HTMLElement {
         // Particles
         for (const p of this._particles) {
             ctx.globalAlpha = Math.min(1, p.life * 3);
-            ctx.fillStyle = p.color + Math.min(1, p.life * 3).toFixed(2) + ")";
+            ctx.fillStyle = p.color;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             ctx.fill();
@@ -454,14 +568,13 @@ class RacingGame extends HTMLElement {
         ctx.globalAlpha = 1;
 
         // Popups
-        ctx.font = "bold 12px 'Segoe UI',sans-serif";
+        ctx.font = "bold 14px 'Segoe UI',sans-serif";
         ctx.textAlign = "center";
         for (const p of this._popups) {
             ctx.globalAlpha = Math.min(1, p.life * 3);
-            ctx.fillStyle = "#fff";
-            ctx.strokeStyle = "#000";
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#000"; ctx.lineWidth = 2;
             ctx.strokeText(p.text, p.x, p.y);
+            ctx.fillStyle = "#fff";
             ctx.fillText(p.text, p.x, p.y);
         }
         ctx.globalAlpha = 1;
@@ -469,366 +582,292 @@ class RacingGame extends HTMLElement {
         // HUD
         this._drawHUD(ctx);
 
-        // Game over overlay
+        // Game over
         if (!this._alive) {
-            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillStyle = "rgba(0,0,0,0.55)";
             ctx.fillRect(0, 0, RC_W, RC_H);
             ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.font = "bold 24px 'Segoe UI',sans-serif";
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.font = "bold 26px 'Segoe UI',sans-serif";
             ctx.fillText("Crash!", RC_W / 2, RC_H / 2 - 25);
             ctx.font = "16px 'Segoe UI',sans-serif";
-            ctx.fillText("Punkte: " + this._score, RC_W / 2, RC_H / 2 + 10);
-            ctx.font = "13px 'Segoe UI',sans-serif";
-            ctx.fillText("Coins: " + this._coinCount + "  Distanz: " + Math.floor(this._distance) + "m", RC_W / 2, RC_H / 2 + 35);
+            ctx.fillText("Punkte: " + this._score + "  Coins: " + this._coinCount, RC_W / 2, RC_H / 2 + 10);
         }
     }
 
-    _getSkyColor(pos) {
-        // Simple day sky
-        return pos === 0 ? "#4488cc" : "#88bbee";
-    }
-
-    _drawMountains(ctx, now) {
-        const scroll = (this._distance * 0.02) % 300;
-        // Far mountains
-        ctx.fillStyle = "#5a7a9a";
+    _drawTrapezoid(ctx, x1, y1, w1, x2, y2, w2) {
         ctx.beginPath();
-        ctx.moveTo(0, RC_H * 0.45);
-        for (let x = -20; x <= RC_W + 20; x += 5) {
-            const h = 25 + Math.sin((x + scroll) * 0.015) * 20 + Math.sin((x + scroll) * 0.03) * 10;
-            ctx.lineTo(x, RC_H * 0.45 - h);
-        }
-        ctx.lineTo(RC_W + 20, RC_H * 0.45);
-        ctx.fill();
-
-        // Near mountains
-        ctx.fillStyle = "#4a6a4a";
-        ctx.beginPath();
-        ctx.moveTo(0, RC_H * 0.45);
-        for (let x = -20; x <= RC_W + 20; x += 5) {
-            const h = 15 + Math.sin((x + scroll * 2) * 0.02) * 15 + Math.sin((x + scroll * 2) * 0.05) * 8;
-            ctx.lineTo(x, RC_H * 0.45 - h);
-        }
-        ctx.lineTo(RC_W + 20, RC_H * 0.45);
+        ctx.moveTo(x1 - w1, y1);
+        ctx.lineTo(x1 + w1, y1);
+        ctx.lineTo(x2 + w2, y2);
+        ctx.lineTo(x2 - w2, y2);
         ctx.fill();
     }
 
-    _drawRoad(ctx, now) {
-        const roadCX = RC_W / 2 + this._roadCurve * 0.3;
-        const rw = this._roadWidth;
-        const laneW = rw / this._laneCount;
+    _drawScenerySprite(ctx, p, side, info, now) {
+        const scale = p.scale * 600;
+        if (scale < 1) return;
+        const x = p.x + side * (p.w + info.offset * p.w * 0.5);
+        const y = p.y;
+        const s = Math.max(0.5, scale);
 
-        // Road surface
-        const roadGrad = ctx.createLinearGradient(0, RC_H * 0.4, 0, RC_H);
-        roadGrad.addColorStop(0, "#555");
-        roadGrad.addColorStop(1, "#333");
-        ctx.fillStyle = roadGrad;
-
-        // Trapezoid road (perspective)
-        const topW = rw * 0.3;
-        const topY = RC_H * 0.42;
-        const botY = RC_H;
-        const curveFar = this._roadCurve * 0.8;
-        ctx.beginPath();
-        ctx.moveTo(roadCX - rw / 2, botY);
-        ctx.lineTo(RC_W / 2 + curveFar - topW / 2, topY);
-        ctx.lineTo(RC_W / 2 + curveFar + topW / 2, topY);
-        ctx.lineTo(roadCX + rw / 2, botY);
-        ctx.fill();
-
-        // Road edge lines (white)
-        ctx.strokeStyle = "#fff";
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(roadCX - rw / 2, botY);
-        ctx.lineTo(RC_W / 2 + curveFar - topW / 2, topY);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(roadCX + rw / 2, botY);
-        ctx.lineTo(RC_W / 2 + curveFar + topW / 2, topY);
-        ctx.stroke();
-
-        // Lane dashes
-        const dashPhase = (this._distance * 2) % 40;
-        ctx.strokeStyle = "#ddd";
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([12, 12]);
-        ctx.lineDashOffset = -dashPhase;
-        for (let l = 1; l < this._laneCount; l++) {
-            const frac = l / this._laneCount;
-            const bx = roadCX - rw / 2 + frac * rw;
-            const tx = RC_W / 2 + curveFar - topW / 2 + frac * topW;
-            ctx.beginPath();
-            ctx.moveTo(bx, botY);
-            ctx.lineTo(tx, topY);
-            ctx.stroke();
-        }
-        ctx.setLineDash([]);
-
-        // Road shoulder (red-white curbs)
-        const curbPhase = (this._distance * 2) % 24;
-        for (let side = -1; side <= 1; side += 2) {
-            for (let y = RC_H; y > topY; y -= 12) {
-                const t = (y - topY) / (botY - topY); // 0 at top, 1 at bottom
-                const edgeX = roadCX + side * (rw / 2) * t + (1 - t) * side * (topW / 2) + (1 - t) * curveFar;
-                const cw = 4 * t + 1;
-                const idx = Math.floor((y + curbPhase) / 12) % 2;
-                ctx.fillStyle = idx ? "#e03020" : "#fff";
-                ctx.fillRect(edgeX - cw / 2, y - 6, cw, 6);
-            }
-        }
-    }
-
-    _drawScenery(ctx) {
-        const roadCX = RC_W / 2 + this._roadCurve * 0.3;
-        const rw = this._roadWidth;
-
-        for (const s of this._scenery) {
-            const side = s.side;
-            const edgeX = roadCX + side * rw / 2;
-            const sx = edgeX + side * s.x * 80;
-            const sy = s.y;
-
-            if (sy < RC_H * 0.4 || sy > RC_H + 20) continue;
-
-            const scale = 0.4 + (sy - RC_H * 0.4) / (RC_H * 0.6) * 0.6;
-
-            if (s.type === "tree") {
-                // trunk
-                ctx.fillStyle = "#5a3a1a";
-                ctx.fillRect(sx - 2 * scale, sy - 25 * scale, 4 * scale, 25 * scale);
-                // foliage
-                ctx.fillStyle = "#2d8c2d";
-                ctx.beginPath();
-                ctx.arc(sx, sy - 28 * scale, 12 * scale, 0, Math.PI * 2);
-                ctx.fill();
+        switch (info.type) {
+            case "tree": {
+                ctx.fillStyle = "#4a2a0a";
+                ctx.fillRect(x - s * 0.08, y - s * 0.5, s * 0.16, s * 0.5);
+                ctx.fillStyle = "#2d8a2d";
+                ctx.beginPath(); ctx.arc(x, y - s * 0.55, s * 0.3, 0, Math.PI * 2); ctx.fill();
                 ctx.fillStyle = "#3aaa3a";
+                ctx.beginPath(); ctx.arc(x - s * 0.1, y - s * 0.45, s * 0.2, 0, Math.PI * 2); ctx.fill();
+                break;
+            }
+            case "pine": {
+                ctx.fillStyle = "#4a2a0a";
+                ctx.fillRect(x - s * 0.06, y - s * 0.6, s * 0.12, s * 0.6);
+                ctx.fillStyle = "#1a6a2a";
                 ctx.beginPath();
-                ctx.arc(sx - 4 * scale, sy - 24 * scale, 8 * scale, 0, Math.PI * 2);
+                ctx.moveTo(x, y - s * 0.9);
+                ctx.lineTo(x - s * 0.25, y - s * 0.2);
+                ctx.lineTo(x + s * 0.25, y - s * 0.2);
                 ctx.fill();
-            } else if (s.type === "bush") {
+                ctx.fillStyle = "#2a8a3a";
+                ctx.beginPath();
+                ctx.moveTo(x, y - s * 0.75);
+                ctx.lineTo(x - s * 0.2, y - s * 0.35);
+                ctx.lineTo(x + s * 0.2, y - s * 0.35);
+                ctx.fill();
+                break;
+            }
+            case "bush": {
                 ctx.fillStyle = "#2d7a2d";
-                ctx.beginPath();
-                ctx.ellipse(sx, sy - 5 * scale, 10 * scale, 7 * scale, 0, 0, Math.PI * 2);
-                ctx.fill();
-            } else if (s.type === "rock") {
-                ctx.fillStyle = "#888";
-                ctx.beginPath();
-                ctx.ellipse(sx, sy - 3 * scale, 8 * scale, 5 * scale, 0, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.ellipse(x, y - s * 0.1, s * 0.2, s * 0.13, 0, 0, Math.PI * 2); ctx.fill();
+                break;
+            }
+            case "rock": {
+                ctx.fillStyle = "#777";
+                ctx.beginPath(); ctx.ellipse(x, y - s * 0.06, s * 0.15, s * 0.1, 0, 0, Math.PI * 2); ctx.fill();
                 ctx.fillStyle = "#999";
-                ctx.beginPath();
-                ctx.ellipse(sx - 2 * scale, sy - 5 * scale, 5 * scale, 3 * scale, -0.3, 0, Math.PI * 2);
-                ctx.fill();
-            } else if (s.type === "sign") {
+                ctx.beginPath(); ctx.ellipse(x - s * 0.04, y - s * 0.1, s * 0.08, s * 0.06, 0, 0, Math.PI * 2); ctx.fill();
+                break;
+            }
+            case "cactus": {
+                ctx.fillStyle = "#2a7a2a";
+                ctx.fillRect(x - s * 0.05, y - s * 0.5, s * 0.1, s * 0.5);
+                ctx.fillRect(x - s * 0.2, y - s * 0.4, s * 0.1, s * 0.2);
+                ctx.fillRect(x + s * 0.1, y - s * 0.35, s * 0.1, s * 0.15);
+                break;
+            }
+            case "sign": {
                 ctx.fillStyle = "#888";
-                ctx.fillRect(sx - 1, sy - 20 * scale, 2, 20 * scale);
-                ctx.fillStyle = "#336699";
-                ctx.fillRect(sx - 8 * scale, sy - 22 * scale, 16 * scale, 10 * scale);
+                ctx.fillRect(x - s * 0.02, y - s * 0.4, s * 0.04, s * 0.4);
+                ctx.fillStyle = "#2255aa";
+                ctx.fillRect(x - s * 0.15, y - s * 0.45, s * 0.3, s * 0.18);
                 ctx.fillStyle = "#fff";
-                ctx.font = `${Math.floor(6 * scale)}px sans-serif`;
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(Math.floor(this._distance / 100) + "km", sx, sy - 17 * scale);
-            } else if (s.type === "building") {
-                const bw = 20 * scale, bh = 35 * scale;
-                ctx.fillStyle = "#8a8070";
-                ctx.fillRect(sx - bw / 2, sy - bh, bw, bh);
-                // windows
+                ctx.font = `${Math.max(6, Math.floor(s * 0.1))}px sans-serif`;
+                ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                ctx.fillText(Math.floor(this._pos / 800) + " km", x, y - s * 0.36);
+                break;
+            }
+            case "building": {
+                const bw = s * 0.35, bh = s * 0.7;
+                ctx.fillStyle = "#7a7060";
+                ctx.fillRect(x - bw / 2, y - bh, bw, bh);
                 ctx.fillStyle = "#ffe080";
-                for (let wy = 0; wy < 3; wy++) {
+                const winS = s * 0.06;
+                for (let wy = 0; wy < 4; wy++) {
                     for (let wx = 0; wx < 2; wx++) {
-                        ctx.fillRect(
-                            sx - bw / 2 + 3 * scale + wx * 8 * scale,
-                            sy - bh + 4 * scale + wy * 10 * scale,
-                            4 * scale, 5 * scale
-                        );
+                        ctx.fillRect(x - bw / 2 + s * 0.06 + wx * s * 0.14, y - bh + s * 0.08 + wy * s * 0.15, winS, winS * 1.2);
                     }
                 }
-                // roof
-                ctx.fillStyle = "#6a4a3a";
+                ctx.fillStyle = "#5a3a2a";
                 ctx.beginPath();
-                ctx.moveTo(sx - bw / 2 - 2, sy - bh);
-                ctx.lineTo(sx, sy - bh - 8 * scale);
-                ctx.lineTo(sx + bw / 2 + 2, sy - bh);
+                ctx.moveTo(x - bw / 2 - s * 0.02, y - bh);
+                ctx.lineTo(x, y - bh - s * 0.15);
+                ctx.lineTo(x + bw / 2 + s * 0.02, y - bh);
                 ctx.fill();
+                break;
             }
         }
     }
 
-    _drawCar(ctx, x, y, w, h, color, isTruck, isPlayer) {
+    _drawTrafficCar(ctx, p, car, now) {
+        const scale = p.scale * 400;
+        if (scale < 2) return;
+        const laneX = car.lane * 0.6;
+        const x = p.x + laneX * p.w * 0.45;
+        const y = p.y;
+        const w = scale * 0.3;
+        const h = scale * (car.isTruck ? 0.55 : 0.4);
+
         // Shadow
         ctx.fillStyle = "rgba(0,0,0,0.2)";
         ctx.beginPath();
-        ctx.ellipse(x, y + h / 2 + 2, w / 2 + 3, 5, 0, 0, Math.PI * 2);
+        ctx.ellipse(x, y + 1, w + 2, h * 0.15, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        if (isTruck) {
-            // Truck body
-            ctx.fillStyle = color.body;
-            ctx.beginPath();
-            ctx.roundRect(x - w / 2, y - h / 2, w, h, 3);
-            ctx.fill();
-            // Cargo area
-            ctx.fillStyle = color.roof;
-            ctx.fillRect(x - w / 2 + 2, y - h / 2 + 5, w - 4, h * 0.55);
-            // Cab
-            ctx.fillStyle = color.stripe;
-            ctx.fillRect(x - w / 2 + 4, y - h / 2 + 2, w - 8, 8);
-            // Headlights
-            ctx.fillStyle = "#ffee88";
-            ctx.fillRect(x - w / 2 + 2, y + h / 2 - 4, 5, 3);
-            ctx.fillRect(x + w / 2 - 7, y + h / 2 - 4, 5, 3);
-        } else {
-            // Car body
-            ctx.fillStyle = color.body;
-            ctx.beginPath();
-            ctx.roundRect(x - w / 2, y - h / 2, w, h, 5);
-            ctx.fill();
-            // Roof / windshield
-            ctx.fillStyle = color.roof;
-            ctx.beginPath();
-            ctx.roundRect(x - w / 2 + 3, y - h / 2 + 6, w - 6, h * 0.35, 3);
-            ctx.fill();
-            // Windshield (glass)
-            ctx.fillStyle = "rgba(150,200,255,0.5)";
-            ctx.beginPath();
-            ctx.roundRect(x - w / 2 + 5, y - h / 2 + 4, w - 10, 8, 2);
-            ctx.fill();
-            // Rear window
-            ctx.fillStyle = "rgba(150,200,255,0.3)";
-            ctx.beginPath();
-            ctx.roundRect(x - w / 2 + 5, y + h / 2 - 12, w - 10, 6, 2);
-            ctx.fill();
-            // Stripe
-            ctx.fillStyle = color.stripe;
-            ctx.fillRect(x - w / 2 + 2, y, w - 4, 2);
-            // Headlights
-            ctx.fillStyle = "#ffee88";
-            ctx.beginPath();
-            ctx.arc(x - w / 2 + 5, y + h / 2 - 2, 2.5, 0, Math.PI * 2);
-            ctx.arc(x + w / 2 - 5, y + h / 2 - 2, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-            // Tail lights
-            ctx.fillStyle = "#ff3333";
-            ctx.fillRect(x - w / 2 + 1, y - h / 2 + 1, 4, 3);
-            ctx.fillRect(x + w / 2 - 5, y - h / 2 + 1, 4, 3);
-        }
+        // Body
+        ctx.fillStyle = car.color.body;
+        ctx.beginPath();
+        ctx.roundRect(x - w, y - h, w * 2, h, Math.min(w * 0.3, 4));
+        ctx.fill();
+
+        // Roof
+        ctx.fillStyle = car.color.roof;
+        ctx.beginPath();
+        ctx.roundRect(x - w * 0.7, y - h * 0.75, w * 1.4, h * 0.35, 2);
+        ctx.fill();
+
+        // Windshield
+        ctx.fillStyle = car.color.win;
+        ctx.globalAlpha = 0.5;
+        ctx.fillRect(x - w * 0.6, y - h * 0.9, w * 1.2, h * 0.2);
+        ctx.globalAlpha = 1;
+
+        // Tail lights
+        ctx.fillStyle = "#ff2222";
+        ctx.fillRect(x - w + 1, y - h, w * 0.25, h * 0.1);
+        ctx.fillRect(x + w * 0.75 - 1, y - h, w * 0.25, h * 0.1);
+    }
+
+    _drawCoinSprite(ctx, p, coin, now) {
+        const scale = p.scale * 400;
+        if (scale < 2) return;
+        const laneX = coin.lane * 0.6;
+        const x = p.x + laneX * p.w * 0.45;
+        const y = p.y - scale * 0.15;
+        const r = Math.max(2, scale * 0.08);
+        const bob = Math.sin(now / 200 + coin.segIdx) * r * 0.3;
+        const stretch = Math.abs(Math.cos(now / 150 + coin.segIdx));
+
+        ctx.fillStyle = "#ffd700";
+        ctx.beginPath();
+        ctx.ellipse(x, y + bob, r * Math.max(0.3, stretch), r, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ffed4a";
+        ctx.beginPath();
+        ctx.ellipse(x, y + bob, r * 0.6 * Math.max(0.3, stretch), r * 0.6, 0, 0, Math.PI * 2);
+        ctx.fill();
     }
 
     _drawPlayerCar(ctx, now) {
-        const x = this._playerX;
-        const y = RC_H - 50;
-        const w = 28, h = 44;
+        const x = RC_W / 2 + this._playerX * RC_W * 0.15;
+        const y = RC_H - 45;
+        const w = 22, h = 42;
         const tilt = ((this._keys.left ? -1 : 0) + (this._keys.right ? 1 : 0)) * 2;
+        const bounce = Math.sin(now / 60) * 0.5;
 
         // Shadow
-        ctx.fillStyle = "rgba(0,0,0,0.25)";
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
         ctx.beginPath();
-        ctx.ellipse(x, y + h / 2 + 4, w / 2 + 5, 6, 0, 0, Math.PI * 2);
+        ctx.ellipse(x, y + h / 2 + 6, w + 6, 7, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Car body (sporty red)
+        // Body
         ctx.fillStyle = "#e03020";
         ctx.beginPath();
-        ctx.roundRect(x - w / 2 + tilt, y - h / 2, w, h, 6);
+        ctx.roundRect(x - w / 2 + tilt, y - h / 2 + bounce, w, h, 6);
         ctx.fill();
 
-        // Hood highlight
-        const hoodGrad = ctx.createLinearGradient(x - w / 2, y + h / 4, x + w / 2, y + h / 4);
-        hoodGrad.addColorStop(0, "rgba(255,255,255,0.05)");
-        hoodGrad.addColorStop(0.5, "rgba(255,255,255,0.15)");
-        hoodGrad.addColorStop(1, "rgba(255,255,255,0.05)");
-        ctx.fillStyle = hoodGrad;
-        ctx.fillRect(x - w / 2 + 2 + tilt, y, w - 4, h / 2);
+        // Hood shine
+        const hg = ctx.createLinearGradient(x - w / 2, y, x + w / 2, y);
+        hg.addColorStop(0, "rgba(255,255,255,0)");
+        hg.addColorStop(0.4, "rgba(255,255,255,0.12)");
+        hg.addColorStop(0.6, "rgba(255,255,255,0.12)");
+        hg.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = hg;
+        ctx.fillRect(x - w / 2 + 2 + tilt, y + bounce, w - 4, h / 2);
 
         // Roof
         ctx.fillStyle = "#c02818";
         ctx.beginPath();
-        ctx.roundRect(x - w / 2 + 4 + tilt, y - h / 2 + 8, w - 8, h * 0.3, 3);
+        ctx.roundRect(x - w / 2 + 4 + tilt, y - h / 2 + 8 + bounce, w - 8, h * 0.28, 3);
         ctx.fill();
 
         // Windshield
-        ctx.fillStyle = "rgba(150,210,255,0.6)";
+        ctx.fillStyle = "rgba(140,200,255,0.6)";
         ctx.beginPath();
-        ctx.roundRect(x - w / 2 + 5 + tilt, y + h / 2 - 14, w - 10, 8, 2);
+        ctx.roundRect(x - w / 2 + 5 + tilt, y + h / 2 - 14 + bounce, w - 10, 8, 2);
         ctx.fill();
 
         // Rear window
-        ctx.fillStyle = "rgba(150,210,255,0.4)";
+        ctx.fillStyle = "rgba(140,200,255,0.4)";
         ctx.beginPath();
-        ctx.roundRect(x - w / 2 + 5 + tilt, y - h / 2 + 4, w - 10, 7, 2);
+        ctx.roundRect(x - w / 2 + 5 + tilt, y - h / 2 + 3 + bounce, w - 10, 7, 2);
         ctx.fill();
 
-        // Racing stripe
-        ctx.fillStyle = "rgba(255,255,255,0.3)";
-        ctx.fillRect(x - 2 + tilt, y - h / 2, 4, h);
+        // Racing stripes
+        ctx.fillStyle = "rgba(255,255,255,0.25)";
+        ctx.fillRect(x - 3 + tilt, y - h / 2 + bounce, 2, h);
+        ctx.fillRect(x + 1 + tilt, y - h / 2 + bounce, 2, h);
 
-        // Headlights (bright)
+        // Headlights
         ctx.fillStyle = "#ffffcc";
         ctx.beginPath();
-        ctx.ellipse(x - w / 2 + 5 + tilt, y + h / 2 - 2, 3, 2.5, 0, 0, Math.PI * 2);
-        ctx.ellipse(x + w / 2 - 5 + tilt, y + h / 2 - 2, 3, 2.5, 0, 0, Math.PI * 2);
+        ctx.ellipse(x - w / 2 + 5 + tilt, y + h / 2 - 2 + bounce, 3, 2.5, 0, 0, Math.PI * 2);
+        ctx.ellipse(x + w / 2 - 5 + tilt, y + h / 2 - 2 + bounce, 3, 2.5, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Headlight beams
-        ctx.fillStyle = "rgba(255,255,200,0.06)";
+        // Light beams
+        ctx.fillStyle = "rgba(255,255,200,0.05)";
         ctx.beginPath();
-        ctx.moveTo(x - w / 2 + 3 + tilt, y + h / 2);
-        ctx.lineTo(x - w / 2 - 8, y + h / 2 + 40);
-        ctx.lineTo(x - w / 2 + 18, y + h / 2 + 40);
+        ctx.moveTo(x - w / 2 + 2 + tilt, y + h / 2 + bounce);
+        ctx.lineTo(x - w / 2 - 12, y + h / 2 + 50);
+        ctx.lineTo(x - w / 2 + 22, y + h / 2 + 50);
         ctx.fill();
         ctx.beginPath();
-        ctx.moveTo(x + w / 2 - 3 + tilt, y + h / 2);
-        ctx.lineTo(x + w / 2 - 18, y + h / 2 + 40);
-        ctx.lineTo(x + w / 2 + 8, y + h / 2 + 40);
+        ctx.moveTo(x + w / 2 - 2 + tilt, y + h / 2 + bounce);
+        ctx.lineTo(x + w / 2 - 22, y + h / 2 + 50);
+        ctx.lineTo(x + w / 2 + 12, y + h / 2 + 50);
         ctx.fill();
 
         // Tail lights
         ctx.fillStyle = "#ff2222";
-        ctx.fillRect(x - w / 2 + 1 + tilt, y - h / 2 + 1, 5, 3);
-        ctx.fillRect(x + w / 2 - 6 + tilt, y - h / 2 + 1, 5, 3);
+        ctx.fillRect(x - w / 2 + 1 + tilt, y - h / 2 + 1 + bounce, 5, 3);
+        ctx.fillRect(x + w / 2 - 6 + tilt, y - h / 2 + 1 + bounce, 5, 3);
 
         // Wheels
-        ctx.fillStyle = "#222";
-        ctx.fillRect(x - w / 2 - 2 + tilt, y + h / 4, 3, 8);
-        ctx.fillRect(x + w / 2 - 1 + tilt, y + h / 4, 3, 8);
-        ctx.fillRect(x - w / 2 - 2 + tilt, y - h / 4 - 4, 3, 8);
-        ctx.fillRect(x + w / 2 - 1 + tilt, y - h / 4 - 4, 3, 8);
+        ctx.fillStyle = "#111";
+        const wheelW = 3, wheelH = 8;
+        ctx.fillRect(x - w / 2 - 2 + tilt, y + h / 4 + bounce, wheelW, wheelH);
+        ctx.fillRect(x + w / 2 - 1 + tilt, y + h / 4 + bounce, wheelW, wheelH);
+        ctx.fillRect(x - w / 2 - 2 + tilt, y - h / 4 - 4 + bounce, wheelW, wheelH);
+        ctx.fillRect(x + w / 2 - 1 + tilt, y - h / 4 - 4 + bounce, wheelW, wheelH);
+
+        // Wheel rims
+        ctx.fillStyle = "#555";
+        ctx.fillRect(x - w / 2 - 1.5 + tilt, y + h / 4 + 2 + bounce, 2, 4);
+        ctx.fillRect(x + w / 2 - 0.5 + tilt, y + h / 4 + 2 + bounce, 2, 4);
+        ctx.fillRect(x - w / 2 - 1.5 + tilt, y - h / 4 - 2 + bounce, 2, 4);
+        ctx.fillRect(x + w / 2 - 0.5 + tilt, y - h / 4 - 2 + bounce, 2, 4);
     }
 
     _drawHUD(ctx) {
-        // Speed gauge background
-        ctx.fillStyle = "rgba(0,0,0,0.55)";
+        // Background
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
         ctx.beginPath();
-        ctx.roundRect(4, 4, 180, 28, 8);
+        ctx.roundRect(4, 4, 200, 28, 8);
         ctx.fill();
 
         ctx.fillStyle = "white";
         ctx.font = "bold 12px 'Segoe UI',sans-serif";
-        ctx.textAlign = "left";
-        ctx.textBaseline = "alphabetic";
-        ctx.fillText("\uD83C\uDFC1 " + this._score + "   \uD83E\uDE99 " + this._coinCount + "   " + Math.floor(this._speed) + " km/h", 12, 22);
+        ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+        const kmh = Math.floor((this._speed / this._maxSpeed) * 320 + 30);
+        ctx.fillText("\uD83C\uDFC1 " + this._score + "   \uD83E\uDE99 " + this._coinCount + "   " + kmh + " km/h", 12, 22);
 
-        // Speed bar
-        const barW = 60, barH = 6;
-        const barX = RC_W - barW - 10, barY = 10;
-        ctx.fillStyle = "rgba(0,0,0,0.55)";
+        // Speedometer
+        const barW = 55, barH = 5;
+        const barX = RC_W - barW - 12, barY = 10;
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
         ctx.beginPath();
-        ctx.roundRect(barX - 4, barY - 2, barW + 8, barH + 14, 6);
+        ctx.roundRect(barX - 4, barY - 2, barW + 8, barH + 16, 6);
         ctx.fill();
-        ctx.fillStyle = "#aaa";
-        ctx.font = "bold 8px sans-serif";
-        ctx.textAlign = "center";
+        ctx.fillStyle = "#aaa"; ctx.font = "bold 7px sans-serif"; ctx.textAlign = "center";
         ctx.fillText("SPEED", barX + barW / 2, barY + 4);
         ctx.fillStyle = "rgba(255,255,255,0.2)";
         ctx.fillRect(barX, barY + 8, barW, barH);
-        const speedPct = (this._speed - 180) / (this._maxSpeed - 180);
-        const sColor = speedPct > 0.7 ? "#e03020" : speedPct > 0.4 ? "#f0c020" : "#30b030";
-        ctx.fillStyle = sColor;
-        ctx.fillRect(barX, barY + 8, barW * speedPct, barH);
+        const pct = this._speed / this._maxSpeed;
+        ctx.fillStyle = pct > 0.7 ? "#e03020" : pct > 0.4 ? "#f0c020" : "#30b030";
+        ctx.fillRect(barX, barY + 8, barW * pct, barH);
     }
 }
 
