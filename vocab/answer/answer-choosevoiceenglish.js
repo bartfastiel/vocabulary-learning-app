@@ -30,7 +30,7 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
     render() {
         const correct = this.word.en.toLowerCase();
         const wrong = this.shuffle(
-            this.vocabulary.filter(v => v.en.toLowerCase() !== correct)
+            this.vocabulary.filter(v => v.en.toLowerCase() !== correct && v._hasAudio)
                 .slice(0, 3)
                 .map(v => v.en.toLowerCase())
         );

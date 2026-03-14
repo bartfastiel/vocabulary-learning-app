@@ -517,11 +517,30 @@ class VocabTrainer extends HTMLElement {
     async loadSets() {
         try {
             const data = await fetch(`vocab/vocab.json`).then(r => r.json());
-            // Built-in vocab sets only show for the "englisch" subject
-            // Mark built-in words as having audio available
+            // Verify which resources actually exist for each word
+            const checks = [];
             for (const set of data) {
-                for (const w of set.words) w._hasAudio = true;
+                for (const w of set.words) {
+                    const safe = w.en.toLowerCase().replaceAll(/[^a-z0-9]/g, "_");
+                    // Check image
+                    if (w.allowImage) {
+                        checks.push(
+                            fetch(`assets/img/${safe}.png`, { method: "HEAD" })
+                                .then(r => { w._hasImage = r.ok; })
+                                .catch(() => { w._hasImage = false; })
+                        );
+                    } else {
+                        w._hasImage = false;
+                    }
+                    // Check audio (just one voice variant is enough)
+                    checks.push(
+                        fetch(`assets/audio/voice/${safe}_alloy.mp3`, { method: "HEAD" })
+                            .then(r => { w._hasAudio = r.ok; })
+                            .catch(() => { w._hasAudio = false; })
+                    );
+                }
             }
+            await Promise.all(checks);
             this._builtinSets = (this._subject || "englisch") === "englisch" ? data : [];
             this._mergeAndRender();
         } catch (err) {
@@ -627,10 +646,15 @@ class VocabTrainer extends HTMLElement {
             "vocab-answer-choosevoiceenglish",
             "vocab-answer-chooseimage",
         ];
+        const otherWithImage = this.vocab.filter(v => v !== word && v._hasImage).length;
+        const otherWithAudio = this.vocab.filter(v => v !== word && v._hasAudio).length;
         const availableModes = MODES.filter(mode => {
-            if (!word.allowImage && (mode.question === "vocab-question-image" || mode.answer === "vocab-answer-chooseimage")) return false;
+            if (!word._hasImage && (mode.question === "vocab-question-image" || mode.answer === "vocab-answer-chooseimage")) return false;
             if (!word._hasAudio && (mode.question === "vocab-question-voiceenglish" || mode.answer === "vocab-answer-choosevoiceenglish")) return false;
             if (this.vocab.length < 4 && needsDistractors.includes(mode.answer)) return false;
+            // Need enough distractors with matching resources
+            if (mode.answer === "vocab-answer-chooseimage" && otherWithImage < 3) return false;
+            if (mode.answer === "vocab-answer-choosevoiceenglish" && otherWithAudio < 3) return false;
             return true;
         });
         const mode = availableModes[Math.floor(Math.random() * availableModes.length)];

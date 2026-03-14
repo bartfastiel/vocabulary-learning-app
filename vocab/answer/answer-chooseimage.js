@@ -33,7 +33,7 @@ class VocabAnswerChooseImage extends HTMLElement {
         const correct = this.word.en.toLowerCase();
         const wrong = this.shuffle(
             this.vocabulary
-                .filter(v => v.en.toLowerCase() !== correct && v.allowImage)
+                .filter(v => v.en.toLowerCase() !== correct && v._hasImage)
 
         ).slice(0, 3);
         const options = this.shuffle([this.word, ...wrong]);
