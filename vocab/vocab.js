@@ -499,7 +499,23 @@ class VocabTrainer extends HTMLElement {
         const custom   = this._loadCustom();
         this.vocabSets = [...(this._builtinSets ?? []), ...custom];
         this.renderPopupButtons();
-        if (!keepCurrentSet && this.vocabSets.length > 0) this.loadSet(0);
+        if (!keepCurrentSet && this.vocabSets.length > 0) {
+            this.loadSet(0);
+        } else if (this.vocabSets.length === 0) {
+            this._showEmptyState();
+        }
+    }
+
+    _showEmptyState() {
+        const q = this.shadowRoot.querySelector("#question");
+        const a = this.shadowRoot.querySelector("#answer");
+        if (q) q.innerHTML = "<div style='text-align:center;color:#888;padding:1rem;'>Noch keine eigenen Vokabeln.<br>Erstelle eine Liste im Vokabel-Editor!</div>";
+        if (a) a.innerHTML = "";
+        this.shadowRoot.querySelector(".lesson-header .title").textContent = "Eigene Vokabeln";
+        const mascot = this.shadowRoot.querySelector("#mascot");
+        if (mascot) mascot.style.display = "none";
+        const progress = this.shadowRoot.querySelector(".progress-wrap");
+        if (progress) progress.style.display = "none";
     }
 
     /** Called when custom vocab changes — switches to the last (newly added) lesson. */

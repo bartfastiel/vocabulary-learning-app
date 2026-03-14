@@ -767,7 +767,7 @@ class AppShell extends HTMLElement {
             // Reload all vocab trainers so custom lists appear under the right subject
             for (const key of Object.keys(this._trainers)) {
                 const t = this._trainers[key];
-                if (t.tagName === "VOCAB-TRAINER" && typeof t.reload === "function") {
+                if (t?.tagName === "VOCAB-TRAINER" && typeof t.reload === "function") {
                     t.reload();
                     t.togglePopup?.(true);
                 }
@@ -776,7 +776,7 @@ class AppShell extends HTMLElement {
         vocabEditor.addEventListener("vocab-updated", () => {
             for (const key of Object.keys(this._trainers)) {
                 const t = this._trainers[key];
-                if (t.tagName === "VOCAB-TRAINER" && typeof t.reload === "function") {
+                if (t?.tagName === "VOCAB-TRAINER" && typeof t.reload === "function") {
                     t.reload();
                 }
             }
@@ -1035,8 +1035,19 @@ class AppShell extends HTMLElement {
             this._trainers[subject] = el;
         }
 
+        // For mathe/deutsch, also create a vocab-trainer for custom vocab lists
+        if (subject !== "englisch" && !this._trainers[subject + "_vocab"]) {
+            const vt = document.createElement("vocab-trainer");
+            vt.points = this._pointsManager;
+            vt._subject = subject;
+            this._trainers[subject + "_vocab"] = vt;
+        }
+
         slot.innerHTML = "";
         slot.appendChild(this._trainers[subject]);
+        if (subject !== "englisch") {
+            slot.appendChild(this._trainers[subject + "_vocab"]);
+        }
     }
 
     _showHome() {
