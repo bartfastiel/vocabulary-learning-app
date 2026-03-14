@@ -484,11 +484,18 @@ class PlatformerGame extends HTMLElement {
         const pw = 20, ph = 24;
         for (const qb of this._qBlocks) {
             if (qb.hit) continue;
-            // Player moving upward and head hits the block from below
-            if (this._pvy < 0 && this._overlaps(this._px, this._py, pw, ph, qb.x, qb.y, qb.w, qb.h)) {
+            const bx = qb.x, by = qb.y - qb.bounceY, bw = qb.w, bh = qb.h;
+            // Check if player's head is hitting the block from below
+            // Use generous overlap: player top within 6px of block bottom, horizontal overlap exists
+            const playerTop = this._py;
+            const blockBottom = by + bh;
+            const headNearBlock = playerTop >= by && playerTop <= blockBottom + 6;
+            const hOverlap = this._px + pw > bx + 2 && this._px < bx + bw - 2;
+            if (headNearBlock && hOverlap && this._pvy < 50) {
                 qb.hit = true;
                 qb.bounceY = 8;
                 this._pvy = 40;
+                this._py = blockBottom; // push player below the block
 
                 if (Math.random() < 0.5) {
                     // Spawn a power-up!
