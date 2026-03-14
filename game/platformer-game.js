@@ -86,6 +86,19 @@ const POWERUPS = [
     { type: "tiny",   emoji: "\u{1F30D}", label: "Mini",         color: "#fb923c", duration: 8  },
 ];
 
+// Persistent inventory
+const INV_KEY = "huepfeltInventory";
+function loadInventory() {
+    try { return JSON.parse(localStorage.getItem(INV_KEY)) || []; } catch { return []; }
+}
+function saveInventory(inv) {
+    localStorage.setItem(INV_KEY, JSON.stringify(inv));
+}
+function unlockPower(type) {
+    const inv = loadInventory();
+    if (!inv.includes(type)) { inv.push(type); saveInventory(inv); }
+}
+
 // Colors
 const COL_SKY_TOP = "#5c94fc";
 const COL_SKY_BOT = "#87ceeb";
@@ -110,6 +123,93 @@ class PlatformerGame extends HTMLElement {
     }
 
     connectedCallback() {
+        const inv = loadInventory();
+        if (inv.length > 0) {
+            this._showLoadout(inv);
+        } else {
+            this._startWithPower(null);
+        }
+    }
+
+    _showLoadout(inv) {
+        const items = inv.map(t => POWERUPS.find(p => p.type === t)).filter(Boolean);
+        this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          width: 100%; height: 100%; background: #000;
+          font-family: "Segoe UI", sans-serif; user-select: none;
+        }
+        .loadout {
+          text-align: center; color: white; padding: 1.5rem;
+          max-width: 360px; width: 100%;
+        }
+        .loadout h2 { margin: 0 0 0.3rem; font-size: 1.3rem; }
+        .loadout p { margin: 0 0 1rem; font-size: 0.85rem; opacity: 0.7; }
+        .power-grid {
+          display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;
+          margin-bottom: 1rem;
+        }
+        .power-card {
+          background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
+          border-radius: 10px; padding: 0.6rem 0.3rem; cursor: pointer;
+          transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+        }
+        .power-card:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+        .power-card.selected { border-color: #fbbf24; background: rgba(251,191,36,0.2); box-shadow: 0 0 12px rgba(251,191,36,0.3); }
+        .power-card .emoji { font-size: 1.6rem; }
+        .power-card .label { font-size: 0.7rem; color: white; }
+        .power-card .desc { font-size: 0.6rem; opacity: 0.6; }
+        .start-btn {
+          background: #28a745; color: white; border: none; border-radius: 10px;
+          padding: 0.7rem 2rem; font-size: 1rem; cursor: pointer; font-weight: bold;
+          transition: background 0.2s;
+        }
+        .start-btn:hover { background: #218838; }
+        .skip-btn {
+          background: none; border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.7);
+          border-radius: 8px; padding: 0.5rem 1.2rem; font-size: 0.8rem; cursor: pointer;
+          margin-top: 0.5rem; transition: all 0.2s;
+        }
+        .skip-btn:hover { border-color: white; color: white; }
+      </style>
+      <div class="loadout">
+        <h2>Ausrüstung wählen</h2>
+        <p>Wähle ein Power-Up für das ganze Spiel!</p>
+        <div class="power-grid" id="pgrid"></div>
+        <button class="start-btn" id="go-btn">Spielen!</button><br>
+        <button class="skip-btn" id="skip-btn">Ohne Power-Up starten</button>
+      </div>`;
+
+        const grid = this.shadowRoot.getElementById("pgrid");
+        let selected = null;
+        const POWER_DESCS = {
+            wings: "Doppelsprung + Gleiten",
+            star: "Gegner besiegen bei Berührung",
+            speed: "Schnellere Bewegung",
+            shield: "Absorbiert einen Treffer",
+            magnet: "Zieht Münzen an",
+            tiny: "Kleiner & wendiger",
+        };
+
+        for (const pu of items) {
+            const card = document.createElement("div");
+            card.className = "power-card";
+            card.innerHTML = `<span class="emoji">${pu.emoji}</span><span class="label">${pu.label}</span><span class="desc">${POWER_DESCS[pu.type] || ""}</span>`;
+            card.onclick = () => {
+                grid.querySelectorAll(".power-card").forEach(c => c.classList.remove("selected"));
+                card.classList.add("selected");
+                selected = pu;
+            };
+            grid.appendChild(card);
+        }
+
+        this.shadowRoot.getElementById("go-btn").onclick = () => this._startWithPower(selected);
+        this.shadowRoot.getElementById("skip-btn").onclick = () => this._startWithPower(null);
+    }
+
+    _startWithPower(equippedPower) {
+        this._equippedPower = equippedPower;
         this.shadowRoot.innerHTML = `
       <style>
         :host {
@@ -176,6 +276,7 @@ class PlatformerGame extends HTMLElement {
         this._qBlocks = [];
         this._powerupItems = [];   // power-ups bouncing out of blocks
         this._activePower = null;  // current active power-up { type, timer }
+        this._shieldCooldown = 0;
         this._flag = null;
         this._playerStart = { x: 0, y: 0 };
 
@@ -210,6 +311,12 @@ class PlatformerGame extends HTMLElement {
         this._camX = 0;
         this._walkFrame = 0;
         this._levelTransition = 1.5;
+
+        // Apply equipped power-up (permanent, timer = Infinity)
+        if (this._equippedPower) {
+            const ep = this._equippedPower;
+            this._activePower = { type: ep.type, timer: Infinity, label: ep.label, emoji: ep.emoji, color: ep.color, permanent: true };
+        }
     }
 
     // -- Input --
@@ -382,10 +489,28 @@ class PlatformerGame extends HTMLElement {
         }
         this._powerupItems = this._powerupItems.filter(p => !p.collected && p.y < this._levelH + 50);
 
-        // active power-up timer
-        if (this._activePower) {
+        // active power-up timer (permanent ones never expire)
+        if (this._activePower && !this._activePower.permanent) {
             this._activePower.timer -= dt;
-            if (this._activePower.timer <= 0) this._activePower = null;
+            if (this._activePower.timer <= 0) {
+                // Revert to equipped power-up if one exists
+                if (this._equippedPower) {
+                    const ep = this._equippedPower;
+                    this._activePower = { type: ep.type, timer: Infinity, label: ep.label, emoji: ep.emoji, color: ep.color, permanent: true };
+                } else {
+                    this._activePower = null;
+                }
+            }
+        }
+
+        // Shield cooldown regeneration (for permanent shield)
+        if (this._shieldCooldown > 0) {
+            this._shieldCooldown -= dt;
+            if (this._shieldCooldown <= 0 && this._equippedPower?.type === "shield" && !this._activePower) {
+                const ep = this._equippedPower;
+                this._activePower = { type: ep.type, timer: Infinity, label: ep.label, emoji: ep.emoji, color: ep.color, permanent: true };
+                this._popups.push({ x: this._px, y: this._py - 15, text: "Schild zurück!", life: 1.5 });
+            }
         }
 
         // enemies
@@ -421,9 +546,15 @@ class PlatformerGame extends HTMLElement {
                     this._spawnStompParticles(en.x + en.w / 2, en.y + en.h);
                 } else if (this._activePower?.type === "shield") {
                     // Shield absorbs the hit
-                    this._activePower = null;
                     this._invincible = 1.5;
                     this._popups.push({ x: this._px, y: this._py - 15, text: "Schild!", life: 1 });
+                    if (this._activePower.permanent) {
+                        // Permanent shield: temporarily deactivate, regenerates after invincibility
+                        this._shieldCooldown = 3;
+                        this._activePower = null;
+                    } else {
+                        this._activePower = null;
+                    }
                 } else {
                     this._die();
                     return;
@@ -500,6 +631,7 @@ class PlatformerGame extends HTMLElement {
                 if (Math.random() < 0.5) {
                     // Spawn a power-up!
                     const pu = POWERUPS[Math.floor(Math.random() * POWERUPS.length)];
+                    unlockPower(pu.type);
                     this._powerupItems.push({
                         x: qb.x + 2, y: qb.y - TILE, w: 20, h: 20,
                         vy: -80, onGround: false,
@@ -598,6 +730,10 @@ class PlatformerGame extends HTMLElement {
         const hearts = "";
         for (let i = 0; i < this._lives; i++) ctx.fillText("\u2764\uFE0F", PF_W / 2 - 30 + i * 15, PF_H / 2 + 15);
         ctx.fillText("x " + this._lives, PF_W / 2 + 20, PF_H / 2 + 15);
+        if (this._equippedPower) {
+            ctx.font = "12px 'Segoe UI',sans-serif";
+            ctx.fillText(this._equippedPower.emoji + " " + this._equippedPower.label, PF_W / 2, PF_H / 2 + 40);
+        }
     }
 
     _draw() {
@@ -896,7 +1032,6 @@ class PlatformerGame extends HTMLElement {
         if (this._activePower) {
             const barW = 60, barH = 8;
             const barX = PF_W - barW - 10, barY = 8;
-            const pct = this._activePower.timer / (POWERUPS.find(p => p.type === this._activePower.type)?.duration || 8);
             // background
             ctx.fillStyle = "rgba(0,0,0,0.55)";
             ctx.beginPath(); ctx.roundRect(barX - 22, barY - 2, barW + 26, barH + 16, 8); ctx.fill();
@@ -906,11 +1041,20 @@ class PlatformerGame extends HTMLElement {
             // label
             ctx.fillStyle = "white"; ctx.font = "bold 9px sans-serif";
             ctx.fillText(this._activePower.label, barX - 2, barY - 1);
-            // timer bar
-            ctx.fillStyle = "rgba(255,255,255,0.2)";
-            ctx.fillRect(barX, barY + 10, barW, barH);
-            ctx.fillStyle = this._activePower.color;
-            ctx.fillRect(barX, barY + 10, barW * Math.max(0, pct), barH);
+            if (this._activePower.permanent) {
+                // Permanent: show full bar with ∞
+                ctx.fillStyle = this._activePower.color;
+                ctx.fillRect(barX, barY + 10, barW, barH);
+                ctx.fillStyle = "white"; ctx.font = "bold 8px sans-serif"; ctx.textAlign = "center";
+                ctx.fillText("\u221E", barX + barW / 2, barY + 11);
+            } else {
+                // Temporary: timer bar
+                const pct = this._activePower.timer / (POWERUPS.find(p => p.type === this._activePower.type)?.duration || 8);
+                ctx.fillStyle = "rgba(255,255,255,0.2)";
+                ctx.fillRect(barX, barY + 10, barW, barH);
+                ctx.fillStyle = this._activePower.color;
+                ctx.fillRect(barX, barY + 10, barW * Math.max(0, pct), barH);
+            }
         }
 
         // game over / win overlay
