@@ -305,10 +305,39 @@ class AppShell extends HTMLElement {
         /* Hide points/streak spans the PointsManager targets */
         #points, #streak, #streak-record { /* visible in topbar stats */ }
 
-        /* ── Theme picker ── */
-        .theme-section {
-          margin-top: 0.5rem;
+        /* ── Background overlay ── */
+        .bg-overlay {
+          display: none; position: fixed; inset: 0; z-index: 1200;
+          background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+          align-items: center; justify-content: center;
         }
+        .bg-overlay.active { display: flex; }
+        .bg-panel {
+          background: white; border-radius: 18px;
+          width: min(480px, 96vw); max-height: 92vh;
+          display: flex; flex-direction: column;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+          overflow: hidden;
+        }
+        :host([data-bg="dark"]) .bg-panel { background: #1a202c; }
+        .bg-header {
+          display: flex; align-items: center; gap: 0.5rem;
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white; padding: 0.9rem 1rem; flex-shrink: 0;
+        }
+        .bg-header-title { font-size: 1.1rem; font-weight: bold; flex: 1; }
+        .bg-close {
+          background: rgba(255,255,255,0.2); border: none; color: white;
+          font-size: 1.2rem; border-radius: 8px; padding: 0.3rem 0.6rem;
+          cursor: pointer; transition: background 0.2s;
+        }
+        .bg-close:hover { background: rgba(255,255,255,0.35); }
+        .bg-body {
+          flex: 1; overflow-y: auto; padding: 1rem;
+          display: flex; flex-direction: column; gap: 0.3rem;
+        }
+
+        /* ── Theme picker ── */
         .theme-section-title {
           font-size: 0.85rem; font-weight: 700; color: #718096;
           margin: 0 0 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;
@@ -620,9 +649,9 @@ class AppShell extends HTMLElement {
             <span class="action-icon">😊</span>
             <span class="action-label">Avatar</span>
           </button>
-          <button class="action-card" id="home-design">
-            <span class="action-icon">🚀</span>
-            <span class="action-label">Klassisch</span>
+          <button class="action-card" id="home-bg">
+            <span class="action-icon">🎨</span>
+            <span class="action-label">Hintergrund</span>
           </button>
           <button class="action-card" id="home-profile">
             <span class="action-icon">🔄</span>
@@ -630,74 +659,96 @@ class AppShell extends HTMLElement {
           </button>
         </div>
 
-        <div class="theme-section">
-          <p class="theme-section-title">Farben</p>
-          <div class="theme-grid">
-            <div class="theme-dot" data-theme="light" style="background:#f0f4f8" title="Hell"></div>
-            <div class="theme-dot" data-theme="blue" style="background:#dbeafe" title="Blau"></div>
-            <div class="theme-dot" data-theme="green" style="background:#d1fae5" title="Grün"></div>
-            <div class="theme-dot" data-theme="purple" style="background:#ede9fe" title="Lila"></div>
-            <div class="theme-dot" data-theme="pink" style="background:#fce7f3" title="Rosa"></div>
-            <div class="theme-dot" data-theme="yellow" style="background:#fef9c3" title="Gelb"></div>
-            <div class="theme-dot" data-theme="orange" style="background:#ffedd5" title="Orange"></div>
-            <div class="theme-dot" data-theme="dark" style="background:#1a202c" title="Dunkel"></div>
-            <div class="theme-custom" id="theme-custom-wrap" title="Eigene Farbe">
-              🎨
-              <input type="color" id="custom-color-input" value="#f0f4f8" />
-            </div>
-          </div>
+      </div>
 
-          <p class="anim-section-title">Farbverläufe</p>
-          <div class="theme-grid">
-            <div class="theme-dot gradient-dot" data-theme="grad-sunset" style="background:linear-gradient(135deg,#f97316,#ec4899,#8b5cf6)" title="Sonnenuntergang"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-ocean" style="background:linear-gradient(135deg,#06b6d4,#3b82f6,#6366f1)" title="Ozean"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-aurora" style="background:linear-gradient(135deg,#10b981,#06b6d4,#8b5cf6)" title="Aurora"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-candy" style="background:linear-gradient(135deg,#f472b6,#c084fc,#60a5fa)" title="Candy"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-forest" style="background:linear-gradient(135deg,#065f46,#059669,#34d399)" title="Wald"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-fire" style="background:linear-gradient(135deg,#dc2626,#f97316,#fbbf24)" title="Feuer"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-sky" style="background:linear-gradient(180deg,#bfdbfe,#60a5fa,#2563eb)" title="Himmel"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-galaxy" style="background:linear-gradient(135deg,#0f172a,#581c87,#7c3aed,#0ea5e9)" title="Galaxie"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-rainbow" style="background:linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)" title="Regenbogen"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-mint" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0,#6ee7b7,#34d399)" title="Minze"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-peach" style="background:linear-gradient(135deg,#fed7aa,#fdba74,#fb923c,#f97316)" title="Pfirsich"></div>
-            <div class="theme-dot gradient-dot" data-theme="grad-night" style="background:linear-gradient(180deg,#0f172a,#1e293b,#334155)" title="Nacht"></div>
+      <!-- Background settings overlay -->
+      <div class="bg-overlay" id="bg-overlay">
+        <div class="bg-panel">
+          <div class="bg-header">
+            <span class="bg-header-title">🎨 Hintergrund</span>
+            <button class="bg-close" id="bg-close">✕</button>
           </div>
+          <div class="bg-body">
 
-          <p class="anim-section-title">Eigener Farbverlauf</p>
-          <div class="grad-builder" id="grad-builder">
-            <div class="grad-builder-row">
-              <label>Farben</label>
-              <div class="grad-color-inputs" id="grad-colors"></div>
-              <button class="grad-add-color" id="grad-add-color" title="Farbe hinzufügen">+</button>
+            <p class="theme-section-title">Farben</p>
+            <div class="theme-grid">
+              <div class="theme-dot" data-theme="light" style="background:#f0f4f8" title="Hell"></div>
+              <div class="theme-dot" data-theme="blue" style="background:#dbeafe" title="Blau"></div>
+              <div class="theme-dot" data-theme="green" style="background:#d1fae5" title="Grün"></div>
+              <div class="theme-dot" data-theme="purple" style="background:#ede9fe" title="Lila"></div>
+              <div class="theme-dot" data-theme="pink" style="background:#fce7f3" title="Rosa"></div>
+              <div class="theme-dot" data-theme="yellow" style="background:#fef9c3" title="Gelb"></div>
+              <div class="theme-dot" data-theme="orange" style="background:#ffedd5" title="Orange"></div>
+              <div class="theme-dot" data-theme="dark" style="background:#1a202c" title="Dunkel"></div>
+              <div class="theme-custom" id="theme-custom-wrap" title="Eigene Farbe">
+                🎨
+                <input type="color" id="custom-color-input" value="#f0f4f8" />
+              </div>
             </div>
-            <div class="grad-builder-row">
-              <label>Richtung</label>
-              <select class="grad-direction" id="grad-direction">
-                <option value="135deg">Diagonal ↘</option>
-                <option value="180deg">Oben → Unten ↓</option>
-                <option value="90deg">Links → Rechts →</option>
-                <option value="45deg">Diagonal ↗</option>
-                <option value="225deg">Diagonal ↙</option>
-                <option value="270deg">Rechts → Links ←</option>
-                <option value="0deg">Unten → Oben ↑</option>
-                <option value="circle">Kreisförmig ⊙</option>
-              </select>
-            </div>
-            <div class="grad-preview" id="grad-preview"></div>
-            <div class="grad-btn-row">
-              <button class="grad-apply" id="grad-apply">Anwenden</button>
-              <button class="grad-anim-toggle" id="grad-anim-toggle">Bewegt</button>
-            </div>
-          </div>
 
-          <p class="anim-section-title">Animation</p>
-          <div class="anim-grid">
-            <div class="anim-chip" data-anim="none">Keine</div>
-            <div class="anim-chip" data-anim="bubbles">Blasen</div>
-            <div class="anim-chip" data-anim="stars">Sterne</div>
-            <div class="anim-chip" data-anim="confetti">Konfetti</div>
-            <div class="anim-chip" data-anim="snow">Schnee</div>
-            <div class="anim-chip" data-anim="hearts">Herzen</div>
+            <p class="anim-section-title">Farbverläufe</p>
+            <div class="theme-grid">
+              <div class="theme-dot gradient-dot" data-theme="grad-sunset" style="background:linear-gradient(135deg,#f97316,#ec4899,#8b5cf6)" title="Sonnenuntergang"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-ocean" style="background:linear-gradient(135deg,#06b6d4,#3b82f6,#6366f1)" title="Ozean"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-aurora" style="background:linear-gradient(135deg,#10b981,#06b6d4,#8b5cf6)" title="Aurora"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-candy" style="background:linear-gradient(135deg,#f472b6,#c084fc,#60a5fa)" title="Candy"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-forest" style="background:linear-gradient(135deg,#065f46,#059669,#34d399)" title="Wald"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-fire" style="background:linear-gradient(135deg,#dc2626,#f97316,#fbbf24)" title="Feuer"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-sky" style="background:linear-gradient(180deg,#bfdbfe,#60a5fa,#2563eb)" title="Himmel"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-galaxy" style="background:linear-gradient(135deg,#0f172a,#581c87,#7c3aed,#0ea5e9)" title="Galaxie"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-rainbow" style="background:linear-gradient(135deg,#ef4444,#f97316,#eab308,#22c55e,#3b82f6,#8b5cf6)" title="Regenbogen"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-mint" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0,#6ee7b7,#34d399)" title="Minze"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-peach" style="background:linear-gradient(135deg,#fed7aa,#fdba74,#fb923c,#f97316)" title="Pfirsich"></div>
+              <div class="theme-dot gradient-dot" data-theme="grad-night" style="background:linear-gradient(180deg,#0f172a,#1e293b,#334155)" title="Nacht"></div>
+            </div>
+
+            <p class="anim-section-title">Eigener Farbverlauf</p>
+            <div class="grad-builder" id="grad-builder">
+              <div class="grad-builder-row">
+                <label>Farben</label>
+                <div class="grad-color-inputs" id="grad-colors"></div>
+                <button class="grad-add-color" id="grad-add-color" title="Farbe hinzufügen">+</button>
+              </div>
+              <div class="grad-builder-row">
+                <label>Richtung</label>
+                <select class="grad-direction" id="grad-direction">
+                  <option value="135deg">Diagonal ↘</option>
+                  <option value="180deg">Oben → Unten ↓</option>
+                  <option value="90deg">Links → Rechts →</option>
+                  <option value="45deg">Diagonal ↗</option>
+                  <option value="225deg">Diagonal ↙</option>
+                  <option value="270deg">Rechts → Links ←</option>
+                  <option value="0deg">Unten → Oben ↑</option>
+                  <option value="circle">Kreisförmig ⊙</option>
+                </select>
+              </div>
+              <div class="grad-preview" id="grad-preview"></div>
+              <div class="grad-btn-row">
+                <button class="grad-apply" id="grad-apply">Anwenden</button>
+                <button class="grad-anim-toggle" id="grad-anim-toggle">Bewegt</button>
+              </div>
+            </div>
+
+            <p class="anim-section-title">Partikel-Animation</p>
+            <div class="anim-grid">
+              <div class="anim-chip" data-anim="none">Keine</div>
+              <div class="anim-chip" data-anim="bubbles">Blasen</div>
+              <div class="anim-chip" data-anim="stars">Sterne</div>
+              <div class="anim-chip" data-anim="confetti">Konfetti</div>
+              <div class="anim-chip" data-anim="snow">Schnee</div>
+              <div class="anim-chip" data-anim="hearts">Herzen</div>
+              <div class="anim-chip" data-anim="leaves">Blätter</div>
+              <div class="anim-chip" data-anim="fireflies">Glühwürmchen</div>
+              <div class="anim-chip" data-anim="diamonds">Diamanten</div>
+              <div class="anim-chip" data-anim="music">Noten</div>
+              <div class="anim-chip" data-anim="rain">Regen</div>
+              <div class="anim-chip" data-anim="matrix">Matrix</div>
+              <div class="anim-chip" data-anim="sakura">Kirschblüten</div>
+              <div class="anim-chip" data-anim="lightning">Blitze</div>
+              <div class="anim-chip" data-anim="coins">Münzen</div>
+              <div class="anim-chip" data-anim="emojis">Emojis</div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -907,10 +958,10 @@ class AppShell extends HTMLElement {
         });
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
-        this.shadowRoot.getElementById("home-design").onclick = () => {
-            localStorage.setItem("appDesign", "classic");
-            location.reload();
-        };
+        // Background settings overlay
+        const bgOverlay = this.shadowRoot.getElementById("bg-overlay");
+        this.shadowRoot.getElementById("home-bg").onclick = () => bgOverlay.classList.add("active");
+        this.shadowRoot.getElementById("bg-close").onclick = () => bgOverlay.classList.remove("active");
         this.shadowRoot.getElementById("home-profile").onclick = () => {
             saveSnapshot();
             this._showProfileOverlay(false, () => location.reload());
@@ -1215,6 +1266,191 @@ class AppShell extends HTMLElement {
                 },
                 rate: 2,
             },
+            leaves: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width, y: -15,
+                    size: 8 + Math.random() * 12, speed: 0.4 + Math.random() * 0.8,
+                    drift: (Math.random() - 0.3) * 0.8, rot: Math.random() * Math.PI * 2,
+                    rotSpeed: (Math.random() - 0.5) * 0.03,
+                    wobble: Math.random() * Math.PI * 2,
+                    color: [`#22c55e`,`#16a34a`,`#f97316`,`#dc2626`,`#eab308`][Math.floor(Math.random()*5)],
+                    opacity: 0.4 + Math.random() * 0.3,
+                }),
+                update: (p) => { p.y += p.speed; p.x += p.drift + Math.sin(p.wobble += 0.015) * 0.5; p.rot += p.rotSpeed; return p.y < canvas.height + 20; },
+                draw: (p) => {
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+                    ctx.globalAlpha = p.opacity; ctx.fillStyle = p.color;
+                    ctx.beginPath(); ctx.ellipse(0, 0, p.size / 2, p.size / 4, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = p.color; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(-p.size/2, 0); ctx.lineTo(p.size/2, 0); ctx.stroke();
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 2,
+            },
+            fireflies: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                    r: 2 + Math.random() * 3, phase: Math.random() * Math.PI * 2,
+                    dx: (Math.random() - 0.5) * 0.5, dy: (Math.random() - 0.5) * 0.5,
+                    life: 200 + Math.random() * 300, age: 0,
+                }),
+                update: (p) => { p.x += p.dx + Math.sin(p.phase += 0.02) * 0.3; p.y += p.dy + Math.cos(p.phase * 0.7) * 0.3; p.age++; return p.age < p.life; },
+                draw: (p) => {
+                    const glow = Math.sin(p.age * 0.05) * 0.3 + 0.4;
+                    ctx.save(); ctx.globalAlpha = glow;
+                    ctx.shadowColor = "#fbbf24"; ctx.shadowBlur = 15;
+                    ctx.fillStyle = "#fde68a"; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 1,
+            },
+            diamonds: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width, y: -15,
+                    size: 5 + Math.random() * 8, speed: 0.3 + Math.random() * 0.5,
+                    rot: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.04,
+                    color: [`#60a5fa`,`#a78bfa`,`#f472b6`,`#34d399`,`#fbbf24`][Math.floor(Math.random()*5)],
+                    opacity: 0.3 + Math.random() * 0.3, sparkle: Math.random() * Math.PI * 2,
+                }),
+                update: (p) => { p.y += p.speed; p.rot += p.rotSpeed; p.sparkle += 0.08; return p.y < canvas.height + 20; },
+                draw: (p) => {
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+                    ctx.globalAlpha = p.opacity + Math.sin(p.sparkle) * 0.15;
+                    ctx.fillStyle = p.color; ctx.beginPath();
+                    ctx.moveTo(0, -p.size); ctx.lineTo(p.size * 0.6, 0); ctx.lineTo(0, p.size); ctx.lineTo(-p.size * 0.6, 0);
+                    ctx.closePath(); ctx.fill();
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 2,
+            },
+            music: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width, y: canvas.height + 20,
+                    size: 14 + Math.random() * 10, speed: 0.4 + Math.random() * 0.6,
+                    wobble: Math.random() * Math.PI * 2,
+                    opacity: 0.2 + Math.random() * 0.3,
+                    note: ["\u266A","\u266B","\u266C","\u2669"][Math.floor(Math.random()*4)],
+                    color: `hsl(${Math.random()*360}, 70%, 60%)`,
+                }),
+                update: (p) => { p.y -= p.speed; p.x += Math.sin(p.wobble += 0.012) * 0.5; return p.y > -30; },
+                draw: (p) => {
+                    ctx.save(); ctx.globalAlpha = p.opacity; ctx.fillStyle = p.color;
+                    ctx.font = `${p.size}px serif`; ctx.fillText(p.note, p.x, p.y);
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 2,
+            },
+            rain: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width, y: -5,
+                    len: 10 + Math.random() * 15, speed: 4 + Math.random() * 6,
+                    opacity: 0.15 + Math.random() * 0.2,
+                }),
+                update: (p) => { p.y += p.speed; p.x -= p.speed * 0.1; return p.y < canvas.height + 20; },
+                draw: (p) => {
+                    ctx.strokeStyle = `rgba(147,197,253,${p.opacity})`; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + p.len * 0.1, p.y + p.len); ctx.stroke();
+                },
+                rate: 15,
+            },
+            matrix: {
+                spawn: () => ({
+                    x: Math.floor(Math.random() * (canvas.width / 14)) * 14, y: -14,
+                    speed: 2 + Math.random() * 4,
+                    char: String.fromCharCode(0x30A0 + Math.random() * 96),
+                    opacity: 0.3 + Math.random() * 0.5, changeRate: Math.random(),
+                }),
+                update: (p) => { p.y += p.speed; if (Math.random() < 0.05) p.char = String.fromCharCode(0x30A0 + Math.random() * 96); return p.y < canvas.height + 20; },
+                draw: (p) => {
+                    ctx.save(); ctx.globalAlpha = p.opacity; ctx.fillStyle = "#22c55e";
+                    ctx.font = "14px monospace"; ctx.fillText(p.char, p.x, p.y);
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 8,
+            },
+            sakura: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width, y: -10,
+                    size: 6 + Math.random() * 8, speed: 0.3 + Math.random() * 0.5,
+                    drift: 0.2 + Math.random() * 0.4, wobble: Math.random() * Math.PI * 2,
+                    rot: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.02,
+                    opacity: 0.3 + Math.random() * 0.35,
+                    color: [`#fbcfe8`,`#f9a8d4`,`#f472b6`,`#fda4af`][Math.floor(Math.random()*4)],
+                }),
+                update: (p) => { p.y += p.speed; p.x += p.drift + Math.sin(p.wobble += 0.01) * 0.3; p.rot += p.rotSpeed; return p.y < canvas.height + 20; },
+                draw: (p) => {
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = p.opacity;
+                    ctx.fillStyle = p.color;
+                    for (let i = 0; i < 5; i++) {
+                        ctx.beginPath(); ctx.ellipse(0, -p.size/2, p.size/4, p.size/2, 0, 0, Math.PI*2); ctx.fill();
+                        ctx.rotate(Math.PI*2/5);
+                    }
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 3,
+            },
+            lightning: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width, y: 0,
+                    segments: [], opacity: 0.7 + Math.random() * 0.3,
+                    life: 8 + Math.floor(Math.random() * 6), age: 0,
+                    built: false,
+                }),
+                update: (p) => {
+                    if (!p.built) {
+                        let cx = p.x, cy = 0;
+                        for (let i = 0; i < 6 + Math.floor(Math.random()*4); i++) {
+                            const nx = cx + (Math.random()-0.5) * 60;
+                            const ny = cy + 30 + Math.random() * 50;
+                            p.segments.push({x1:cx,y1:cy,x2:nx,y2:ny});
+                            cx = nx; cy = ny;
+                        }
+                        p.built = true;
+                    }
+                    p.age++; return p.age < p.life;
+                },
+                draw: (p) => {
+                    ctx.save(); ctx.globalAlpha = p.opacity * (1 - p.age / p.life);
+                    ctx.strokeStyle = "#fef08a"; ctx.lineWidth = 2; ctx.shadowColor = "#fef08a"; ctx.shadowBlur = 10;
+                    ctx.beginPath();
+                    p.segments.forEach(s => { ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2); });
+                    ctx.stroke(); ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 0.3,
+            },
+            coins: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width, y: -15,
+                    size: 8 + Math.random() * 6, speed: 0.5 + Math.random() * 0.8,
+                    wobble: Math.random() * Math.PI * 2, opacity: 0.4 + Math.random() * 0.3,
+                    phase: Math.random() * Math.PI * 2,
+                }),
+                update: (p) => { p.y += p.speed; p.x += Math.sin(p.wobble += 0.01) * 0.3; p.phase += 0.06; return p.y < canvas.height + 20; },
+                draw: (p) => {
+                    const squeeze = Math.abs(Math.cos(p.phase));
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.globalAlpha = p.opacity;
+                    ctx.fillStyle = "#fbbf24"; ctx.beginPath(); ctx.ellipse(0, 0, p.size * squeeze, p.size, 0, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = "#f59e0b"; ctx.font = `bold ${p.size}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                    if (squeeze > 0.3) ctx.fillText("$", 0, 1);
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 2,
+            },
+            emojis: {
+                spawn: () => ({
+                    x: Math.random() * canvas.width, y: -20,
+                    size: 16 + Math.random() * 14, speed: 0.3 + Math.random() * 0.6,
+                    wobble: Math.random() * Math.PI * 2, opacity: 0.3 + Math.random() * 0.3,
+                    rot: (Math.random() - 0.5) * 0.5, rotSpeed: (Math.random() - 0.5) * 0.01,
+                    emoji: ["\u{1F60A}","\u{1F389}","\u{2B50}","\u{1F525}","\u{1F308}","\u{1F680}","\u{1F381}","\u{1F4A1}","\u{1F3B5}","\u{1F338}","\u{1F98B}","\u{1F30D}"][Math.floor(Math.random()*12)],
+                }),
+                update: (p) => { p.y += p.speed; p.x += Math.sin(p.wobble += 0.008) * 0.4; p.rot += p.rotSpeed; return p.y < canvas.height + 30; },
+                draw: (p) => {
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = p.opacity;
+                    ctx.font = `${p.size}px serif`; ctx.fillText(p.emoji, 0, 0);
+                    ctx.restore(); ctx.globalAlpha = 1;
+                },
+                rate: 2,
+            },
         };
 
         let currentAnim = null;
@@ -1233,7 +1469,7 @@ class AppShell extends HTMLElement {
                 }
                 particles = particles.filter(p => currentAnim.update(p));
                 particles.forEach(p => currentAnim.draw(p));
-                if (particles.length > 150) particles.splice(0, particles.length - 150);
+                if (particles.length > 300) particles.splice(0, particles.length - 300);
                 animId = requestAnimationFrame(loop);
             };
             loop();
