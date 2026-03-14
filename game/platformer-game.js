@@ -308,6 +308,8 @@ class PlatformerGame extends HTMLElement {
 
         // move Y
         this._py += this._pvy * dt;
+        // Check ? blocks BEFORE collision resolution pushes player away
+        this._checkQBlocks();
         this._resolveCollisionsY();
 
         // fell off - don't die, respawn at start of current section
@@ -346,36 +348,9 @@ class PlatformerGame extends HTMLElement {
             }
         }
 
-        // question blocks (hit from below)
+        // question blocks bounce animation
         for (const qb of this._qBlocks) {
-            if (qb.hit) continue;
             if (qb.bounceY > 0) qb.bounceY = Math.max(0, qb.bounceY - dt * 40);
-            if (this._pvy < 0 && this._overlaps(this._px, this._py, pw, ph, qb.x, qb.y, qb.w, qb.h)) {
-                if (this._py + ph > qb.y + qb.h * 0.5) {
-                    qb.hit = true;
-                    qb.bounceY = 8;
-                    this._pvy = 40;
-
-                    if (Math.random() < 0.35) {
-                        // Spawn a power-up!
-                        const pu = POWERUPS[Math.floor(Math.random() * POWERUPS.length)];
-                        this._powerupItems.push({
-                            x: qb.x + 2, y: qb.y - TILE, w: 20, h: 20,
-                            vy: -80, onGround: false,
-                            type: pu.type, emoji: pu.emoji, label: pu.label,
-                            color: pu.color, duration: pu.duration,
-                            bobPhase: 0,
-                        });
-                        this._popups.push({ x: qb.x, y: qb.y - 20, text: pu.label + "!", life: 1.5 });
-                    } else {
-                        // Normal coin
-                        this._score += 10;
-                        this._coins++;
-                        this._spawnCoinParticles(qb.x + qb.w / 2, qb.y - 10);
-                        this._popups.push({ x: qb.x, y: qb.y - 15, text: "+10", life: 1 });
-                    }
-                }
-            }
         }
 
         // power-up items physics
@@ -500,6 +475,38 @@ class PlatformerGame extends HTMLElement {
                 } else if (this._pvy < 0) {
                     this._py = t.y + t.h;
                     this._pvy = 0;
+                }
+            }
+        }
+    }
+
+    _checkQBlocks() {
+        const pw = 20, ph = 24;
+        for (const qb of this._qBlocks) {
+            if (qb.hit) continue;
+            // Player moving upward and head hits the block from below
+            if (this._pvy < 0 && this._overlaps(this._px, this._py, pw, ph, qb.x, qb.y, qb.w, qb.h)) {
+                qb.hit = true;
+                qb.bounceY = 8;
+                this._pvy = 40;
+
+                if (Math.random() < 0.5) {
+                    // Spawn a power-up!
+                    const pu = POWERUPS[Math.floor(Math.random() * POWERUPS.length)];
+                    this._powerupItems.push({
+                        x: qb.x + 2, y: qb.y - TILE, w: 20, h: 20,
+                        vy: -80, onGround: false,
+                        type: pu.type, emoji: pu.emoji, label: pu.label,
+                        color: pu.color, duration: pu.duration,
+                        bobPhase: 0,
+                    });
+                    this._popups.push({ x: qb.x, y: qb.y - 20, text: pu.label + "!", life: 1.5 });
+                } else {
+                    // Normal coin
+                    this._score += 10;
+                    this._coins++;
+                    this._spawnCoinParticles(qb.x + qb.w / 2, qb.y - 10);
+                    this._popups.push({ x: qb.x, y: qb.y - 15, text: "+10", life: 1 });
                 }
             }
         }
