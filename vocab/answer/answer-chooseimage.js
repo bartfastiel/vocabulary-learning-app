@@ -77,11 +77,12 @@ class VocabAnswerChooseImage extends HTMLElement {
 
         const optionsDiv = this.shadowRoot.querySelector(".options");
         const nextBtn = this.shadowRoot.querySelector("next-button");
+        let wasCorrect = false;
 
         nextBtn.addEventListener("next", () => {
             this.dispatchEvent(new CustomEvent("answered", {
                 bubbles: true,
-                detail: { correct: true }
+                detail: { correct: wasCorrect }
             }));
         });
 
@@ -100,6 +101,7 @@ class VocabAnswerChooseImage extends HTMLElement {
 
             btn.onclick = () => {
                 const isCorrect = opt.en.toLowerCase() === correct;
+                wasCorrect = isCorrect;
                 btn.classList.add(isCorrect ? "correct" : "wrong");
                 (isCorrect ? this.soundCorrect : this.soundWrong).play();
                 playVoice(this.word.en);

@@ -544,6 +544,10 @@ class AppShell extends HTMLElement {
             <span class="action-icon">🚀</span>
             <span class="action-label">Klassisch</span>
           </button>
+          <button class="action-card" id="home-profile">
+            <span class="action-icon">🔄</span>
+            <span class="action-label">Profil</span>
+          </button>
         </div>
 
         <div class="theme-section">
@@ -765,19 +769,37 @@ class AppShell extends HTMLElement {
         const vocabEditor = this.shadowRoot.querySelector("vocab-editor");
         this.shadowRoot.getElementById("home-vocab-edit").onclick = () => vocabEditor.open();
         vocabEditor.onSaved = () => {
-            if (this._trainers.englisch) {
-                this._trainers.englisch.reload();
-                this._trainers.englisch.togglePopup?.(true);
+            // Reload all vocab trainers so custom lists appear under the right subject
+            for (const key of Object.keys(this._trainers)) {
+                const t = this._trainers[key];
+                if (t.tagName === "VOCAB-TRAINER" && typeof t.reload === "function") {
+                    t.reload();
+                    t.togglePopup?.(true);
+                }
             }
         };
         vocabEditor.addEventListener("vocab-updated", () => {
-            if (this._trainers.englisch) this._trainers.englisch.reload();
+            for (const key of Object.keys(this._trainers)) {
+                const t = this._trainers[key];
+                if (t.tagName === "VOCAB-TRAINER" && typeof t.reload === "function") {
+                    t.reload();
+                }
+            }
         });
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
         this.shadowRoot.getElementById("home-design").onclick = () => {
             localStorage.setItem("appDesign", "classic");
             location.reload();
+        };
+        this.shadowRoot.getElementById("home-profile").onclick = () => {
+            saveSnapshot();
+            const overlay = this.shadowRoot.getElementById("profile-overlay");
+            const grid = this.shadowRoot.getElementById("profile-grid");
+            this.shadowRoot.getElementById("profile-pick-view").hidden = false;
+            this.shadowRoot.getElementById("profile-new-view").hidden = true;
+            this._renderProfileGrid(grid, (id) => { activateProfile(id); location.reload(); });
+            overlay.classList.remove("hidden");
         };
         this.shadowRoot.getElementById("info-btn").onclick = () => this.startHelp(help);
 
@@ -1016,11 +1038,9 @@ class AppShell extends HTMLElement {
         // Lazy create trainer or reuse
         if (!this._trainers[subject]) {
             const el = document.createElement(s.tag);
-            if (el.points !== undefined || subject !== "englisch") {
-                el.points = this._pointsManager;
-            } else {
-                // vocab-trainer uses .points setter
-                el.points = this._pointsManager;
+            el.points = this._pointsManager;
+            if (s.tag === "vocab-trainer") {
+                el._subject = subject;
             }
             this._trainers[subject] = el;
         }

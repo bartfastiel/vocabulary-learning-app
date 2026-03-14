@@ -130,6 +130,14 @@ class VocabEditor extends HTMLElement {
         }
         input[type=text]:focus { border-color: #4dd0e1; }
 
+        select {
+          width: 100%; padding: 0.6rem 0.8rem; border: 2px solid #e0e0e0;
+          border-radius: 8px; font-size: 0.95rem; outline: none;
+          transition: border-color 0.15s; background: white;
+          cursor: pointer;
+        }
+        select:focus { border-color: #4dd0e1; }
+
         .quick-textarea {
           width: 100%; min-height: 220px; padding: 0.7rem 0.8rem;
           border: 2px solid #e0e0e0; border-radius: 8px;
@@ -263,6 +271,14 @@ class VocabEditor extends HTMLElement {
                 <input id="lesson-name-input" type="text" placeholder="z.B. Meine Wörter"
                        autocomplete="off" autocorrect="off" spellcheck="false"/>
               </div>
+              <div>
+                <label for="lesson-subject-select">Fach</label>
+                <select id="lesson-subject-select">
+                  <option value="englisch">Englisch</option>
+                  <option value="mathe">Mathe</option>
+                  <option value="deutsch">Deutsch</option>
+                </select>
+              </div>
               <hr class="divider"/>
               <div class="section-title">Wörter eingeben</div>
               <textarea id="quick-input" class="quick-textarea"
@@ -358,10 +374,12 @@ class VocabEditor extends HTMLElement {
             this._data.forEach((lesson, i) => {
                 const row = document.createElement("div");
                 row.className = "lesson-item";
+                const subjectLabels = { englisch: "Englisch", mathe: "Mathe", deutsch: "Deutsch" };
+                const subjectLabel = subjectLabels[lesson.subject] || "Englisch";
                 row.innerHTML = `
           <div class="lesson-info">
             <div class="lesson-name">${this._esc(lesson.name || "Unbenannte Lektion")}</div>
-            <div class="lesson-count">${lesson.words.length} Wörter</div>
+            <div class="lesson-count">${lesson.words.length} Wörter · ${subjectLabel}</div>
           </div>
           <button class="btn-icon" title="Bearbeiten">✏️</button>
           <button class="btn-icon del" title="Löschen">🗑</button>`;
@@ -401,6 +419,7 @@ class VocabEditor extends HTMLElement {
         this.shadowRoot.getElementById("edit-header-title").textContent =
             isNew ? "Neue Lektion" : lesson.name || "Lektion";
         this.shadowRoot.getElementById("lesson-name-input").value = lesson.name;
+        this.shadowRoot.getElementById("lesson-subject-select").value = lesson.subject || "englisch";
         this.shadowRoot.getElementById("btn-del-lesson").hidden = isNew;
 
         // Fill textarea with existing words
@@ -436,7 +455,8 @@ class VocabEditor extends HTMLElement {
             alert("Füge mindestens ein Wortpaar hinzu.\nFormat: Hund = dog");
             return;
         }
-        const lesson = { name, words };
+        const subject = this.shadowRoot.getElementById("lesson-subject-select").value;
+        const lesson = { name, words, subject };
         if (this._editIdx === -1) {
             this._data.push(lesson);
         } else {

@@ -86,6 +86,26 @@ function shuffle(arr) {
     return arr.sort(() => Math.random() - 0.5);
 }
 
+// === MASCOT MESSAGES ===
+const MASCOT_CORRECT = [
+    "Super gemacht! 🎉", "Richtig! Weiter so! 💪", "Genau! Du bist toll! ⭐",
+    "Perfekt! 👏", "Klasse! Das sitzt! 🔥", "Yeah! Volltreffer! 🎯",
+    "Wow, du kannst das! 🌟", "Stark! Weiter so! 💫",
+];
+const MASCOT_WRONG = [
+    "Nicht schlimm, versuch's nochmal! 💪", "Fast! Nächstes Mal klappt's! 🍀",
+    "Kopf hoch! Übung macht den Meister! 📚", "Das wird schon! Bleib dran! 💪",
+];
+const MASCOT_STREAK = [
+    { min: 3, msg: "3er Streak! Du bist auf Kurs! 🚀" },
+    { min: 5, msg: "5er Streak! Unaufhaltsam! 🔥" },
+    { min: 10, msg: "10er Streak! Du bist ein Profi! 🏆" },
+    { min: 15, msg: "15er Streak! Einfach unglaublich! 🌈" },
+    { min: 20, msg: "20er Streak! LEGENDÄR! 👑" },
+];
+
+function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
 // === COMPONENT ===
 class VocabTrainer extends HTMLElement {
     constructor() {
@@ -94,6 +114,11 @@ class VocabTrainer extends HTMLElement {
         this.vocabSets = [];
         this.vocab = [];
         this.index = 0;
+        // lesson stats
+        this._correct = 0;
+        this._wrong = 0;
+        this._bestStreak = 0;
+        this._currentStreak = 0;
     }
 
     connectedCallback() {
@@ -157,6 +182,91 @@ class VocabTrainer extends HTMLElement {
           display: flex; flex-direction: column; justify-content: space-between;
         }
 
+        /* Mascot */
+        .mascot {
+          display: flex; align-items: center; gap: 0.6rem;
+          background: rgba(14,165,233,0.15);
+          border: 1px solid rgba(56,189,248,0.3);
+          border-radius: 12px; padding: 0.5rem 0.8rem;
+          margin-bottom: 0.8rem; min-height: 48px;
+          transition: all 0.3s ease;
+        }
+        .mascot-face {
+          font-size: 2rem; flex-shrink: 0;
+          animation: mascot-bounce 0.6s ease;
+        }
+        .mascot-bubble {
+          font-size: 0.85rem; color: #bae6fd;
+          line-height: 1.3; text-align: left;
+        }
+        .mascot.correct { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.4); }
+        .mascot.wrong { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); }
+        .mascot.streak { background: rgba(251,191,36,0.2); border-color: rgba(251,191,36,0.4); }
+        @keyframes mascot-bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+
+        /* Progress bar */
+        .progress-wrap {
+          width: 100%; height: 6px; background: rgba(56,189,248,0.15);
+          border-radius: 3px; margin-bottom: 0.6rem; overflow: hidden;
+        }
+        .progress-bar {
+          height: 100%; background: linear-gradient(90deg, #38bdf8, #22d3ee);
+          border-radius: 3px; transition: width 0.4s ease;
+        }
+
+        /* Summary overlay */
+        .summary-overlay {
+          position: fixed; inset: 0; z-index: 300;
+          background: rgba(0,5,15,0.85);
+          backdrop-filter: blur(10px);
+          display: flex; align-items: center; justify-content: center;
+        }
+        .summary-overlay.hidden { display: none; }
+        .summary-box {
+          background: linear-gradient(135deg, rgba(3,60,110,0.95), rgba(7,100,160,0.95));
+          border: 1px solid rgba(56,189,248,0.5);
+          border-radius: 20px; padding: 2rem 1.5rem;
+          width: 340px; max-width: 92vw; text-align: center;
+          box-shadow: 0 0 40px rgba(14,165,233,0.4);
+          color: #e0f2fe;
+        }
+        .summary-box h2 {
+          font-size: 1.5rem; margin: 0 0 0.3rem;
+          color: #38bdf8;
+        }
+        .summary-sub { color: #7dd3fc; font-size: 0.9rem; margin: 0 0 1.2rem; }
+        .summary-trophy { font-size: 4rem; margin-bottom: 0.8rem; }
+        .summary-stats {
+          display: flex; gap: 0.6rem; justify-content: center;
+          margin-bottom: 1.2rem;
+        }
+        .summary-stat {
+          flex: 1; background: rgba(14,165,233,0.15);
+          border: 1px solid rgba(56,189,248,0.3);
+          border-radius: 12px; padding: 0.7rem 0.4rem;
+        }
+        .summary-stat-value {
+          font-size: 1.6rem; font-weight: 800;
+        }
+        .summary-stat-value.green { color: #4ade80; }
+        .summary-stat-value.red { color: #f87171; }
+        .summary-stat-value.gold { color: #fbbf24; }
+        .summary-stat-value.blue { color: #38bdf8; }
+        .summary-stat-label {
+          font-size: 0.7rem; color: #7dd3fc; margin-top: 0.2rem;
+        }
+        .summary-btn {
+          width: 100%; padding: 0.8rem;
+          background: linear-gradient(90deg, #0ea5e9, #22d3ee);
+          border: none; border-radius: 12px;
+          color: white; font-size: 1rem; font-weight: 700;
+          cursor: pointer; transition: filter 0.2s;
+        }
+        .summary-btn:hover { filter: brightness(1.15); }
+
         /* Popup */
         .lesson-popup {
           position: fixed; top: 50%; left: 50%;
@@ -218,8 +328,43 @@ class VocabTrainer extends HTMLElement {
 
       <!-- Main white box -->
       <div id="quiz-box">
+        <div class="mascot" id="mascot">
+          <span class="mascot-face" id="mascot-face">🦉</span>
+          <span class="mascot-bubble" id="mascot-bubble">Los geht's! Du schaffst das!</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+        </div>
         <div id="question"></div>
         <div id="answer"></div>
+      </div>
+
+      <!-- Summary overlay -->
+      <div class="summary-overlay hidden" id="summary-overlay">
+        <div class="summary-box">
+          <div class="summary-trophy" id="summary-trophy">🏆</div>
+          <h2 id="summary-title">Lektion geschafft!</h2>
+          <p class="summary-sub" id="summary-sub"></p>
+          <div class="summary-stats">
+            <div class="summary-stat">
+              <div class="summary-stat-value green" id="sum-correct">0</div>
+              <div class="summary-stat-label">Richtig</div>
+            </div>
+            <div class="summary-stat">
+              <div class="summary-stat-value red" id="sum-wrong">0</div>
+              <div class="summary-stat-label">Falsch</div>
+            </div>
+            <div class="summary-stat">
+              <div class="summary-stat-value gold" id="sum-streak">0</div>
+              <div class="summary-stat-label">Bester Streak</div>
+            </div>
+            <div class="summary-stat">
+              <div class="summary-stat-value blue" id="sum-percent">0%</div>
+              <div class="summary-stat-label">Ergebnis</div>
+            </div>
+          </div>
+          <button class="summary-btn" id="summary-btn">Nochmal spielen</button>
+        </div>
       </div>
 
       <!-- Popup and overlay -->
@@ -258,7 +403,8 @@ class VocabTrainer extends HTMLElement {
     async loadSets() {
         try {
             const data = await fetch(`vocab/vocab.json`).then(r => r.json());
-            this._builtinSets = data;
+            // Built-in vocab sets only show for the "englisch" subject
+            this._builtinSets = (this._subject || "englisch") === "englisch" ? data : [];
             this._mergeAndRender();
         } catch (err) {
             this.shadowRoot.querySelector("#question").textContent =
@@ -268,7 +414,11 @@ class VocabTrainer extends HTMLElement {
     }
 
     _loadCustom() {
-        try { return JSON.parse(localStorage.getItem("customVocab") || "[]"); } catch { return []; }
+        try {
+            const all = JSON.parse(localStorage.getItem("customVocab") || "[]");
+            const subject = this._subject || "englisch";
+            return all.filter(s => (s.subject || "englisch") === subject);
+        } catch { return []; }
     }
 
     _mergeAndRender(keepCurrentSet = false) {
@@ -317,26 +467,33 @@ class VocabTrainer extends HTMLElement {
         this.currentSet = this.vocabSets[index];
         this.vocab = shuffle([...this.currentSet.words]);
         this.index = 0;
+        this._correct = 0;
+        this._wrong = 0;
+        this._bestStreak = 0;
+        this._currentStreak = 0;
+        this._setMascot("🦉", "Los geht's! Du schaffst das!");
+        this._updateProgress();
         this.updateHeaderTitle(this.currentSet.name);
         this.nextRound();
     }
 
     nextRound() {
         if (this.index >= this.vocab.length) {
-            alert(`Alle Vokabeln aus „${this.currentSet.name}“ geschafft!`);
-            this.index = 0;
-            this.vocab = shuffle(this.vocab);
+            this._showSummary();
+            return;
         }
+
+        this._updateProgress();
 
         const word = this.vocab[this.index];
         const needsDistractors = [
-            "vocab-answer-choosewordenglish",
-            "vocab-answer-choosewordgerman",
-            "vocab-answer-choosevoiceenglish",
-            "vocab-answer-chooseimage",
+            “vocab-answer-choosewordenglish”,
+            “vocab-answer-choosewordgerman”,
+            “vocab-answer-choosevoiceenglish”,
+            “vocab-answer-chooseimage”,
         ];
         const availableModes = MODES.filter(mode => {
-            if (!word.allowImage && (mode.question === "vocab-question-image" || mode.answer === "vocab-answer-chooseimage")) return false;
+            if (!word.allowImage && (mode.question === “vocab-question-image” || mode.answer === “vocab-answer-chooseimage”)) return false;
             if (this.vocab.length < 4 && needsDistractors.includes(mode.answer)) return false;
             return true;
         });
@@ -351,21 +508,97 @@ class VocabTrainer extends HTMLElement {
             vocabulary: this.vocab,
             updatePoints: delta => this.points?.updatePoints(delta),
             updateStreak: correct => this.points?.updateStreak(correct),
-            soundCorrect: new Audio("assets/audio/ding.mp3"),
-            soundWrong: new Audio("assets/audio/buzz.mp3")
+            soundCorrect: new Audio(“assets/audio/ding.mp3”),
+            soundWrong: new Audio(“assets/audio/buzz.mp3”)
         };
 
-        const questionHost = this.shadowRoot.querySelector("#question");
-        const answerHost = this.shadowRoot.querySelector("#answer");
-        questionHost.innerHTML = "";
-        answerHost.innerHTML = "";
+        const questionHost = this.shadowRoot.querySelector(“#question”);
+        const answerHost = this.shadowRoot.querySelector(“#answer”);
+        questionHost.innerHTML = “”;
+        answerHost.innerHTML = “”;
         questionHost.append(qEl);
         answerHost.append(aEl);
 
-        aEl.addEventListener("answered", () => {
+        aEl.addEventListener(“answered”, (e) => {
+            const isCorrect = e.detail?.correct;
+            if (isCorrect) {
+                this._correct++;
+                this._currentStreak++;
+                if (this._currentStreak > this._bestStreak) this._bestStreak = this._currentStreak;
+                // Check streak milestone first
+                const streakMsg = [...MASCOT_STREAK].reverse().find(s => this._currentStreak === s.min);
+                if (streakMsg) {
+                    this._setMascot(“🔥”, streakMsg.msg, “streak”);
+                } else {
+                    this._setMascot(“😄”, randomFrom(MASCOT_CORRECT), “correct”);
+                }
+            } else {
+                this._wrong++;
+                this._currentStreak = 0;
+                this._setMascot(“🤗”, randomFrom(MASCOT_WRONG), “wrong”);
+            }
             this.index++;
             this.nextRound();
         });
+    }
+
+    _setMascot(face, text, mood = “”) {
+        const mascot = this.shadowRoot.getElementById(“mascot”);
+        const faceEl = this.shadowRoot.getElementById(“mascot-face”);
+        const bubbleEl = this.shadowRoot.getElementById(“mascot-bubble”);
+        mascot.className = “mascot” + (mood ? ` ${mood}` : “”);
+        faceEl.textContent = face;
+        bubbleEl.textContent = text;
+        // re-trigger bounce animation
+        faceEl.style.animation = “none”;
+        faceEl.offsetHeight; // reflow
+        faceEl.style.animation = “”;
+    }
+
+    _updateProgress() {
+        const bar = this.shadowRoot.getElementById(“progress-bar”);
+        if (bar && this.vocab.length > 0) {
+            bar.style.width = `${(this.index / this.vocab.length) * 100}%`;
+        }
+    }
+
+    _showSummary() {
+        const total = this._correct + this._wrong;
+        const percent = total > 0 ? Math.round((this._correct / total) * 100) : 0;
+
+        this.shadowRoot.getElementById(“sum-correct”).textContent = this._correct;
+        this.shadowRoot.getElementById(“sum-wrong”).textContent = this._wrong;
+        this.shadowRoot.getElementById(“sum-streak”).textContent = this._bestStreak;
+        this.shadowRoot.getElementById(“sum-percent”).textContent = `${percent}%`;
+        this.shadowRoot.getElementById(“summary-sub”).textContent =
+            `„${this.currentSet.name}” — ${total} Vokabeln`;
+
+        // Trophy based on performance
+        let trophy = “🏆”;
+        let title = “Lektion geschafft!”;
+        if (percent === 100) { trophy = “👑”; title = “Perfekt! Alle richtig!”; }
+        else if (percent >= 80) { trophy = “🌟”; title = “Super gemacht!”; }
+        else if (percent >= 50) { trophy = “💪”; title = “Gut gemacht!”; }
+        else { trophy = “📚”; title = “Weiter lernen!”; }
+
+        this.shadowRoot.getElementById(“summary-trophy”).textContent = trophy;
+        this.shadowRoot.getElementById(“summary-title”).textContent = title;
+
+        const overlay = this.shadowRoot.getElementById(“summary-overlay”);
+        overlay.classList.remove(“hidden”);
+
+        this.shadowRoot.getElementById(“summary-btn”).onclick = () => {
+            overlay.classList.add(“hidden”);
+            this._updateProgress();
+            this.index = 0;
+            this._correct = 0;
+            this._wrong = 0;
+            this._bestStreak = 0;
+            this._currentStreak = 0;
+            this.vocab = shuffle(this.vocab);
+            this._setMascot(“🦉”, “Neue Runde! Du schaffst das!”);
+            this.nextRound();
+        };
     }
 }
 

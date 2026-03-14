@@ -61,11 +61,12 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
 
         const optionsDiv = this.shadowRoot.querySelector(".options");
         const nextBtn = this.shadowRoot.querySelector("next-button");
+        let wasCorrect = false;
 
         nextBtn.addEventListener("next", () => {
             this.dispatchEvent(new CustomEvent("answered", {
                 bubbles: true,
-                detail: { correct: true }
+                detail: { correct: wasCorrect }
             }));
         });
 
@@ -75,6 +76,7 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
             btn.textContent = opt;
             btn.onclick = () => {
                 const isCorrect = opt === correct;
+                wasCorrect = isCorrect;
                 btn.classList.add(isCorrect ? "correct" : "wrong");
                 (isCorrect ? this.soundCorrect : this.soundWrong).play();
                 playVoice(this.word.en);

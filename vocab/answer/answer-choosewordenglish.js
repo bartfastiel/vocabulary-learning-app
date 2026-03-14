@@ -58,11 +58,12 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
 
         const optionsDiv = this.shadowRoot.querySelector(".options");
         const nextBtn = this.shadowRoot.querySelector("next-button");
+        let wasCorrect = false;
 
         nextBtn.addEventListener("next", () => {
             this.dispatchEvent(new CustomEvent("answered", {
                 bubbles: true,
-                detail: {correct: true}
+                detail: {correct: wasCorrect}
             }));
         });
 
@@ -72,6 +73,7 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
             b.textContent = opt;
             b.onclick = () => {
                 const isCorrect = opt === correct;
+                wasCorrect = isCorrect;
                 b.classList.add(isCorrect ? "correct" : "wrong");
                 (isCorrect ? this.soundCorrect : this.soundWrong).play();
                 this.updatePoints(isCorrect ? 1 : -1);

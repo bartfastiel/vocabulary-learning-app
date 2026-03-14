@@ -94,11 +94,13 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
         });
 
         let answered = false;
+        let wasCorrect = false;
         button.onclick = () => {
             if (!answered) {
                 answered = true;
                 const user = input.value.trim().toLowerCase();
                 const isCorrect = user === correct;
+                wasCorrect = isCorrect;
                 input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
                 (isCorrect ? this.soundCorrect : this.soundWrong).play();
                 playVoice(this.word.en);
@@ -115,7 +117,7 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
             } else {
                 this.dispatchEvent(new CustomEvent("answered", {
                     bubbles: true,
-                    detail: { correct: true }
+                    detail: { correct: wasCorrect }
                 }));
             }
         };

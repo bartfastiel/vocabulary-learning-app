@@ -1403,7 +1403,7 @@
     ]
   },
   {
-    "name": "Unit 3",
+    "name": "Unit 3 - Vorträge",
     "words": [
       {
         "de": "die dort, jene (dort)",
@@ -1450,7 +1450,12 @@
         "de": "lächeln",
         "en": "smile",
         "allowImage": true
-      },
+      }
+    ]
+  },
+  {
+    "name": "Unit 3 - Einkaufen & Essen",
+    "words": [
       {
         "de": "Land",
         "en": "country",
