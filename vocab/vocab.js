@@ -487,13 +487,13 @@ class VocabTrainer extends HTMLElement {
 
         const word = this.vocab[this.index];
         const needsDistractors = [
-            “vocab-answer-choosewordenglish”,
-            “vocab-answer-choosewordgerman”,
-            “vocab-answer-choosevoiceenglish”,
-            “vocab-answer-chooseimage”,
+            "vocab-answer-choosewordenglish",
+            "vocab-answer-choosewordgerman",
+            "vocab-answer-choosevoiceenglish",
+            "vocab-answer-chooseimage",
         ];
         const availableModes = MODES.filter(mode => {
-            if (!word.allowImage && (mode.question === “vocab-question-image” || mode.answer === “vocab-answer-chooseimage”)) return false;
+            if (!word.allowImage && (mode.question === "vocab-question-image" || mode.answer === "vocab-answer-chooseimage")) return false;
             if (this.vocab.length < 4 && needsDistractors.includes(mode.answer)) return false;
             return true;
         });
@@ -508,18 +508,18 @@ class VocabTrainer extends HTMLElement {
             vocabulary: this.vocab,
             updatePoints: delta => this.points?.updatePoints(delta),
             updateStreak: correct => this.points?.updateStreak(correct),
-            soundCorrect: new Audio(“assets/audio/ding.mp3”),
-            soundWrong: new Audio(“assets/audio/buzz.mp3”)
+            soundCorrect: new Audio("assets/audio/ding.mp3"),
+            soundWrong: new Audio("assets/audio/buzz.mp3")
         };
 
-        const questionHost = this.shadowRoot.querySelector(“#question”);
-        const answerHost = this.shadowRoot.querySelector(“#answer”);
-        questionHost.innerHTML = “”;
-        answerHost.innerHTML = “”;
+        const questionHost = this.shadowRoot.querySelector("#question");
+        const answerHost = this.shadowRoot.querySelector("#answer");
+        questionHost.innerHTML = "";
+        answerHost.innerHTML = "";
         questionHost.append(qEl);
         answerHost.append(aEl);
 
-        aEl.addEventListener(“answered”, (e) => {
+        aEl.addEventListener("answered", (e) => {
             const isCorrect = e.detail?.correct;
             if (isCorrect) {
                 this._correct++;
@@ -528,35 +528,35 @@ class VocabTrainer extends HTMLElement {
                 // Check streak milestone first
                 const streakMsg = [...MASCOT_STREAK].reverse().find(s => this._currentStreak === s.min);
                 if (streakMsg) {
-                    this._setMascot(“🔥”, streakMsg.msg, “streak”);
+                    this._setMascot("🔥", streakMsg.msg, "streak");
                 } else {
-                    this._setMascot(“😄”, randomFrom(MASCOT_CORRECT), “correct”);
+                    this._setMascot("😄", randomFrom(MASCOT_CORRECT), "correct");
                 }
             } else {
                 this._wrong++;
                 this._currentStreak = 0;
-                this._setMascot(“🤗”, randomFrom(MASCOT_WRONG), “wrong”);
+                this._setMascot("🤗", randomFrom(MASCOT_WRONG), "wrong");
             }
             this.index++;
             this.nextRound();
         });
     }
 
-    _setMascot(face, text, mood = “”) {
-        const mascot = this.shadowRoot.getElementById(“mascot”);
-        const faceEl = this.shadowRoot.getElementById(“mascot-face”);
-        const bubbleEl = this.shadowRoot.getElementById(“mascot-bubble”);
-        mascot.className = “mascot” + (mood ? ` ${mood}` : “”);
+    _setMascot(face, text, mood = "") {
+        const mascot = this.shadowRoot.getElementById("mascot");
+        const faceEl = this.shadowRoot.getElementById("mascot-face");
+        const bubbleEl = this.shadowRoot.getElementById("mascot-bubble");
+        mascot.className = "mascot" + (mood ? ` ${mood}` : "");
         faceEl.textContent = face;
         bubbleEl.textContent = text;
         // re-trigger bounce animation
-        faceEl.style.animation = “none”;
+        faceEl.style.animation = "none";
         faceEl.offsetHeight; // reflow
-        faceEl.style.animation = “”;
+        faceEl.style.animation = "";
     }
 
     _updateProgress() {
-        const bar = this.shadowRoot.getElementById(“progress-bar”);
+        const bar = this.shadowRoot.getElementById("progress-bar");
         if (bar && this.vocab.length > 0) {
             bar.style.width = `${(this.index / this.vocab.length) * 100}%`;
         }
@@ -566,29 +566,29 @@ class VocabTrainer extends HTMLElement {
         const total = this._correct + this._wrong;
         const percent = total > 0 ? Math.round((this._correct / total) * 100) : 0;
 
-        this.shadowRoot.getElementById(“sum-correct”).textContent = this._correct;
-        this.shadowRoot.getElementById(“sum-wrong”).textContent = this._wrong;
-        this.shadowRoot.getElementById(“sum-streak”).textContent = this._bestStreak;
-        this.shadowRoot.getElementById(“sum-percent”).textContent = `${percent}%`;
-        this.shadowRoot.getElementById(“summary-sub”).textContent =
-            `„${this.currentSet.name}” — ${total} Vokabeln`;
+        this.shadowRoot.getElementById("sum-correct").textContent = this._correct;
+        this.shadowRoot.getElementById("sum-wrong").textContent = this._wrong;
+        this.shadowRoot.getElementById("sum-streak").textContent = this._bestStreak;
+        this.shadowRoot.getElementById("sum-percent").textContent = `${percent}%`;
+        this.shadowRoot.getElementById("summary-sub").textContent =
+            `„${this.currentSet.name}" — ${total} Vokabeln`;
 
         // Trophy based on performance
-        let trophy = “🏆”;
-        let title = “Lektion geschafft!”;
-        if (percent === 100) { trophy = “👑”; title = “Perfekt! Alle richtig!”; }
-        else if (percent >= 80) { trophy = “🌟”; title = “Super gemacht!”; }
-        else if (percent >= 50) { trophy = “💪”; title = “Gut gemacht!”; }
-        else { trophy = “📚”; title = “Weiter lernen!”; }
+        let trophy = "🏆";
+        let title = "Lektion geschafft!";
+        if (percent === 100) { trophy = "👑"; title = "Perfekt! Alle richtig!"; }
+        else if (percent >= 80) { trophy = "🌟"; title = "Super gemacht!"; }
+        else if (percent >= 50) { trophy = "💪"; title = "Gut gemacht!"; }
+        else { trophy = "📚"; title = "Weiter lernen!"; }
 
-        this.shadowRoot.getElementById(“summary-trophy”).textContent = trophy;
-        this.shadowRoot.getElementById(“summary-title”).textContent = title;
+        this.shadowRoot.getElementById("summary-trophy").textContent = trophy;
+        this.shadowRoot.getElementById("summary-title").textContent = title;
 
-        const overlay = this.shadowRoot.getElementById(“summary-overlay”);
-        overlay.classList.remove(“hidden”);
+        const overlay = this.shadowRoot.getElementById("summary-overlay");
+        overlay.classList.remove("hidden");
 
-        this.shadowRoot.getElementById(“summary-btn”).onclick = () => {
-            overlay.classList.add(“hidden”);
+        this.shadowRoot.getElementById("summary-btn").onclick = () => {
+            overlay.classList.add("hidden");
             this._updateProgress();
             this.index = 0;
             this._correct = 0;
@@ -596,7 +596,7 @@ class VocabTrainer extends HTMLElement {
             this._bestStreak = 0;
             this._currentStreak = 0;
             this.vocab = shuffle(this.vocab);
-            this._setMascot(“🦉”, “Neue Runde! Du schaffst das!”);
+            this._setMascot("🦉", "Neue Runde! Du schaffst das!");
             this.nextRound();
         };
     }

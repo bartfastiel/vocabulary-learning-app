@@ -320,7 +320,7 @@ class VocabEditor extends HTMLElement {
             <!-- Phase: processing -->
             <div class="body scan-status-wrap" id="scan-phase-processing" hidden>
               <div class="scan-spinner"></div>
-              <div class="scan-status-text" id="scan-status-text">Lade OCR-Modul…</div>
+              <div class="scan-status-text" id="scan-status-text">Lade OCR-Modul...</div>
             </div>
 
             <!-- Phase: results -->
@@ -519,7 +519,7 @@ class VocabEditor extends HTMLElement {
         try {
             // Load Tesseract.js on first use
             if (!window.Tesseract) {
-                status.textContent = "Lade OCR-Modul…";
+                status.textContent = "Lade OCR-Modul...";
                 await new Promise((resolve, reject) => {
                     const s = document.createElement("script");
                     s.src     = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
@@ -529,11 +529,11 @@ class VocabEditor extends HTMLElement {
                 });
             }
 
-            status.textContent = "Erkenne Text… 0 %";
+            status.textContent = "Erkenne Text... 0 %";
             const { data: { text } } = await Tesseract.recognize(canvas, "deu+eng", {
                 logger: m => {
                     if (m.status === "recognizing text") {
-                        status.textContent = `Erkenne Text… ${Math.round(m.progress * 100)} %`;
+                        status.textContent = `Erkenne Text... ${Math.round(m.progress * 100)} %`;
                     }
                 }
             });
