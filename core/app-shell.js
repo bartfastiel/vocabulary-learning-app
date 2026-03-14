@@ -378,6 +378,83 @@ class AppShell extends HTMLElement {
         :host([data-bg="dark"]) .anim-chip.active { background: #2c5282; border-color: #63b3ed; color: #bee3f8; }
         :host([data-bg="dark"]) .anim-section-title { color: #a0aec0; }
 
+        /* ── Custom gradient builder ── */
+        .grad-builder {
+          margin-top: 0.5rem; padding: 0.7rem;
+          border: 2px solid #e2e8f0; border-radius: 12px;
+          background: #f7fafc;
+        }
+        :host([data-bg="dark"]) .grad-builder { background: #2d3748; border-color: #4a5568; }
+        .grad-builder-row {
+          display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
+        }
+        .grad-builder-row label {
+          font-size: 0.78rem; font-weight: 600; color: #718096; min-width: 55px;
+        }
+        :host([data-bg="dark"]) .grad-builder-row label { color: #a0aec0; }
+        .grad-color-inputs { display: flex; gap: 0.4rem; flex: 1; flex-wrap: wrap; }
+        .grad-color-input {
+          width: 36px; height: 36px; border: 2px solid #e2e8f0; border-radius: 8px;
+          cursor: pointer; padding: 0; overflow: hidden;
+        }
+        .grad-color-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .grad-color-input::-webkit-color-swatch { border: none; border-radius: 6px; }
+        .grad-add-color {
+          width: 36px; height: 36px; border: 2px dashed #cbd5e0; border-radius: 8px;
+          background: transparent; color: #718096; font-size: 1.2rem; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          transition: all 0.15s;
+        }
+        .grad-add-color:hover { border-color: #4299e1; color: #4299e1; }
+        .grad-remove-color {
+          width: 20px; height: 20px; border: none; border-radius: 50%;
+          background: #fc8181; color: white; font-size: 0.7rem; cursor: pointer;
+          position: absolute; top: -6px; right: -6px; display: none;
+          align-items: center; justify-content: center; line-height: 1;
+        }
+        .grad-color-wrap { position: relative; }
+        .grad-color-wrap:hover .grad-remove-color { display: flex; }
+        .grad-direction {
+          padding: 0.3rem 0.6rem; border: 2px solid #e2e8f0; border-radius: 8px;
+          background: white; font-size: 0.82rem; cursor: pointer; color: #4a5568;
+        }
+        :host([data-bg="dark"]) .grad-direction { background: #1a202c; color: #e2e8f0; border-color: #4a5568; }
+        .grad-preview {
+          height: 40px; border-radius: 8px; margin-top: 0.4rem;
+          border: 2px solid #e2e8f0;
+        }
+        .grad-btn-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .grad-apply {
+          flex: 1; padding: 0.45rem; border: none; border-radius: 8px;
+          background: #4299e1; color: white; font-size: 0.82rem; font-weight: 600;
+          cursor: pointer; transition: filter 0.15s;
+        }
+        .grad-apply:hover { filter: brightness(1.1); }
+        .grad-anim-toggle {
+          padding: 0.45rem 0.8rem; border: 2px solid #e2e8f0; border-radius: 8px;
+          background: white; font-size: 0.82rem; font-weight: 600;
+          cursor: pointer; color: #4a5568; transition: all 0.15s;
+        }
+        .grad-anim-toggle.active { border-color: #4299e1; background: #ebf8ff; color: #2b6cb0; }
+        :host([data-bg="dark"]) .grad-anim-toggle { background: #1a202c; color: #e2e8f0; border-color: #4a5568; }
+        :host([data-bg="dark"]) .grad-anim-toggle.active { background: #2c5282; border-color: #63b3ed; color: #bee3f8; }
+
+        /* Animated gradient layer */
+        #grad-anim-layer {
+          position: fixed; inset: 0; z-index: -1; pointer-events: none;
+          background-size: 300% 300%;
+          animation: gradientFlow 8s ease infinite;
+          opacity: 0; transition: opacity 0.5s;
+        }
+        #grad-anim-layer.active { opacity: 1; }
+        @keyframes gradientFlow {
+          0%   { background-position: 0% 50%; }
+          25%  { background-position: 100% 0%; }
+          50%  { background-position: 100% 100%; }
+          75%  { background-position: 0% 100%; }
+          100% { background-position: 0% 50%; }
+        }
+
         /* Animation canvas */
         #anim-canvas {
           position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -586,6 +663,33 @@ class AppShell extends HTMLElement {
             <div class="theme-dot gradient-dot" data-theme="grad-night" style="background:linear-gradient(180deg,#0f172a,#1e293b,#334155)" title="Nacht"></div>
           </div>
 
+          <p class="anim-section-title">Eigener Farbverlauf</p>
+          <div class="grad-builder" id="grad-builder">
+            <div class="grad-builder-row">
+              <label>Farben</label>
+              <div class="grad-color-inputs" id="grad-colors"></div>
+              <button class="grad-add-color" id="grad-add-color" title="Farbe hinzufügen">+</button>
+            </div>
+            <div class="grad-builder-row">
+              <label>Richtung</label>
+              <select class="grad-direction" id="grad-direction">
+                <option value="135deg">Diagonal ↘</option>
+                <option value="180deg">Oben → Unten ↓</option>
+                <option value="90deg">Links → Rechts →</option>
+                <option value="45deg">Diagonal ↗</option>
+                <option value="225deg">Diagonal ↙</option>
+                <option value="270deg">Rechts → Links ←</option>
+                <option value="0deg">Unten → Oben ↑</option>
+                <option value="circle">Kreisförmig ⊙</option>
+              </select>
+            </div>
+            <div class="grad-preview" id="grad-preview"></div>
+            <div class="grad-btn-row">
+              <button class="grad-apply" id="grad-apply">Anwenden</button>
+              <button class="grad-anim-toggle" id="grad-anim-toggle">Bewegt</button>
+            </div>
+          </div>
+
           <p class="anim-section-title">Animation</p>
           <div class="anim-grid">
             <div class="anim-chip" data-anim="none">Keine</div>
@@ -598,6 +702,7 @@ class AppShell extends HTMLElement {
         </div>
       </div>
 
+      <div id="grad-anim-layer"></div>
       <canvas id="anim-canvas"></canvas>
 
       <!-- Trainer view (shown when subject is selected) -->
@@ -825,6 +930,8 @@ class AppShell extends HTMLElement {
         const clearActive = () => {
             this.shadowRoot.querySelectorAll(".theme-dot").forEach(d => d.classList.remove("active"));
             customWrap.classList.remove("active");
+            const gal = this.shadowRoot.getElementById("grad-anim-layer");
+            if (gal) gal.classList.remove("active");
         };
         const applyBg = (color) => {
             this.style.background = color;
@@ -896,7 +1003,115 @@ class AppShell extends HTMLElement {
             applyBg(color);
             localStorage.setItem("appBg", "custom");
             localStorage.setItem("appBgCustom", color);
+            gradAnimLayer.classList.remove("active");
         };
+
+        // ── Custom gradient builder ──
+        const gradAnimLayer = this.shadowRoot.getElementById("grad-anim-layer");
+        const gradColorsWrap = this.shadowRoot.getElementById("grad-colors");
+        const gradDirection = this.shadowRoot.getElementById("grad-direction");
+        const gradPreview = this.shadowRoot.getElementById("grad-preview");
+        const gradApply = this.shadowRoot.getElementById("grad-apply");
+        const gradAnimToggle = this.shadowRoot.getElementById("grad-anim-toggle");
+
+        // Load saved custom gradient
+        let gradColors = JSON.parse(localStorage.getItem("gradColors") || '["#4299e1","#9f7aea","#ed64a6"]');
+        let gradDir = localStorage.getItem("gradDir") || "135deg";
+        let gradAnimated = localStorage.getItem("gradAnimated") === "true";
+
+        gradDirection.value = gradDir;
+        if (gradAnimated) gradAnimToggle.classList.add("active");
+
+        const buildGradientCSS = () => {
+            if (gradColors.length < 2) return gradColors[0] || "#4299e1";
+            if (gradDir === "circle") return `radial-gradient(circle, ${gradColors.join(",")})`;
+            return `linear-gradient(${gradDir}, ${gradColors.join(",")})`;
+        };
+
+        const renderGradColors = () => {
+            gradColorsWrap.innerHTML = "";
+            gradColors.forEach((c, i) => {
+                const wrap = document.createElement("div");
+                wrap.className = "grad-color-wrap";
+                const inp = document.createElement("input");
+                inp.type = "color"; inp.value = c;
+                inp.className = "grad-color-input";
+                inp.oninput = () => { gradColors[i] = inp.value; updateGradPreview(); };
+                wrap.appendChild(inp);
+                if (gradColors.length > 2) {
+                    const rm = document.createElement("button");
+                    rm.className = "grad-remove-color"; rm.textContent = "x";
+                    rm.onclick = () => { gradColors.splice(i, 1); renderGradColors(); updateGradPreview(); };
+                    wrap.appendChild(rm);
+                }
+                gradColorsWrap.appendChild(wrap);
+            });
+        };
+
+        const updateGradPreview = () => {
+            gradPreview.style.background = buildGradientCSS();
+        };
+
+        renderGradColors();
+        updateGradPreview();
+
+        this.shadowRoot.getElementById("grad-add-color").onclick = () => {
+            if (gradColors.length < 6) {
+                const hue = Math.floor(Math.random() * 360);
+                gradColors.push(`hsl(${hue}, 70%, 60%)`);
+                renderGradColors();
+                updateGradPreview();
+            }
+        };
+
+        gradDirection.onchange = () => {
+            gradDir = gradDirection.value;
+            updateGradPreview();
+        };
+
+        gradAnimToggle.onclick = () => {
+            gradAnimated = !gradAnimated;
+            gradAnimToggle.classList.toggle("active", gradAnimated);
+        };
+
+        const applyCustomGrad = () => {
+            const css = buildGradientCSS();
+            clearActive();
+            this.removeAttribute("data-bg");
+            localStorage.setItem("appBg", "customGrad");
+            localStorage.setItem("gradColors", JSON.stringify(gradColors));
+            localStorage.setItem("gradDir", gradDir);
+            localStorage.setItem("gradAnimated", String(gradAnimated));
+
+            if (gradAnimated) {
+                // Apply to animated layer with flowing effect
+                gradAnimLayer.style.background = css;
+                gradAnimLayer.style.backgroundSize = "300% 300%";
+                gradAnimLayer.classList.add("active");
+                this.style.background = "transparent";
+                document.body.style.background = gradColors[0];
+            } else {
+                gradAnimLayer.classList.remove("active");
+                applyBg(css);
+            }
+
+            // Detect dark gradients
+            const darkColors = gradColors.every(c => {
+                const d = document.createElement("div");
+                d.style.color = c; document.body.appendChild(d);
+                const rgb = getComputedStyle(d).color.match(/\d+/g).map(Number);
+                d.remove();
+                return (rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114) < 100;
+            });
+            if (darkColors) this.setAttribute("data-bg", "dark");
+        };
+
+        gradApply.onclick = applyCustomGrad;
+
+        // Restore custom gradient on load
+        if (savedTheme === "customGrad") {
+            applyCustomGrad();
+        }
 
         // Animation picker
         const canvas = this.shadowRoot.getElementById("anim-canvas");

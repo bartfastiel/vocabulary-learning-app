@@ -106,6 +106,46 @@ const MASCOT_STREAK = [
 
 function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
+// === SPACED REPETITION (Leitner-Box System) ===
+// Each word has a "box" level 1–5. Box 1 = hard (repeat often), Box 5 = mastered.
+// Correct → move up one box. Wrong → reset to box 1.
+// Words in lower boxes appear more often in the shuffled order.
+
+const SR_KEY = "spacedRepetition";
+
+function _srKey(word) {
+    return `${(word.de || "").toLowerCase()}|${(word.en || "").toLowerCase()}`;
+}
+
+function srLoad() {
+    try { return JSON.parse(localStorage.getItem(SR_KEY) || "{}"); } catch { return {}; }
+}
+
+function srSave(data) {
+    localStorage.setItem(SR_KEY, JSON.stringify(data));
+}
+
+function srGetBox(srData, word) {
+    return srData[_srKey(word)] || 1;
+}
+
+function srSetBox(srData, word, box) {
+    srData[_srKey(word)] = Math.max(1, Math.min(5, box));
+    srSave(srData);
+}
+
+/** Sorts words so lower-box words repeat more often.
+ *  Box 1 words appear ~4x, box 2 ~3x, box 3 ~2x, box 4-5 ~1x each. */
+function srWeightedShuffle(words, srData) {
+    const weighted = [];
+    for (const w of words) {
+        const box = srGetBox(srData, w);
+        const repeats = Math.max(1, 5 - box);
+        for (let i = 0; i < repeats; i++) weighted.push(w);
+    }
+    return shuffle(weighted);
+}
+
 // === COMPONENT ===
 class VocabTrainer extends HTMLElement {
     constructor() {
@@ -478,6 +518,10 @@ class VocabTrainer extends HTMLElement {
         try {
             const data = await fetch(`vocab/vocab.json`).then(r => r.json());
             // Built-in vocab sets only show for the "englisch" subject
+            // Mark built-in words as having audio available
+            for (const set of data) {
+                for (const w of set.words) w._hasAudio = true;
+            }
             this._builtinSets = (this._subject || "englisch") === "englisch" ? data : [];
             this._mergeAndRender();
         } catch (err) {
@@ -555,7 +599,8 @@ class VocabTrainer extends HTMLElement {
         });
 
         this.currentSet = this.vocabSets[index];
-        this.vocab = shuffle([...this.currentSet.words]);
+        this._srData = srLoad();
+        this.vocab = srWeightedShuffle([...this.currentSet.words], this._srData);
         this.index = 0;
         this._correct = 0;
         this._wrong = 0;
@@ -584,6 +629,7 @@ class VocabTrainer extends HTMLElement {
         ];
         const availableModes = MODES.filter(mode => {
             if (!word.allowImage && (mode.question === "vocab-question-image" || mode.answer === "vocab-answer-chooseimage")) return false;
+            if (!word._hasAudio && (mode.question === "vocab-question-voiceenglish" || mode.answer === "vocab-answer-choosevoiceenglish")) return false;
             if (this.vocab.length < 4 && needsDistractors.includes(mode.answer)) return false;
             return true;
         });
@@ -611,11 +657,13 @@ class VocabTrainer extends HTMLElement {
 
         aEl.addEventListener("answered", (e) => {
             const isCorrect = e.detail?.correct;
+            // Update spaced repetition box for this word
+            const curBox = srGetBox(this._srData, word);
             if (isCorrect) {
+                srSetBox(this._srData, word, curBox + 1);
                 this._correct++;
                 this._currentStreak++;
                 if (this._currentStreak > this._bestStreak) this._bestStreak = this._currentStreak;
-                // Check streak milestone first
                 const streakMsg = [...MASCOT_STREAK].reverse().find(s => this._currentStreak === s.min);
                 if (streakMsg) {
                     this._setMascot("🔥", streakMsg.msg, "streak");
@@ -623,6 +671,7 @@ class VocabTrainer extends HTMLElement {
                     this._setMascot("😄", randomFrom(MASCOT_CORRECT), "correct");
                 }
             } else {
+                srSetBox(this._srData, word, 1);
                 this._wrong++;
                 this._currentStreak = 0;
                 this._setMascot("🤗", randomFrom(MASCOT_WRONG), "wrong");
@@ -683,13 +732,14 @@ class VocabTrainer extends HTMLElement {
 
         this.shadowRoot.getElementById("summary-btn").onclick = () => {
             overlay.classList.add("hidden");
-            this._updateProgress();
+            this._srData = srLoad();
+            this.vocab = srWeightedShuffle([...this.currentSet.words], this._srData);
             this.index = 0;
             this._correct = 0;
             this._wrong = 0;
             this._bestStreak = 0;
             this._currentStreak = 0;
-            this.vocab = shuffle(this.vocab);
+            this._updateProgress();
             this._setMascot("🦉", "Neue Runde! Du schaffst das!");
             this.nextRound();
         };
