@@ -34,7 +34,8 @@ import "./minesweeper-game.js";
 import "./asteroids-game.js";
 import "./racing-game.js";
 import "./quiz-game.js";
-import { isPlayAllowed, isGameAllowed, trackPlayStart, trackPlayEnd } from "../core/teacher-controls.js";
+// Teacher controls disabled for now — will be re-enabled with proper online setup
+// import { isPlayAllowed, isGameAllowed, trackPlayStart, trackPlayEnd } from "../core/teacher-controls.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -501,23 +502,15 @@ class GameLobby extends HTMLElement {
         this.shadowRoot.getElementById("lobby-points").textContent =
             `${pts} Punkt${pts !== 1 ? "e" : ""}`;
 
-        // Check teacher controls
-        const playCheck = isPlayAllowed();
-
         grid.innerHTML = GAMES.map(g => {
             const locked = pts < g.cost;
-            const blocked = !isGameAllowed(g.id);
             const hsVal  = hs[g.id] != null ? hs[g.id] : null;
             const hsText = hsVal != null && g.scoreLabel
                 ? `Highscore: ${hsVal} ${g.scoreLabel}`
                 : hsVal != null ? `Gespielt` : `Noch nicht gespielt`;
-            const isLocked = locked || blocked || !playCheck.allowed;
-            const lockReason = blocked ? "Vom Lehrer gesperrt"
-                : !playCheck.allowed ? playCheck.reason
-                : locked ? `\uD83D\uDD12 ${g.cost} Pkt.` : "";
             return `
-        <div class="game-card${isLocked ? " locked" : ""}" data-id="${g.id}">
-          ${isLocked ? `<span class="locked-badge">${lockReason}</span>` : ""}
+        <div class="game-card${locked ? " locked" : ""}" data-id="${g.id}">
+          ${locked ? `<span class="locked-badge">\uD83D\uDD12 ${g.cost} Pkt.</span>` : ""}
           <span class="card-emoji">${g.emoji}</span>
           <span class="card-label">${g.label}</span>
           <span class="card-desc">${g.desc}</span>
@@ -540,7 +533,6 @@ class GameLobby extends HTMLElement {
 
         pm.updatePoints(-game.cost);
         this._activeGame = game;
-        trackPlayStart();
         this._showPlay(game);
     }
 
@@ -551,7 +543,6 @@ class GameLobby extends HTMLElement {
 
     _handleGameOver(e) {
         if (!this._activeGame) return;
-        trackPlayEnd();
         const { score } = e.detail ?? {};
         const isNew = saveHighscore(this._activeGame.id, score ?? 0);
         this._showResult(score ?? null, 0, isNew);
