@@ -1009,6 +1009,27 @@ export function getAvatarSVG() {
     }
 }
 
+/** Generate a random avatar selection (only free items, index 0 = none for glasses/accessory) */
+export function randomAvatarSelection() {
+    const rnd = (arr) => Math.floor(Math.random() * arr.length);
+    return {
+        background: rnd(LAYERS.background),
+        face:       rnd(LAYERS.face),
+        hair:       rnd(LAYERS.hair),
+        eyebrows:   rnd(LAYERS.eyebrows),
+        eyes:       rnd(LAYERS.eyes),
+        mouth:      rnd(LAYERS.mouth),
+        glasses:    Math.random() < 0.3 ? rnd(LAYERS.glasses) : 0,   // 30% chance of glasses
+        accessory:  Math.random() < 0.2 ? rnd(LAYERS.accessory) : 0, // 20% chance of accessory
+    };
+}
+
+/** Generate random avatar and return both selection + SVG */
+export function generateRandomAvatar() {
+    const sel = randomAvatarSelection();
+    return { selection: sel, svg: composeSVG(sel) };
+}
+
 // ─── component ────────────────────────────────────────────────────────────────
 
 class AvatarBuilder extends HTMLElement {

@@ -184,12 +184,13 @@ class CloudLogin extends HTMLElement {
 
         // Login
         this.shadowRoot.getElementById("btn-login").onclick = async () => {
-            const code = this.shadowRoot.getElementById("login-code").value.toUpperCase().trim();
+            const rawCode = this.shadowRoot.getElementById("login-code").value;
+            const code = rawCode.toUpperCase().trim().replace(/\s/g, "");
             const msg = this.shadowRoot.getElementById("login-msg");
-            if (code.length < 3) { msg.textContent = "Code zu kurz!"; msg.className = "msg err"; return; }
-            msg.textContent = "Lade Profil..."; msg.className = "msg";
+            if (code.length < 3) { msg.textContent = "Code zu kurz! (" + code.length + " Zeichen)"; msg.className = "msg err"; return; }
+            msg.textContent = "Suche " + code + "..."; msg.className = "msg";
             const cloud = await loginWithCode(code);
-            if (!cloud) { msg.textContent = "Code nicht gefunden!"; msg.className = "msg err"; return; }
+            if (!cloud) { msg.textContent = "Code \"" + code + "\" nicht gefunden!"; msg.className = "msg err"; return; }
             // Create/update local profile
             const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
             const idx = list.findIndex(p => p.id === cloud.id);
