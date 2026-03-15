@@ -1064,7 +1064,8 @@ class PlatformerGame extends HTMLElement {
         }
 
         // player power-up aura (no shadowBlur for performance)
-        if (this._activePower) {
+        // Skip aura for wings — just show the wing sprites
+        if (this._activePower && this._activePower.type !== "wings") {
             ctx.save();
             ctx.globalAlpha = 0.18 + Math.sin(now / 200) * 0.08;
             ctx.fillStyle = this._activePower.color;
@@ -1076,32 +1077,6 @@ class PlatformerGame extends HTMLElement {
             ctx.arc(this._px + 10, this._py + 12, 26, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
-
-            // Wings visual
-            if (this._activePower.type === "wings") {
-                const isGliding = this._keys.jump && !this._onGround && this._pvy > 0;
-                const flapSpeed = isGliding ? 200 : 100;
-                const wingSpread = isGliding ? 14 : 10;
-                const wingFlap = Math.sin(now / flapSpeed) * (isGliding ? 4 : 8);
-                ctx.fillStyle = isGliding ? "rgba(147,197,253,0.8)" : "rgba(147,197,253,0.6)";
-                // left wing
-                ctx.beginPath();
-                ctx.ellipse(this._px - 2, this._py + 6, wingSpread, 5 + wingFlap, -0.3, 0, Math.PI * 2);
-                ctx.fill();
-                // right wing
-                ctx.beginPath();
-                ctx.ellipse(this._px + 22, this._py + 6, wingSpread, 5 + wingFlap, 0.3, 0, Math.PI * 2);
-                ctx.fill();
-                // Glide feather trail
-                if (isGliding && Math.random() < 0.25) {
-                    this._particles.push({
-                        x: this._px + 10 + (Math.random() - 0.5) * 20,
-                        y: this._py + 15,
-                        vx: (Math.random() - 0.5) * 15, vy: 15 + Math.random() * 10,
-                        life: 0.6, color: "#bfdbfe", size: 1.5 + Math.random(),
-                    });
-                }
-            }
 
             // Star sparkle trail
             if (this._activePower.type === "star" && Math.random() < 0.3) {
@@ -1145,9 +1120,32 @@ class PlatformerGame extends HTMLElement {
             }
         }
 
-        // player
+        // player (wings drawn behind, then body on top)
         const blink = this._invincible > 0 && Math.floor(now / 80) % 2;
         if (!blink) {
+            // Draw wings BEHIND player
+            if (this._activePower?.type === "wings") {
+                const isGliding = this._keys.jump && !this._onGround && this._pvy > 0;
+                const flapSpeed = isGliding ? 200 : 100;
+                const wingSpread = isGliding ? 16 : 12;
+                const wingFlap = Math.sin(now / flapSpeed) * (isGliding ? 4 : 8);
+                ctx.fillStyle = isGliding ? "rgba(100,170,255,0.85)" : "rgba(100,170,255,0.7)";
+                ctx.beginPath();
+                ctx.ellipse(this._px - 2, this._py + 6, wingSpread, 6 + wingFlap, -0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(this._px + 22, this._py + 6, wingSpread, 6 + wingFlap, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                // Glide feather trail
+                if (isGliding && Math.random() < 0.25) {
+                    this._particles.push({
+                        x: this._px + 10 + (Math.random() - 0.5) * 20,
+                        y: this._py + 15,
+                        vx: (Math.random() - 0.5) * 15, vy: 15 + Math.random() * 10,
+                        life: 0.6, color: "#bfdbfe", size: 1.5 + Math.random(),
+                    });
+                }
+            }
             const tinyScale = (this._activePower?.type === "tiny") ? 0.6 : 1;
             this._drawPlayer(ctx, this._px, this._py, this._facingRight, this._walkFrame, this._onGround, this._pvy, tinyScale);
         }
