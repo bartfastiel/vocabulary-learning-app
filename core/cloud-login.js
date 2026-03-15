@@ -222,6 +222,13 @@ class CloudLogin extends HTMLElement {
             if (cloud.avatarSelection) localStorage.setItem("avatarSelection", JSON.stringify(cloud.avatarSelection));
             if (cloud.avatarUnlocked) localStorage.setItem("avatarUnlocked", JSON.stringify(cloud.avatarUnlocked));
             if (cloud.role) localStorage.setItem("userRole", cloud.role);
+            // Restore background extras (gradients, animations, custom colors)
+            const bgEx = cloud.bgExtra || {};
+            if (bgEx.gradColors) localStorage.setItem("gradColors", JSON.stringify(bgEx.gradColors));
+            if (bgEx.gradDir) localStorage.setItem("gradDir", bgEx.gradDir);
+            if (bgEx.gradAnimated) localStorage.setItem("gradAnimated", bgEx.gradAnimated);
+            if (bgEx.liveBgKey) localStorage.setItem("liveBgKey", bgEx.liveBgKey);
+            if (bgEx.appBgCustom) localStorage.setItem("appBgCustom", bgEx.appBgCustom);
 
             activateProfile(cloud.id);
             msg.textContent = "Willkommen, " + cloud.name + "! Lade..."; msg.className = "msg ok";
