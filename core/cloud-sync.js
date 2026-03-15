@@ -115,10 +115,8 @@ export async function loginWithCode(code) {
     }
 }
 
-/** Get login code for current profile */
+/** Get login code for current active profile (always checks server) */
 export async function getMyLoginCode() {
-    const cached = localStorage.getItem("myLoginCode");
-    if (cached) return cached;
     try {
         const id = getActiveId();
         if (!id) return null;
@@ -127,8 +125,13 @@ export async function getMyLoginCode() {
             localStorage.setItem("myLoginCode", rows[0].login_code);
             return rows[0].login_code;
         }
+        // No code for this profile — clear any stale cached code
+        localStorage.removeItem("myLoginCode");
         return null;
-    } catch { return null; }
+    } catch {
+        // Offline fallback: only return cached if we can't reach server
+        return localStorage.getItem("myLoginCode") || null;
+    }
 }
 
 // ─── groups ─────────────────────────────────────────────────────────────────
