@@ -34,7 +34,7 @@ import "./minesweeper-game.js";
 import "./asteroids-game.js";
 import "./racing-game.js";
 import "./quiz-game.js";
-import "./drift-game.js";
+import "./craft-game.js";
 import { isPlayAllowed, isGameAllowed, trackPlayStart, trackPlayEnd } from "../core/teacher-controls.js";
 
 const HS_KEY = "gameHighscores";
@@ -216,10 +216,10 @@ const GAMES = [
         scoreLabel: "Fragen",
     },
     {
-        id: "drift", label: "Neon Drift",            emoji: "\uD83C\uDF03",
+        id: "craft", label: "Blockwelt",              emoji: "\u26CF\uFE0F",
         cost: 2,  maxEarn: 0,
-        component: "drift-game",
-        desc: "Nacht-Rennen durch die Neon-City! Driften, Nitro, Highscore!",
+        component: "craft-game",
+        desc: "Baue, grabe und entdecke eine Welt aus Bl\u00f6cken!",
         scoreLabel: "Punkte",
     },
 ];
