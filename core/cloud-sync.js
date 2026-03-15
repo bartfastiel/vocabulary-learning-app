@@ -3,6 +3,7 @@
 
 import { supabaseGet, supabaseUpsert, supabaseInsert, supabaseDelete, supabaseUpdate } from "./supabase.js";
 import { getActiveProfile, getActiveId, getProfiles, saveSnapshot } from "./profiles.js";
+import { getAvatarSVG } from "./avatar-builder.js";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -23,18 +24,23 @@ function toCloudRow(p) {
     try { avatarSel = JSON.parse(localStorage.getItem("avatarSelection")) || avatarSel; } catch {}
     let avatarUnl = p.avatarUnlocked || [];
     try { avatarUnl = JSON.parse(localStorage.getItem("avatarUnlocked") || "[]"); } catch {}
+    // Get fresh avatar SVG
+    let svg = "";
+    try { svg = getAvatarSVG(); } catch { svg = p.avatarSvg || ""; }
 
-    return {
+    const row = {
         id:               p.id,
         name:             p.name || "Unnamed",
         role:             p.role || localStorage.getItem("userRole") || "schueler",
         points:           points,
         streak_record:    streak,
-        avatar_svg:       p.avatarSvg || "",
+        avatar_svg:       svg,
         avatar_selection: avatarSel,
         avatar_unlocked:  avatarUnl,
         app_bg:           bg,
     };
+    console.log("[cloud-sync] pushing:", p.name, "pts:", points, "streak:", streak, "id:", p.id);
+    return row;
 }
 
 /** Map cloud row back to local profile + apply to localStorage */
@@ -232,8 +238,10 @@ export async function pullFromCloud() {
 }
 
 // ─── auto-sync on import ────────────────────────────────────────────────────
-syncProfileToCloud();
-
-// Pull + push loop: push every 60s, pull every 30s
-setInterval(() => syncProfileToCloud(), 60000);
-setInterval(() => pullFromCloud(), 30000);
+// Wait for the app to be fully loaded before first sync
+setTimeout(() => {
+    syncProfileToCloud();
+    // Pull + push loop: push every 45s, pull every 30s
+    setInterval(() => syncProfileToCloud(), 45000);
+    setInterval(() => pullFromCloud(), 30000);
+}, 3000);
