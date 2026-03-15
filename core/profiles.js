@@ -1,8 +1,6 @@
 // core/profiles.js
 // Multi-profile support for a single device.
 
-import { generateRandomAvatar } from "./avatar-builder.js";
-
 const LS_ALL    = "allProfiles";
 const LS_ACTIVE = "activeProfileId";
 
@@ -23,16 +21,41 @@ export function getActiveProfile() {
     return id ? (getProfiles().find(p => p.id === id) || null) : null;
 }
 
+const RANDOM_BGS = [
+    "light", "blue", "green", "purple", "pink", "yellow",
+    "grad-sunset", "grad-ocean", "grad-aurora", "grad-candy",
+    "grad-sky", "grad-mint", "grad-peach",
+];
+
 export function createProfile(name) {
     const list = getProfiles();
     const id = "p" + Date.now();
-    const { selection, svg } = generateRandomAvatar();
+    const bg = RANDOM_BGS[Math.floor(Math.random() * RANDOM_BGS.length)];
     list.push({ id, name, role: null, points: 0, streakRecord: 0,
-                avatarSelection: selection, avatarUnlocked: [], avatarSvg: svg, appBg: "light" });
+                avatarSelection: null, avatarUnlocked: [], avatarSvg: "", appBg: bg,
+                _needsRandomAvatar: true });
     _save(list);
-    // Also save the avatar selection to localStorage so avatar-builder picks it up
-    localStorage.setItem("avatarSelection", JSON.stringify(selection));
     return id;
+}
+
+/** Called after avatar-builder is loaded to assign a random avatar */
+export function assignRandomAvatarIfNeeded(generateFn) {
+    const list = getProfiles();
+    let changed = false;
+    for (const p of list) {
+        if (p._needsRandomAvatar) {
+            const { selection, svg } = generateFn();
+            p.avatarSelection = selection;
+            p.avatarSvg = svg;
+            delete p._needsRandomAvatar;
+            changed = true;
+            // Set in localStorage if this is the active profile
+            if (p.id === getActiveId()) {
+                localStorage.setItem("avatarSelection", JSON.stringify(selection));
+            }
+        }
+    }
+    if (changed) _save(list);
 }
 
 export function deleteProfile(id) {

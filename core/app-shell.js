@@ -13,9 +13,9 @@ import "../game/game-lobby.js";
 import "../math/math-trainer.js";
 import "../deutsch/deutsch-trainer.js";
 import { PointsManager } from "../vocab/points.js";
-import { getAvatarSVG } from "./avatar-builder.js";
+import { getAvatarSVG, generateRandomAvatar } from "./avatar-builder.js";
 import { getProfiles, getActiveId, getActiveProfile, createProfile, deleteProfile,
-         activateProfile, saveSnapshot, setAvatarSvg } from "./profiles.js";
+         activateProfile, saveSnapshot, setAvatarSvg, assignRandomAvatarIfNeeded } from "./profiles.js";
 
 class AppShell extends HTMLElement {
     constructor() {
@@ -887,6 +887,9 @@ class AppShell extends HTMLElement {
     // ── Startup ──────────────────────────────────────────────────────────────
 
     _startup() {
+        // Assign random avatars to any new profiles that need them
+        assignRandomAvatarIfNeeded(generateRandomAvatar);
+
         const profiles = getProfiles();
         const activeId = getActiveId();
         const active = profiles.find(p => p.id === activeId);
