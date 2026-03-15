@@ -12,9 +12,15 @@ jobs:
       - name: Install PostgreSQL client
         run: sudo apt-get install -y postgresql-client
 
+      - name: Setup credentials
+        run: |
+          echo 'db.anrwjfidqqjivatjarrg.supabase.co:5432:postgres:postgres:!X,?N7mT%umv,YJ' > ~/.pgpass
+          echo 'aws-0-eu-central-1.pooler.supabase.com:5432:postgres:postgres.anrwjfidqqjivatjarrg:!X,?N7mT%umv,YJ' >> ~/.pgpass
+          chmod 600 ~/.pgpass
+
       - name: Write migration SQL
         run: |
-          cat > /tmp/migration.sql <<'ENDSQL'
+          cat > /tmp/migrate.sql << 'ENDSQL'
           CREATE TABLE IF NOT EXISTS profiles (
             id text PRIMARY KEY,
             name text NOT NULL,
@@ -55,46 +61,19 @@ jobs:
           END $$;
           ENDSQL
 
-      - name: Debug DNS
+      - name: Run migration (direct)
         run: |
-          echo "=== Direct host ==="
-          nslookup db.anrwjfidqqjivatjarrg.supabase.co || true
-          echo "=== Pooler eu-central ==="
-          nslookup aws-0-eu-central-1.pooler.supabase.com || true
-          echo "=== Pooler us-east ==="
-          nslookup aws-0-us-east-1.pooler.supabase.com || true
+          echo "Trying direct connection..."
+          psql -h db.anrwjfidqqjivatjarrg.supabase.co -p 5432 -U postgres -d postgres -f /tmp/migrate.sql && echo "DIRECT SUCCESS" && exit 0
+          echo "Direct failed, trying pooler..."
+          psql -h aws-0-eu-central-1.pooler.supabase.com -p 5432 -U postgres.anrwjfidqqjivatjarrg -d postgres -f /tmp/migrate.sql && echo "POOLER SUCCESS" && exit 0
+          echo "ALL FAILED"
+          exit 1
 
-      - name: Try direct connection
-        continue-on-error: true
-        id: direct
+      - name: Verify tables
         run: |
-          export PGPASSWORD='!X,?N7mT%umv,YJ'
-          psql "postgresql://postgres@db.anrwjfidqqjivatjarrg.supabase.co:5432/postgres?sslmode=require" -f /tmp/migration.sql
-          echo "result=success" >> $GITHUB_OUTPUT
+          psql -h db.anrwjfidqqjivatjarrg.supabase.co -p 5432 -U postgres -d postgres -c "SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename;" || true
 
-      - name: Try pooler eu-central (session mode)
-        if: steps.direct.outcome == 'failure'
-        continue-on-error: true
-        id: pooler1
+      - name: Notify PostgREST to reload schema
         run: |
-          export PGPASSWORD='!X,?N7mT%umv,YJ'
-          psql "postgresql://postgres.anrwjfidqqjivatjarrg@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require" -f /tmp/migration.sql
-          echo "result=success" >> $GITHUB_OUTPUT
-
-      - name: Try pooler us-east
-        if: steps.direct.outcome == 'failure' && steps.pooler1.outcome == 'failure'
-        continue-on-error: true
-        id: pooler2
-        run: |
-          export PGPASSWORD='!X,?N7mT%umv,YJ'
-          psql "postgresql://postgres.anrwjfidqqjivatjarrg@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require" -f /tmp/migration.sql
-          echo "result=success" >> $GITHUB_OUTPUT
-
-      - name: Check result
-        run: |
-          if [[ "${{ steps.direct.outcome }}" == "success" || "${{ steps.pooler1.outcome }}" == "success" || "${{ steps.pooler2.outcome }}" == "success" ]]; then
-            echo "Database setup completed successfully!"
-          else
-            echo "All connection attempts failed. Check the logs above."
-            exit 1
-          fi
+          psql -h db.anrwjfidqqjivatjarrg.supabase.co -p 5432 -U postgres -d postgres -c "NOTIFY pgrst, 'reload schema';" || true
