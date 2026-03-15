@@ -717,6 +717,10 @@ class AppShell extends HTMLElement {
             <span class="action-icon">📲</span>
             <span class="action-label">Freunde</span>
           </button>
+          <button class="action-card" id="home-design">
+            <span class="action-icon">🚀</span>
+            <span class="action-label">Klassisch</span>
+          </button>
           <button class="action-card" id="home-profile">
             <span class="action-icon">🔄</span>
             <span class="action-label">Profil</span>
@@ -1059,6 +1063,10 @@ class AppShell extends HTMLElement {
         this.shadowRoot.getElementById("home-friends").onclick = () => inviteQR.open();
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
+        this.shadowRoot.getElementById("home-design").onclick = () => {
+            localStorage.setItem("appDesign", "classic");
+            location.reload();
+        };
         // Background settings overlay
         const bgOverlay = this.shadowRoot.getElementById("bg-overlay");
         this.shadowRoot.getElementById("home-bg").onclick = () => bgOverlay.classList.add("active");
