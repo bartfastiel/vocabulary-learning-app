@@ -127,7 +127,7 @@ class CloudLogin extends HTMLElement {
             <!-- Login on this device -->
             <div class="section-title">Auf diesem Ger\u00e4t einloggen</div>
             <p class="hint">Hast du schon einen Code? Gib ihn hier ein:</p>
-            <input class="input" id="login-code" maxlength="6" placeholder="CODE" />
+            <input class="input" id="login-code" maxlength="10" placeholder="CODE" />
             <button class="btn btn-green" id="btn-login">Einloggen</button>
             <div class="msg" id="login-msg"></div>
 
@@ -186,7 +186,7 @@ class CloudLogin extends HTMLElement {
         this.shadowRoot.getElementById("btn-login").onclick = async () => {
             const code = this.shadowRoot.getElementById("login-code").value.toUpperCase().trim();
             const msg = this.shadowRoot.getElementById("login-msg");
-            if (code.length < 4) { msg.textContent = "Code zu kurz!"; msg.className = "msg err"; return; }
+            if (code.length < 3) { msg.textContent = "Code zu kurz!"; msg.className = "msg err"; return; }
             msg.textContent = "Lade Profil..."; msg.className = "msg";
             const cloud = await loginWithCode(code);
             if (!cloud) { msg.textContent = "Code nicht gefunden!"; msg.className = "msg err"; return; }
