@@ -191,7 +191,7 @@ class CloudLogin extends HTMLElement {
             msg.textContent = "Suche " + code + "..."; msg.className = "msg";
             const cloud = await loginWithCode(code);
             if (!cloud) { msg.textContent = "Code \"" + code + "\" nicht gefunden!"; msg.className = "msg err"; return; }
-            // Create/update local profile
+            // Create/update local profile with ALL cloud data
             const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
             const idx = list.findIndex(p => p.id === cloud.id);
             const localProfile = {
@@ -204,8 +204,17 @@ class CloudLogin extends HTMLElement {
             else list.push(localProfile);
             localStorage.setItem("allProfiles", JSON.stringify(list));
             localStorage.setItem("myLoginCode", code);
+
+            // Set ALL data directly in localStorage so the app picks it up
+            localStorage.setItem("points", String(cloud.points || 0));
+            localStorage.setItem("streakRecord", String(cloud.streakRecord || 0));
+            localStorage.setItem("appBg", cloud.appBg || "light");
+            if (cloud.avatarSelection) localStorage.setItem("avatarSelection", JSON.stringify(cloud.avatarSelection));
+            if (cloud.avatarUnlocked) localStorage.setItem("avatarUnlocked", JSON.stringify(cloud.avatarUnlocked));
+            if (cloud.role) localStorage.setItem("userRole", cloud.role);
+
             activateProfile(cloud.id);
-            msg.textContent = "Willkommen, " + cloud.name + "!"; msg.className = "msg ok";
+            msg.textContent = "Willkommen, " + cloud.name + "! Lade..."; msg.className = "msg ok";
             setTimeout(() => location.reload(), 800);
         };
 

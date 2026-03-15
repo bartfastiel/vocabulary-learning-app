@@ -2,7 +2,7 @@
 // Synchronises local profiles with Supabase and manages group membership.
 
 import { supabaseGet, supabaseUpsert, supabaseInsert, supabaseDelete, supabaseUpdate } from "./supabase.js";
-import { getActiveProfile, getActiveId, getProfiles } from "./profiles.js";
+import { getActiveProfile, getActiveId, getProfiles, saveSnapshot } from "./profiles.js";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -13,18 +13,27 @@ function generateCode(len) {
     return code;
 }
 
-/** Push ALL local profile data to cloud */
+/** Push ALL local profile data to cloud — reads fresh from localStorage */
 function toCloudRow(p) {
+    // Read latest values directly from localStorage (most up-to-date)
+    const points = parseInt(localStorage.getItem("points") || "0");
+    const streak = parseInt(localStorage.getItem("streakRecord") || "0");
+    const bg = localStorage.getItem("appBg") || "light";
+    let avatarSel = p.avatarSelection;
+    try { avatarSel = JSON.parse(localStorage.getItem("avatarSelection")) || avatarSel; } catch {}
+    let avatarUnl = p.avatarUnlocked || [];
+    try { avatarUnl = JSON.parse(localStorage.getItem("avatarUnlocked") || "[]"); } catch {}
+
     return {
         id:               p.id,
         name:             p.name || "Unnamed",
-        role:             p.role || "schueler",
-        points:           parseInt(localStorage.getItem("points") || "0"),
-        streak_record:    parseInt(localStorage.getItem("streakRecord") || "0"),
+        role:             p.role || localStorage.getItem("userRole") || "schueler",
+        points:           points,
+        streak_record:    streak,
         avatar_svg:       p.avatarSvg || "",
-        avatar_selection: p.avatarSelection || null,
-        avatar_unlocked:  p.avatarUnlocked || [],
-        app_bg:           localStorage.getItem("appBg") || "light",
+        avatar_selection: avatarSel,
+        avatar_unlocked:  avatarUnl,
+        app_bg:           bg,
     };
 }
 
@@ -48,6 +57,7 @@ function fromCloudRow(row) {
 
 export async function syncProfileToCloud() {
     try {
+        saveSnapshot(); // make sure profile object has latest localStorage values
         const profile = getActiveProfile();
         if (!profile) return null;
         const rows = await supabaseUpsert("profiles", [toCloudRow(profile)]);
