@@ -12,12 +12,9 @@ jobs:
       - name: Install PostgreSQL client
         run: sudo apt-get install -y postgresql-client
 
-      - name: Create tables
+      - name: Write migration SQL
         run: |
-          export PGPASSWORD='!X,?N7mT%umv,YJ'
-          psql "postgresql://postgres@db.anrwjfidqqjivatjarrg.supabase.co:5432/postgres" <<'SQL'
-
-          -- Profiles
+          cat > /tmp/migration.sql <<'ENDSQL'
           CREATE TABLE IF NOT EXISTS profiles (
             id text PRIMARY KEY,
             name text NOT NULL,
@@ -28,8 +25,6 @@ jobs:
             group_code text,
             created_at timestamptz DEFAULT now()
           );
-
-          -- Groups
           CREATE TABLE IF NOT EXISTS groups (
             id text PRIMARY KEY,
             name text NOT NULL,
@@ -38,50 +33,68 @@ jobs:
             settings jsonb DEFAULT '{}',
             created_at timestamptz DEFAULT now()
           );
-
-          -- Group members
           CREATE TABLE IF NOT EXISTS group_members (
             group_id text REFERENCES groups(id) ON DELETE CASCADE,
             profile_id text REFERENCES profiles(id) ON DELETE CASCADE,
             joined_at timestamptz DEFAULT now(),
             PRIMARY KEY (group_id, profile_id)
           );
-
-          -- Enable RLS
           ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
           ALTER TABLE groups ENABLE ROW LEVEL SECURITY;
           ALTER TABLE group_members ENABLE ROW LEVEL SECURITY;
-
-          -- Policies (idempotent with DO block)
           DO $$ BEGIN
-            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_read_profiles') THEN
-              CREATE POLICY pub_read_profiles ON profiles FOR SELECT USING (true);
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_insert_profiles') THEN
-              CREATE POLICY pub_insert_profiles ON profiles FOR INSERT WITH CHECK (true);
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_update_profiles') THEN
-              CREATE POLICY pub_update_profiles ON profiles FOR UPDATE USING (true);
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_read_groups') THEN
-              CREATE POLICY pub_read_groups ON groups FOR SELECT USING (true);
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_insert_groups') THEN
-              CREATE POLICY pub_insert_groups ON groups FOR INSERT WITH CHECK (true);
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_update_groups') THEN
-              CREATE POLICY pub_update_groups ON groups FOR UPDATE USING (true);
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_read_members') THEN
-              CREATE POLICY pub_read_members ON group_members FOR SELECT USING (true);
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_insert_members') THEN
-              CREATE POLICY pub_insert_members ON group_members FOR INSERT WITH CHECK (true);
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_delete_members') THEN
-              CREATE POLICY pub_delete_members ON group_members FOR DELETE USING (true);
-            END IF;
+            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_read_profiles') THEN CREATE POLICY pub_read_profiles ON profiles FOR SELECT USING (true); END IF;
+            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_insert_profiles') THEN CREATE POLICY pub_insert_profiles ON profiles FOR INSERT WITH CHECK (true); END IF;
+            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_update_profiles') THEN CREATE POLICY pub_update_profiles ON profiles FOR UPDATE USING (true); END IF;
+            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_read_groups') THEN CREATE POLICY pub_read_groups ON groups FOR SELECT USING (true); END IF;
+            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_insert_groups') THEN CREATE POLICY pub_insert_groups ON groups FOR INSERT WITH CHECK (true); END IF;
+            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_update_groups') THEN CREATE POLICY pub_update_groups ON groups FOR UPDATE USING (true); END IF;
+            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_read_members') THEN CREATE POLICY pub_read_members ON group_members FOR SELECT USING (true); END IF;
+            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_insert_members') THEN CREATE POLICY pub_insert_members ON group_members FOR INSERT WITH CHECK (true); END IF;
+            IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_delete_members') THEN CREATE POLICY pub_delete_members ON group_members FOR DELETE USING (true); END IF;
           END $$;
+          ENDSQL
 
-          SELECT 'SUCCESS: All tables and policies created!' as result;
-          SQL
+      - name: Debug DNS
+        run: |
+          echo "=== Direct host ==="
+          nslookup db.anrwjfidqqjivatjarrg.supabase.co || true
+          echo "=== Pooler eu-central ==="
+          nslookup aws-0-eu-central-1.pooler.supabase.com || true
+          echo "=== Pooler us-east ==="
+          nslookup aws-0-us-east-1.pooler.supabase.com || true
+
+      - name: Try direct connection
+        continue-on-error: true
+        id: direct
+        run: |
+          export PGPASSWORD='!X,?N7mT%umv,YJ'
+          psql "postgresql://postgres@db.anrwjfidqqjivatjarrg.supabase.co:5432/postgres?sslmode=require" -f /tmp/migration.sql
+          echo "result=success" >> $GITHUB_OUTPUT
+
+      - name: Try pooler eu-central (session mode)
+        if: steps.direct.outcome == 'failure'
+        continue-on-error: true
+        id: pooler1
+        run: |
+          export PGPASSWORD='!X,?N7mT%umv,YJ'
+          psql "postgresql://postgres.anrwjfidqqjivatjarrg@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require" -f /tmp/migration.sql
+          echo "result=success" >> $GITHUB_OUTPUT
+
+      - name: Try pooler us-east
+        if: steps.direct.outcome == 'failure' && steps.pooler1.outcome == 'failure'
+        continue-on-error: true
+        id: pooler2
+        run: |
+          export PGPASSWORD='!X,?N7mT%umv,YJ'
+          psql "postgresql://postgres.anrwjfidqqjivatjarrg@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require" -f /tmp/migration.sql
+          echo "result=success" >> $GITHUB_OUTPUT
+
+      - name: Check result
+        run: |
+          if [[ "${{ steps.direct.outcome }}" == "success" || "${{ steps.pooler1.outcome }}" == "success" || "${{ steps.pooler2.outcome }}" == "success" ]]; then
+            echo "Database setup completed successfully!"
+          else
+            echo "All connection attempts failed. Check the logs above."
+            exit 1
+          fi
