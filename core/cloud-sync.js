@@ -28,6 +28,14 @@ function toCloudRow(p) {
     let svg = "";
     try { svg = getAvatarSVG(); } catch { svg = p.avatarSvg || ""; }
 
+    // Collect all background-related settings
+    const bgExtra = {};
+    try { bgExtra.gradColors = JSON.parse(localStorage.getItem("gradColors") || "null"); } catch {}
+    bgExtra.gradDir = localStorage.getItem("gradDir") || null;
+    bgExtra.gradAnimated = localStorage.getItem("gradAnimated") || null;
+    bgExtra.liveBgKey = localStorage.getItem("liveBgKey") || null;
+    bgExtra.appBgCustom = localStorage.getItem("appBgCustom") || null;
+
     const row = {
         id:               p.id,
         name:             p.name || "Unnamed",
@@ -38,6 +46,7 @@ function toCloudRow(p) {
         avatar_selection: avatarSel,
         avatar_unlocked:  avatarUnl,
         app_bg:           bg,
+        bg_extra:         bgExtra,
     };
     console.log("[cloud-sync] pushing:", p.name, "pts:", points, "streak:", streak, "id:", p.id);
     return row;
@@ -55,6 +64,7 @@ function fromCloudRow(row) {
         avatarSelection: row.avatar_selection ?? null,
         avatarUnlocked:  row.avatar_unlocked ?? [],
         appBg:           row.app_bg ?? "light",
+        bgExtra:         row.bg_extra ?? {},
         loginCode:       row.login_code ?? null,
     };
 }
