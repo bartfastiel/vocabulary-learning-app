@@ -1,8 +1,8 @@
 // core/cloud-sync.js
 // Synchronises local profiles with Supabase and manages group membership.
 
-import { supabaseGet, supabaseUpsert, supabaseInsert, supabaseDelete } from "./supabase.js";
-import { getActiveProfile, getActiveId } from "./profiles.js";
+import { supabaseGet, supabaseUpsert, supabaseInsert, supabaseDelete, supabaseUpdate } from "./supabase.js";
+import { getActiveProfile, getActiveId, getProfiles } from "./profiles.js";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -177,6 +177,76 @@ export async function getGroupByCode(code) {
         console.warn("[cloud-sync] getGroupByCode failed:", e);
         return null;
     }
+}
+
+// ─── login system ──────────────────────────────────────────────────────────
+
+/** Simple hash for PIN (not crypto-grade, but prevents casual snooping) */
+async function hashPin(pin) {
+    const data = new TextEncoder().encode(pin + "vokabel-salt-2026");
+    const buf = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** Generate a unique 8-char login code for a profile */
+function generateLoginCode() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "";
+    for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return code;
+}
+
+/**
+ * Register a profile in the cloud with a login code and PIN.
+ * Returns { loginCode } on success, null on failure.
+ */
+export async function registerCloudAccount(profileId, pin) {
+    try {
+        const code = generateLoginCode();
+        const pinH = await hashPin(pin);
+        await supabaseUpdate("profiles", { id: profileId }, { login_code: code, pin_hash: pinH });
+        localStorage.setItem("myLoginCode", code);
+        return { loginCode: code };
+    } catch (e) {
+        console.warn("[cloud-sync] registerCloudAccount failed:", e);
+        return null;
+    }
+}
+
+/**
+ * Login with a login code + PIN from another device.
+ * Returns the cloud profile data on success, null on failure.
+ */
+export async function loginWithCode(loginCode, pin) {
+    try {
+        const rows = await supabaseGet("profiles", `login_code=eq.${encodeURIComponent(loginCode.toUpperCase())}`);
+        if (!rows || rows.length === 0) return null;
+        const row = rows[0];
+        const pinH = await hashPin(pin);
+        if (row.pin_hash !== pinH) return null; // wrong PIN
+        return fromCloudRow(row);
+    } catch (e) {
+        console.warn("[cloud-sync] loginWithCode failed:", e);
+        return null;
+    }
+}
+
+/**
+ * Get the login code for the current profile (if registered).
+ */
+export async function getMyLoginCode() {
+    const cached = localStorage.getItem("myLoginCode");
+    if (cached) return cached;
+    try {
+        const id = getActiveId();
+        if (!id) return null;
+        const rows = await supabaseGet("profiles", `id=eq.${encodeURIComponent(id)}&select=login_code`);
+        if (rows?.[0]?.login_code) {
+            localStorage.setItem("myLoginCode", rows[0].login_code);
+            return rows[0].login_code;
+        }
+        return null;
+    } catch { return null; }
 }
 
 // ─── auto-sync on import ────────────────────────────────────────────────────
