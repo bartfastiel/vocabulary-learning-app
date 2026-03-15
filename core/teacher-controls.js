@@ -5,10 +5,17 @@
 const TC_KEY = "teacherControls";
 const TC_PIN_KEY = "teacherPin";
 
+// One-time reset: clear any accidental teacher settings from before the fix
+if (!localStorage.getItem("teacherControlsV2")) {
+    localStorage.removeItem(TC_KEY);
+    localStorage.removeItem(TC_PIN_KEY);
+    localStorage.setItem("teacherControlsV2", "1");
+}
+
 function loadControls() {
     // If no teacher PIN is set, always return defaults (no restrictions)
     if (!localStorage.getItem(TC_PIN_KEY)) {
-        localStorage.removeItem(TC_KEY); // clean up any accidental settings
+        localStorage.removeItem(TC_KEY);
         return getDefaults();
     }
     try { return JSON.parse(localStorage.getItem(TC_KEY)) || getDefaults(); }
