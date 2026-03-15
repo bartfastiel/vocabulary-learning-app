@@ -208,6 +208,8 @@ export async function joinGroup(joinCode) {
         const group = await getGroupByCode(joinCode);
         if (!group) return null;
         await supabaseInsert("group_members", [{ group_id: group.id, profile_id: profileId }]);
+        // Mark this profile as being in this class
+        await supabaseUpdate("profiles", { id: profileId }, { class_id: group.id });
         return group;
     } catch (e) {
         console.warn("[cloud-sync] joinGroup failed:", e);
