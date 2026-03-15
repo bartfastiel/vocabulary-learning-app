@@ -182,5 +182,58 @@ export async function getGroupByCode(code) {
     } catch { return null; }
 }
 
+// ─── pull latest data from cloud into local ─────────────────────────────────
+
+/**
+ * Pull the latest profile data from the cloud and update localStorage.
+ * This keeps a second device in sync when the first device earns points.
+ */
+export async function pullFromCloud() {
+    try {
+        const id = getActiveId();
+        if (!id) return;
+        const rows = await supabaseGet("profiles", `id=eq.${encodeURIComponent(id)}`);
+        if (!rows || rows.length === 0) return;
+        const cloud = fromCloudRow(rows[0]);
+
+        // Only update if cloud has higher values (don't overwrite local progress)
+        const localPoints = parseInt(localStorage.getItem("points") || "0");
+        const localStreak = parseInt(localStorage.getItem("streakRecord") || "0");
+
+        if (cloud.points > localPoints) {
+            localStorage.setItem("points", String(cloud.points));
+            // Update the displayed points if the element exists
+            const el = document.querySelector("app-shell")?.shadowRoot?.getElementById("home-points");
+            if (el) el.textContent = cloud.points;
+        }
+        if (cloud.streakRecord > localStreak) {
+            localStorage.setItem("streakRecord", String(cloud.streakRecord));
+            const el = document.querySelector("app-shell")?.shadowRoot?.getElementById("home-streak");
+            if (el) el.textContent = cloud.streakRecord;
+        }
+
+        // Sync avatar and background if changed on other device
+        if (cloud.avatarSvg && cloud.avatarSvg !== localStorage.getItem("lastCloudAvatar")) {
+            localStorage.setItem("lastCloudAvatar", cloud.avatarSvg);
+            const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
+            const p = list.find(p => p.id === id);
+            if (p) {
+                p.avatarSvg = cloud.avatarSvg;
+                p.points = Math.max(p.points || 0, cloud.points);
+                p.streakRecord = Math.max(p.streakRecord || 0, cloud.streakRecord);
+                if (cloud.avatarSelection) p.avatarSelection = cloud.avatarSelection;
+                if (cloud.appBg) p.appBg = cloud.appBg;
+                localStorage.setItem("allProfiles", JSON.stringify(list));
+            }
+        }
+    } catch (e) {
+        console.warn("[cloud-sync] pullFromCloud failed:", e);
+    }
+}
+
 // ─── auto-sync on import ────────────────────────────────────────────────────
 syncProfileToCloud();
+
+// Pull + push loop: push every 60s, pull every 30s
+setInterval(() => syncProfileToCloud(), 60000);
+setInterval(() => pullFromCloud(), 30000);

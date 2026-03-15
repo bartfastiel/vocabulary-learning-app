@@ -1031,8 +1031,6 @@ class AppShell extends HTMLElement {
             this._showProfileOverlay(false, () => location.reload());
         };
         window.addEventListener("beforeunload", () => { saveSnapshot(); syncProfileToCloud(); });
-        // Sync to cloud every 60 seconds while active
-        setInterval(() => { saveSnapshot(); syncProfileToCloud(); }, 60000);
 
         // Welcome text
         if (profile) {
