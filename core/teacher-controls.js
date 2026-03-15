@@ -6,6 +6,11 @@ const TC_KEY = "teacherControls";
 const TC_PIN_KEY = "teacherPin";
 
 function loadControls() {
+    // If no teacher PIN is set, always return defaults (no restrictions)
+    if (!localStorage.getItem(TC_PIN_KEY)) {
+        localStorage.removeItem(TC_KEY); // clean up any accidental settings
+        return getDefaults();
+    }
     try { return JSON.parse(localStorage.getItem(TC_KEY)) || getDefaults(); }
     catch { return getDefaults(); }
 }
@@ -29,6 +34,8 @@ function getDefaults() {
 
 /** Check if playing games is currently allowed */
 export function isPlayAllowed() {
+    // Only enforce restrictions if a teacher PIN has been set
+    if (!localStorage.getItem(TC_PIN_KEY)) return { allowed: true };
     const ctrl = loadControls();
     if (!ctrl.gamesEnabled) return { allowed: false, reason: "Spiele sind deaktiviert." };
 
@@ -57,8 +64,10 @@ export function isPlayAllowed() {
 
 /** Check if a specific game is allowed */
 export function isGameAllowed(gameId) {
+    // Only enforce restrictions if a teacher PIN has been set
+    if (!localStorage.getItem(TC_PIN_KEY)) return true;
     const ctrl = loadControls();
-    if (Object.keys(ctrl.allowedGames).length === 0) return true; // no restrictions
+    if (Object.keys(ctrl.allowedGames).length === 0) return true;
     return ctrl.allowedGames[gameId] !== false;
 }
 
