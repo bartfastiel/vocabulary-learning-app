@@ -13,9 +13,8 @@ jobs:
         run: sudo apt-get install -y postgresql-client
 
       - name: Create tables
-        env:
-          PGPASSWORD: "***REMOVED***"
         run: |
+          export PGPASSWORD='***REMOVED***'
           psql "postgresql://postgres@db.anrwjfidqqjivatjarrg.supabase.co:5432/postgres" <<'SQL'
 
           -- Profiles
