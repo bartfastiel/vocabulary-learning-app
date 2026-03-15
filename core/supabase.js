@@ -2,7 +2,7 @@
 // Supabase client singleton for online features.
 
 const SUPABASE_URL = "https://anrwjfidqqjivatjarrg.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFucndqZmlkcXFqaXZhdGphcnJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwMDI2Nn0.Pxq5uXvFqk5UF8hrnT94A8WT1ZUEVeiWfu2_OZZA8us";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFucndqZmlkcXFqaXZhdGphcnJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NjQyNjYsImV4cCI6MjA4OTE0MDI2Nn0.Pxq5uXvFqk5UF8hrnT94A8WT1ZUEVeiWfu2_OZZA8us";
 
 const HEADERS = {
     "apikey": SUPABASE_ANON_KEY,
