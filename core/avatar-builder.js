@@ -1009,18 +1009,19 @@ export function getAvatarSVG() {
     }
 }
 
-/** Generate a random avatar selection (only free items, index 0 = none for glasses/accessory) */
+/** Generate a random avatar selection (only free items, no cost items) */
 export function randomAvatarSelection() {
-    const rnd = (arr) => Math.floor(Math.random() * arr.length);
+    const freeIndices = (arr) => arr.map((item, i) => item.cost ? -1 : i).filter(i => i >= 0);
+    const rndFree = (arr) => { const free = freeIndices(arr); return free.length ? free[Math.floor(Math.random() * free.length)] : 0; };
     return {
-        background: rnd(LAYERS.background),
-        face:       rnd(LAYERS.face),
-        hair:       rnd(LAYERS.hair),
-        eyebrows:   rnd(LAYERS.eyebrows),
-        eyes:       rnd(LAYERS.eyes),
-        mouth:      rnd(LAYERS.mouth),
-        glasses:    Math.random() < 0.3 ? rnd(LAYERS.glasses) : 0,   // 30% chance of glasses
-        accessory:  Math.random() < 0.2 ? rnd(LAYERS.accessory) : 0, // 20% chance of accessory
+        background: rndFree(LAYERS.background),
+        face:       rndFree(LAYERS.face),
+        hair:       rndFree(LAYERS.hair),
+        eyebrows:   rndFree(LAYERS.eyebrows),
+        eyes:       rndFree(LAYERS.eyes),
+        mouth:      rndFree(LAYERS.mouth),
+        glasses:    Math.random() < 0.3 ? rndFree(LAYERS.glasses) : 0,
+        accessory:  Math.random() < 0.2 ? rndFree(LAYERS.accessory) : 0,
     };
 }
 
