@@ -5,6 +5,7 @@ import "./help-overlay.js";
 import "./group-board.js";
 import "./invite-qr.js";
 import "./teacher-controls.js";
+import { syncProfileToCloud } from "./cloud-sync.js";
 import "../vocab/vocab.js";
 import "../vocab/vocab-editor.js";
 import "../game/game-lobby.js";
@@ -1020,7 +1021,9 @@ class AppShell extends HTMLElement {
             saveSnapshot();
             this._showProfileOverlay(false, () => location.reload());
         };
-        window.addEventListener("beforeunload", () => saveSnapshot());
+        window.addEventListener("beforeunload", () => { saveSnapshot(); syncProfileToCloud(); });
+        // Sync to cloud every 60 seconds while active
+        setInterval(() => { saveSnapshot(); syncProfileToCloud(); }, 60000);
 
         // Welcome text
         if (profile) {
