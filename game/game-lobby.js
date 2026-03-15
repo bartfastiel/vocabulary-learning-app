@@ -34,6 +34,7 @@ import "./minesweeper-game.js";
 import "./asteroids-game.js";
 import "./racing-game.js";
 import "./quiz-game.js";
+import "./drift-game.js";
 import { isPlayAllowed, isGameAllowed, trackPlayStart, trackPlayEnd } from "../core/teacher-controls.js";
 
 const HS_KEY = "gameHighscores";
@@ -213,6 +214,13 @@ const GAMES = [
         component: "quiz-game",
         desc: "Beantworte 15 Vokabelfragen und werde Million\u00e4r!",
         scoreLabel: "Fragen",
+    },
+    {
+        id: "drift", label: "Neon Drift",            emoji: "\uD83C\uDF03",
+        cost: 2,  maxEarn: 0,
+        component: "drift-game",
+        desc: "Nacht-Rennen durch die Neon-City! Driften, Nitro, Highscore!",
+        scoreLabel: "Punkte",
     },
 ];
 
