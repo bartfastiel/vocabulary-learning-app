@@ -1,6 +1,8 @@
 // core/profiles.js
 // Multi-profile support for a single device.
 
+import { generateRandomAvatar } from "./avatar-builder.js";
+
 const LS_ALL    = "allProfiles";
 const LS_ACTIVE = "activeProfileId";
 
@@ -24,9 +26,12 @@ export function getActiveProfile() {
 export function createProfile(name) {
     const list = getProfiles();
     const id = "p" + Date.now();
+    const { selection, svg } = generateRandomAvatar();
     list.push({ id, name, role: null, points: 0, streakRecord: 0,
-                avatarSelection: null, avatarUnlocked: [], avatarSvg: "", appBg: "dark" });
+                avatarSelection: selection, avatarUnlocked: [], avatarSvg: svg, appBg: "light" });
     _save(list);
+    // Also save the avatar selection to localStorage so avatar-builder picks it up
+    localStorage.setItem("avatarSelection", JSON.stringify(selection));
     return id;
 }
 
