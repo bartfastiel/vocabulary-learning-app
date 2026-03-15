@@ -409,12 +409,12 @@ class PlatformerGame extends HTMLElement {
         else this._jumpHeld = false;
 
         if (jumpPressed && this._onGround) {
-            this._pvy = JUMP_VEL * (hasWings ? 1.3 : 1);
+            this._pvy = JUMP_VEL * (hasWings ? 1.15 : 1);
             this._onGround = false;
             this._doubleJumpUsed = false;
         } else if (jumpPressed && hasWings && !this._onGround && !this._doubleJumpUsed) {
-            // Wings: double jump
-            this._pvy = JUMP_VEL * 0.9;
+            // Wings: double jump (flap)
+            this._pvy = JUMP_VEL * 0.75;
             this._doubleJumpUsed = true;
             // Wing flap particles
             for (let i = 0; i < 4; i++) {
@@ -426,10 +426,12 @@ class PlatformerGame extends HTMLElement {
             }
         }
 
-        // gravity (wings = floatier)
-        const gravMul = hasWings ? 0.6 : 1;
+        // gravity (wings = floatier; holding jump = glide slowly)
+        const gliding = hasWings && this._keys.jump && !this._onGround && this._pvy > 0;
+        const gravMul = gliding ? 0.25 : (hasWings ? 0.65 : 1);
         this._pvy += GRAVITY * gravMul * dt;
-        if (this._pvy > (hasWings ? 200 : 500)) this._pvy = hasWings ? 200 : 500;
+        const maxFall = gliding ? 80 : (hasWings ? 180 : 500);
+        if (this._pvy > maxFall) this._pvy = maxFall;
 
         // move X
         this._px += this._pvx * dt;
@@ -644,7 +646,10 @@ class PlatformerGame extends HTMLElement {
         this._camX = Math.max(0, Math.min(this._levelW - PF_W, this._camX));
 
         const targetCamY = this._py - PF_H / 2;
-        this._camY += (targetCamY - this._camY) * 0.08;
+        // Faster follow when player is far from camera center (e.g. flying with wings)
+        const camDiffY = Math.abs(targetCamY - this._camY);
+        const camSpeedY = camDiffY > PF_H * 0.25 ? 0.25 : camDiffY > PF_H * 0.15 ? 0.15 : 0.1;
+        this._camY += (targetCamY - this._camY) * camSpeedY;
         this._camY = Math.max(this._skyTop - TILE * 2, Math.min(this._levelH - PF_H, this._camY));
     }
 
@@ -1072,16 +1077,28 @@ class PlatformerGame extends HTMLElement {
 
             // Wings visual
             if (this._activePower.type === "wings") {
-                const wingFlap = Math.sin(now / 100) * 8;
-                ctx.fillStyle = "rgba(147,197,253,0.6)";
+                const isGliding = this._keys.jump && !this._onGround && this._pvy > 0;
+                const flapSpeed = isGliding ? 200 : 100;
+                const wingSpread = isGliding ? 14 : 10;
+                const wingFlap = Math.sin(now / flapSpeed) * (isGliding ? 4 : 8);
+                ctx.fillStyle = isGliding ? "rgba(147,197,253,0.8)" : "rgba(147,197,253,0.6)";
                 // left wing
                 ctx.beginPath();
-                ctx.ellipse(this._px - 2, this._py + 6, 10, 5 + wingFlap, -0.3, 0, Math.PI * 2);
+                ctx.ellipse(this._px - 2, this._py + 6, wingSpread, 5 + wingFlap, -0.3, 0, Math.PI * 2);
                 ctx.fill();
                 // right wing
                 ctx.beginPath();
-                ctx.ellipse(this._px + 22, this._py + 6, 10, 5 + wingFlap, 0.3, 0, Math.PI * 2);
+                ctx.ellipse(this._px + 22, this._py + 6, wingSpread, 5 + wingFlap, 0.3, 0, Math.PI * 2);
                 ctx.fill();
+                // Glide feather trail
+                if (isGliding && Math.random() < 0.25) {
+                    this._particles.push({
+                        x: this._px + 10 + (Math.random() - 0.5) * 20,
+                        y: this._py + 15,
+                        vx: (Math.random() - 0.5) * 15, vy: 15 + Math.random() * 10,
+                        life: 0.6, color: "#bfdbfe", size: 1.5 + Math.random(),
+                    });
+                }
             }
 
             // Star sparkle trail
