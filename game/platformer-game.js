@@ -409,28 +409,26 @@ class PlatformerGame extends HTMLElement {
         else this._jumpHeld = false;
 
         if (jumpPressed && this._onGround) {
-            this._pvy = JUMP_VEL * (hasWings ? 1.15 : 1);
+            this._pvy = JUMP_VEL;
             this._onGround = false;
-            this._doubleJumpUsed = false;
-        } else if (jumpPressed && hasWings && !this._onGround && !this._doubleJumpUsed) {
-            // Wings: double jump (flap)
-            this._pvy = JUMP_VEL * 0.75;
-            this._doubleJumpUsed = true;
+        } else if (jumpPressed && hasWings && !this._onGround) {
+            // Wings: flap! Can flap multiple times to fly higher
+            this._pvy = Math.max(this._pvy - 180, -280);
             // Wing flap particles
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 5; i++) {
                 this._particles.push({
-                    x: this._px + 10, y: this._py + 12,
-                    vx: (Math.random() - 0.5) * 40, vy: 20 + Math.random() * 30,
-                    life: 0.5, color: "#93c5fd", size: 2,
+                    x: this._px + 10 + (Math.random() - 0.5) * 16, y: this._py + 16,
+                    vx: (Math.random() - 0.5) * 30, vy: 30 + Math.random() * 25,
+                    life: 0.5, color: "#93c5fd", size: 2 + Math.random(),
                 });
             }
         }
 
-        // gravity (wings = floatier; holding jump = glide slowly)
+        // gravity (wings = floatier; holding jump while falling = glide)
         const gliding = hasWings && this._keys.jump && !this._onGround && this._pvy > 0;
-        const gravMul = gliding ? 0.25 : (hasWings ? 0.65 : 1);
+        const gravMul = gliding ? 0.3 : (hasWings ? 0.55 : 1);
         this._pvy += GRAVITY * gravMul * dt;
-        const maxFall = gliding ? 80 : (hasWings ? 180 : 500);
+        const maxFall = gliding ? 60 : (hasWings ? 150 : 500);
         if (this._pvy > maxFall) this._pvy = maxFall;
 
         // move X
@@ -646,10 +644,14 @@ class PlatformerGame extends HTMLElement {
         this._camX = Math.max(0, Math.min(this._levelW - PF_W, this._camX));
 
         const targetCamY = this._py - PF_H / 2;
-        // Faster follow when player is far from camera center (e.g. flying with wings)
         const camDiffY = Math.abs(targetCamY - this._camY);
-        const camSpeedY = camDiffY > PF_H * 0.25 ? 0.25 : camDiffY > PF_H * 0.15 ? 0.15 : 0.1;
-        this._camY += (targetCamY - this._camY) * camSpeedY;
+        // Snap camera if player is far away, otherwise smooth follow
+        if (camDiffY > PF_H * 0.4) {
+            this._camY = targetCamY; // instant snap
+        } else {
+            const camSpeedY = camDiffY > PF_H * 0.2 ? 0.3 : 0.12;
+            this._camY += (targetCamY - this._camY) * camSpeedY;
+        }
         this._camY = Math.max(this._skyTop - TILE * 2, Math.min(this._levelH - PF_H, this._camY));
     }
 
