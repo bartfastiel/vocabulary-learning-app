@@ -25,7 +25,7 @@ const BLOCK_INFO = {
     [B.WOOD]:    { name: "Holz",     color: "#8B5E3C", hardness: 2, accent: "#6B4226" },
     [B.LEAVES]:  { name: "Bl\u00e4tter", color: "#2E7D32", hardness: 0.5, accent: "#388E3C" },
     [B.SAND]:    { name: "Sand",     color: "#F4D03F", hardness: 0.5 },
-    [B.WATER]:   { name: "Wasser",   color: "rgba(30,100,200,0.6)", hardness: -1 },
+    [B.WATER]:   { name: "Wasser",   color: "rgba(30,100,200,0.6)", hardness: 0.5 },
     [B.COAL]:    { name: "Kohle",    color: "#555", hardness: 3, accent: "#222" },
     [B.IRON]:    { name: "Eisen",    color: "#888", hardness: 4, accent: "#D4A574" },
     [B.GOLD]:    { name: "Gold",     color: "#888", hardness: 4, accent: "#FFD700" },
@@ -33,9 +33,9 @@ const BLOCK_INFO = {
     [B.PLANK]:   { name: "Planke",   color: "#C68E4E", hardness: 2, accent: "#A0723C" },
     [B.BRICK]:   { name: "Ziegel",   color: "#B74C3C", hardness: 3, accent: "#943C30" },
     [B.GLASS]:   { name: "Glas",     color: "rgba(200,230,255,0.4)", hardness: 0.3 },
-    [B.BEDROCK]: { name: "Grundstein", color: "#333", hardness: -1, accent: "#222" },
+    [B.BEDROCK]: { name: "Grundstein", color: "#333", hardness: 6, accent: "#222" },
     [B.SNOW]:    { name: "Schnee",   color: "#F5F5F5", hardness: 0.5 },
-    [B.LAVA]:    { name: "Lava",     color: "#FF4500", hardness: -1, accent: "#FF6600" },
+    [B.LAVA]:    { name: "Lava",     color: "#FF4500", hardness: 1, accent: "#FF6600" },
 };
 
 class CraftGame extends HTMLElement {
