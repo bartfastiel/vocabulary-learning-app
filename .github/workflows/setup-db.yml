@@ -9,18 +9,20 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Install PostgreSQL client
-        run: sudo apt-get install -y postgresql-client
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Setup credentials
-        run: |
-          echo 'db.anrwjfidqqjivatjarrg.supabase.co:5432:postgres:postgres:!X,?N7mT%umv,YJ' > ~/.pgpass
-          echo 'aws-0-eu-central-1.pooler.supabase.com:5432:postgres:postgres.anrwjfidqqjivatjarrg:!X,?N7mT%umv,YJ' >> ~/.pgpass
-          chmod 600 ~/.pgpass
+      - name: Install pg module
+        run: npm install pg
 
-      - name: Write migration SQL
+      - name: Run migration
         run: |
-          cat > /tmp/migrate.sql << 'ENDSQL'
+          node << 'ENDSCRIPT'
+          const { Client } = require('pg');
+
+          const SQL = `
           CREATE TABLE IF NOT EXISTS profiles (
             id text PRIMARY KEY,
             name text NOT NULL,
@@ -59,21 +61,64 @@ jobs:
             IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_insert_members') THEN CREATE POLICY pub_insert_members ON group_members FOR INSERT WITH CHECK (true); END IF;
             IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname='pub_delete_members') THEN CREATE POLICY pub_delete_members ON group_members FOR DELETE USING (true); END IF;
           END $$;
-          ENDSQL
+          NOTIFY pgrst, 'reload schema';
+          `;
 
-      - name: Run migration (direct)
-        run: |
-          echo "Trying direct connection..."
-          psql -h db.anrwjfidqqjivatjarrg.supabase.co -p 5432 -U postgres -d postgres -f /tmp/migrate.sql && echo "DIRECT SUCCESS" && exit 0
-          echo "Direct failed, trying pooler..."
-          psql -h aws-0-eu-central-1.pooler.supabase.com -p 5432 -U postgres.anrwjfidqqjivatjarrg -d postgres -f /tmp/migrate.sql && echo "POOLER SUCCESS" && exit 0
-          echo "ALL FAILED"
-          exit 1
+          async function tryConnect(config, label) {
+            const client = new Client(config);
+            try {
+              await client.connect();
+              console.log(label + ': connected!');
+              await client.query(SQL);
+              console.log(label + ': migration SUCCESS!');
+              const res = await client.query("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename");
+              console.log('Tables:', res.rows.map(r => r.tablename).join(', '));
+              await client.end();
+              return true;
+            } catch (e) {
+              console.log(label + ': FAILED -', e.message);
+              try { await client.end(); } catch {}
+              return false;
+            }
+          }
 
-      - name: Verify tables
-        run: |
-          psql -h db.anrwjfidqqjivatjarrg.supabase.co -p 5432 -U postgres -d postgres -c "SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename;" || true
+          (async () => {
+            // Try direct connection
+            let ok = await tryConnect({
+              host: 'db.anrwjfidqqjivatjarrg.supabase.co',
+              port: 5432, database: 'postgres', user: 'postgres',
+              password: '!X,?N7mT%umv,YJ',
+              ssl: { rejectUnauthorized: false },
+              connectionTimeoutMillis: 10000,
+            }, 'Direct');
 
-      - name: Notify PostgREST to reload schema
-        run: |
-          psql -h db.anrwjfidqqjivatjarrg.supabase.co -p 5432 -U postgres -d postgres -c "NOTIFY pgrst, 'reload schema';" || true
+            if (!ok) {
+              // Try pooler EU
+              ok = await tryConnect({
+                host: 'aws-0-eu-central-1.pooler.supabase.com',
+                port: 5432, database: 'postgres',
+                user: 'postgres.anrwjfidqqjivatjarrg',
+                password: '!X,?N7mT%umv,YJ',
+                ssl: { rejectUnauthorized: false },
+                connectionTimeoutMillis: 10000,
+              }, 'Pooler-EU');
+            }
+
+            if (!ok) {
+              // Try pooler US
+              ok = await tryConnect({
+                host: 'aws-0-us-east-1.pooler.supabase.com',
+                port: 5432, database: 'postgres',
+                user: 'postgres.anrwjfidqqjivatjarrg',
+                password: '!X,?N7mT%umv,YJ',
+                ssl: { rejectUnauthorized: false },
+                connectionTimeoutMillis: 10000,
+              }, 'Pooler-US');
+            }
+
+            if (!ok) {
+              console.error('All connection methods failed!');
+              process.exit(1);
+            }
+          })();
+          ENDSCRIPT
