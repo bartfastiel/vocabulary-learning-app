@@ -35,7 +35,7 @@ import "./asteroids-game.js";
 import "./racing-game.js";
 import "./quiz-game.js";
 import "./craft-game.js";
-import { isPlayAllowed, isGameAllowed, trackPlayStart, trackPlayEnd } from "../core/teacher-controls.js";
+import { isPlayAllowedCloud, isGameAllowedCloud } from "../core/teacher-controls.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -500,7 +500,7 @@ class GameLobby extends HTMLElement {
 
     // ── game lifecycle ────────────────────────────────────────────────────────
 
-    _renderCards() {
+    async _renderCards() {
         const pm = this._pm();
         const pts = pm?.points ?? 0;
         const hs  = getHighscores();
@@ -509,19 +509,21 @@ class GameLobby extends HTMLElement {
         this.shadowRoot.getElementById("lobby-points").textContent =
             `${pts} Punkt${pts !== 1 ? "e" : ""}`;
 
-        // Teacher controls: only check if a PIN was set
-        const playCheck = isPlayAllowed();
-        const hasTeacher = !playCheck.allowed || playCheck.reason;
+        // Check cloud-based teacher restrictions
+        const playCheck = await isPlayAllowedCloud();
+        const blockedGames = {};
+        for (const g of GAMES) {
+            blockedGames[g.id] = !(await isGameAllowedCloud(g.id));
+        }
 
         grid.innerHTML = GAMES.map(g => {
             const locked = pts < g.cost;
-            const blocked = !isGameAllowed(g.id);
+            const blocked = blockedGames[g.id];
             const teacherBlocked = blocked || !playCheck.allowed;
             const hsVal  = hs[g.id] != null ? hs[g.id] : null;
             const hsText = hsVal != null && g.scoreLabel
                 ? `Highscore: ${hsVal} ${g.scoreLabel}`
                 : hsVal != null ? `Gespielt` : `Noch nicht gespielt`;
-            // Only show teacher lock if actually blocked by teacher
             const isLocked = locked || teacherBlocked;
             const lockReason = teacherBlocked && blocked ? "Vom Lehrer gesperrt"
                 : teacherBlocked && !playCheck.allowed ? playCheck.reason
