@@ -4,6 +4,7 @@
 import "./help-overlay.js";
 import "./group-board.js";
 import "./invite-qr.js";
+import "./teacher-controls.js";
 import "../vocab/vocab.js";
 import "../vocab/vocab-editor.js";
 import "../game/game-lobby.js";
@@ -648,6 +649,7 @@ class AppShell extends HTMLElement {
       <group-board></group-board>
       <game-lobby></game-lobby>
       <invite-qr></invite-qr>
+      <teacher-controls></teacher-controls>
 
       <!-- Home / Dashboard -->
       <div id="home-screen">
@@ -716,6 +718,10 @@ class AppShell extends HTMLElement {
           <button class="action-card" id="home-friends">
             <span class="action-icon">📲</span>
             <span class="action-label">Freunde</span>
+          </button>
+          <button class="action-card" id="home-teacher">
+            <span class="action-icon">\uD83C\uDF93</span>
+            <span class="action-label">Lehrer</span>
           </button>
           <button class="action-card" id="home-design">
             <span class="action-icon">🚀</span>
@@ -1063,6 +1069,8 @@ class AppShell extends HTMLElement {
         this.shadowRoot.getElementById("home-friends").onclick = () => inviteQR.open();
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
+        const teacherCtrl = this.shadowRoot.querySelector("teacher-controls");
+        this.shadowRoot.getElementById("home-teacher").onclick = () => teacherCtrl.open();
         this.shadowRoot.getElementById("home-design").onclick = () => {
             localStorage.setItem("appDesign", "classic");
             location.reload();
