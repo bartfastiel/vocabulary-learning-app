@@ -42,7 +42,32 @@ class CraftGame extends HTMLElement {
     constructor() { super(); this.attachShadow({ mode: "open" }); }
 
     connectedCallback() {
-        this.shadowRoot.innerHTML = `<style>:host{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#000;position:relative}canvas{width:100%;height:100%;image-rendering:pixelated;cursor:crosshair}</style><canvas></canvas>`;
+        this._isTouch = "ontouchstart" in window;
+        this.shadowRoot.innerHTML = `<style>
+            :host{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#000;position:relative;flex-direction:column}
+            canvas{width:100%;flex:1;image-rendering:pixelated;cursor:crosshair;touch-action:none}
+            .touch-ui{display:${this._isTouch ? "flex" : "none"};width:100%;padding:4px 6px;gap:4px;background:rgba(0,0,0,0.85);align-items:center;flex-shrink:0}
+            .tb{width:38px;height:38px;border:2px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.08);color:white;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;flex-shrink:0;transition:background 0.15s}
+            .tb.active{background:rgba(255,255,255,0.25);border-color:rgba(255,255,255,0.6)}
+            .tb.mode{font-size:13px;font-weight:700;min-width:52px;width:auto;padding:0 8px}
+            .tb.mode.mine{border-color:#e94560;color:#e94560}
+            .tb.mode.build{border-color:#4CAF50;color:#4CAF50}
+            .spacer{flex:1}
+            .touch-hotbar{display:flex;gap:3px;overflow-x:auto;flex:1;padding:0 4px}
+            .th-item{width:32px;height:32px;border:2px solid transparent;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative}
+            .th-item.sel{border-color:#fff}
+            .th-item canvas{width:24px;height:24px;image-rendering:pixelated}
+            .th-count{position:absolute;bottom:0;right:1px;font-size:7px;color:white;font-weight:700;text-shadow:0 0 2px black}
+        </style>
+        <canvas></canvas>
+        <div class="touch-ui" id="touch-ui">
+            <button class="tb" id="t-left">\u25C0</button>
+            <button class="tb" id="t-right">\u25B6</button>
+            <button class="tb" id="t-jump">\u25B2</button>
+            <div class="spacer"></div>
+            <button class="tb mode mine" id="t-mode">Abbauen</button>
+            <div class="touch-hotbar" id="t-hotbar"></div>
+        </div>`;
         const c = this.shadowRoot.querySelector("canvas");
         c.width = W; c.height = H;
         this._ctx = c.getContext("2d");
@@ -157,16 +182,17 @@ class CraftGame extends HTMLElement {
     _bind() {
         this._keys = { left: false, right: false, jump: false };
         this._mouse = { x: 0, y: 0, left: false, right: false };
+        this._touchMode = "mine"; // "mine" or "build"
         this._ctrl = new AbortController();
         const o = { signal: this._ctrl.signal };
 
+        // ── Keyboard ──
         document.addEventListener("keydown", e => {
             if (e.key === "ArrowLeft" || e.key === "a") this._keys.left = true;
             if (e.key === "ArrowRight" || e.key === "d") this._keys.right = true;
             if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") this._keys.jump = true;
-            // Hotbar selection
             const n = parseInt(e.key);
-            if (n >= 1 && n <= 8) this._selectedBlock = this._hotbar[n - 1];
+            if (n >= 1 && n <= 9) this._selectedBlock = this._hotbar[n - 1];
         }, o);
         document.addEventListener("keyup", e => {
             if (e.key === "ArrowLeft" || e.key === "a") this._keys.left = false;
@@ -174,6 +200,7 @@ class CraftGame extends HTMLElement {
             if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") this._keys.jump = false;
         }, o);
 
+        // ── Mouse (desktop) ──
         const c = this._canvas;
         const getPos = (e) => {
             const r = c.getBoundingClientRect();
@@ -192,17 +219,22 @@ class CraftGame extends HTMLElement {
             this._mining = null; this._mineProgress = 0;
         }, o);
         c.addEventListener("contextmenu", e => e.preventDefault(), o);
+        c.addEventListener("wheel", e => {
+            e.preventDefault();
+            const idx = this._hotbar.indexOf(this._selectedBlock);
+            const dir = e.deltaY > 0 ? 1 : -1;
+            this._selectedBlock = this._hotbar[(idx + dir + this._hotbar.length) % this._hotbar.length];
+        }, o);
 
-        // Touch: tap = mine, long press = place
-        let touchTimer = null;
+        // ── Touch (iPad) — tap on canvas = mine or build based on mode ──
         c.addEventListener("touchstart", e => {
             e.preventDefault();
             const t = e.touches[0];
             const r = c.getBoundingClientRect();
             this._mouse.x = (t.clientX - r.left) / r.width * W;
             this._mouse.y = (t.clientY - r.top) / r.height * H;
-            this._mouse.left = true;
-            touchTimer = setTimeout(() => { this._mouse.left = false; this._mouse.right = true; }, 300);
+            if (this._touchMode === "mine") this._mouse.left = true;
+            else this._mouse.right = true;
         }, o);
         c.addEventListener("touchmove", e => {
             e.preventDefault();
@@ -215,17 +247,70 @@ class CraftGame extends HTMLElement {
             e.preventDefault();
             this._mouse.left = false; this._mouse.right = false;
             this._mining = null;
-            clearTimeout(touchTimer);
         }, o);
 
-        // Scroll = switch block
-        c.addEventListener("wheel", e => {
-            e.preventDefault();
-            const idx = this._hotbar.indexOf(this._selectedBlock);
-            const dir = e.deltaY > 0 ? 1 : -1;
-            const ni = (idx + dir + this._hotbar.length) % this._hotbar.length;
-            this._selectedBlock = this._hotbar[ni];
+        // ── Touch buttons ──
+        const hold = (el, key) => {
+            const start = (e) => { e.preventDefault(); this._keys[key] = true; el.classList.add("active"); };
+            const end = (e) => { e.preventDefault(); this._keys[key] = false; el.classList.remove("active"); };
+            el.addEventListener("touchstart", start, o);
+            el.addEventListener("touchend", end, o);
+            el.addEventListener("touchcancel", end, o);
+        };
+
+        const sr = this.shadowRoot;
+        hold(sr.getElementById("t-left"), "left");
+        hold(sr.getElementById("t-right"), "right");
+        hold(sr.getElementById("t-jump"), "jump");
+
+        // Mode toggle
+        const modeBtn = sr.getElementById("t-mode");
+        modeBtn.addEventListener("touchstart", e => { e.preventDefault(); }, o);
+        modeBtn.addEventListener("click", () => {
+            this._touchMode = this._touchMode === "mine" ? "build" : "mine";
+            modeBtn.textContent = this._touchMode === "mine" ? "Abbauen" : "Bauen";
+            modeBtn.className = "tb mode " + (this._touchMode === "mine" ? "mine" : "build");
         }, o);
+
+        // Touch hotbar
+        this._renderTouchHotbar();
+    }
+
+    _renderTouchHotbar() {
+        if (!this._isTouch) return;
+        const hb = this.shadowRoot.getElementById("t-hotbar");
+        if (!hb) return;
+        hb.innerHTML = "";
+        for (let i = 0; i < this._hotbar.length; i++) {
+            const b = this._hotbar[i];
+            const info = BLOCK_INFO[b];
+            const item = document.createElement("div");
+            item.className = "th-item" + (b === this._selectedBlock ? " sel" : "");
+            // Mini canvas for block preview
+            const mc = document.createElement("canvas");
+            mc.width = 16; mc.height = 16;
+            const mx = mc.getContext("2d");
+            mx.fillStyle = info.color || "#888";
+            mx.fillRect(0, 0, 16, 16);
+            if (info.top) { mx.fillStyle = info.top; mx.fillRect(0, 0, 16, 4); }
+            if (info.accent && [B.COAL, B.IRON, B.GOLD, B.DIAMOND].includes(b)) {
+                mx.fillStyle = info.accent;
+                mx.fillRect(3, 5, 4, 4); mx.fillRect(9, 8, 4, 4);
+            }
+            item.appendChild(mc);
+            const count = this._inventory[b] || 0;
+            if (count > 0) {
+                const cnt = document.createElement("span");
+                cnt.className = "th-count";
+                cnt.textContent = count > 99 ? "99+" : count;
+                item.appendChild(cnt);
+            }
+            item.addEventListener("click", () => {
+                this._selectedBlock = b;
+                this._renderTouchHotbar();
+            });
+            hb.appendChild(item);
+        }
     }
 
     _loop(t) {
@@ -299,9 +384,10 @@ class CraftGame extends HTMLElement {
                         });
                     }
                     // Add to hotbar if not there
-                    if (!this._hotbar.includes(block) && this._hotbar.length < 9) {
+                    if (!this._hotbar.includes(block) && this._hotbar.length < 12) {
                         this._hotbar.push(block);
                     }
+                    this._renderTouchHotbar();
                 }
             }
         }
@@ -320,6 +406,7 @@ class CraftGame extends HTMLElement {
                         this._world[wy][wx] = this._selectedBlock;
                         this._inventory[this._selectedBlock]--;
                         this._score += 2;
+                        this._renderTouchHotbar();
                     }
                 }
             }
