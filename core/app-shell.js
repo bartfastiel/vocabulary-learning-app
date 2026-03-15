@@ -6,6 +6,7 @@ import "./group-board.js";
 import "./invite-qr.js";
 import "./teacher-controls.js";
 import { syncProfileToCloud } from "./cloud-sync.js";
+import "./cloud-login.js";
 import "../vocab/vocab.js";
 import "../vocab/vocab-editor.js";
 import "../game/game-lobby.js";
@@ -651,6 +652,7 @@ class AppShell extends HTMLElement {
       <game-lobby></game-lobby>
       <invite-qr></invite-qr>
       <teacher-controls></teacher-controls>
+      <cloud-login></cloud-login>
 
       <!-- Home / Dashboard -->
       <div id="home-screen">
@@ -727,6 +729,10 @@ class AppShell extends HTMLElement {
           <button class="action-card" id="home-design">
             <span class="action-icon">🚀</span>
             <span class="action-label">Klassisch</span>
+          </button>
+          <button class="action-card" id="home-cloud">
+            <span class="action-icon">\u2601\uFE0F</span>
+            <span class="action-label">Online</span>
           </button>
           <button class="action-card" id="home-profile">
             <span class="action-icon">🔄</span>
@@ -1074,6 +1080,8 @@ class AppShell extends HTMLElement {
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
         const teacherCtrl = this.shadowRoot.querySelector("teacher-controls");
         this.shadowRoot.getElementById("home-teacher").onclick = () => teacherCtrl.open();
+        const cloudLogin = this.shadowRoot.querySelector("cloud-login");
+        this.shadowRoot.getElementById("home-cloud").onclick = () => cloudLogin.open();
         this.shadowRoot.getElementById("home-design").onclick = () => {
             localStorage.setItem("appDesign", "classic");
             location.reload();
