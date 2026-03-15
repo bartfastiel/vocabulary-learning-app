@@ -204,8 +204,8 @@ export async function getGroupByCode(code) {
 // ─── pull latest data from cloud into local ─────────────────────────────────
 
 /**
- * Pull the latest profile data from the cloud and update localStorage.
- * This keeps a second device in sync when the first device earns points.
+ * Pull the latest profile data from the cloud and update EVERYTHING locally.
+ * Keeps two devices in perfect sync — points, background, avatar, all of it.
  */
 export async function pullFromCloud() {
     try {
@@ -214,36 +214,64 @@ export async function pullFromCloud() {
         const rows = await supabaseGet("profiles", `id=eq.${encodeURIComponent(id)}`);
         if (!rows || rows.length === 0) return;
         const cloud = fromCloudRow(rows[0]);
+        const shell = document.querySelector("app-shell");
+        const sr = shell?.shadowRoot;
+        let changed = false;
 
-        // Only update if cloud has higher values (don't overwrite local progress)
+        // ── Points & Streak (take the higher value) ──
         const localPoints = parseInt(localStorage.getItem("points") || "0");
         const localStreak = parseInt(localStorage.getItem("streakRecord") || "0");
 
         if (cloud.points > localPoints) {
             localStorage.setItem("points", String(cloud.points));
-            // Update the displayed points if the element exists
-            const el = document.querySelector("app-shell")?.shadowRoot?.getElementById("home-points");
+            const el = sr?.getElementById("home-points");
             if (el) el.textContent = cloud.points;
+            changed = true;
         }
         if (cloud.streakRecord > localStreak) {
             localStorage.setItem("streakRecord", String(cloud.streakRecord));
-            const el = document.querySelector("app-shell")?.shadowRoot?.getElementById("home-streak");
+            const el = sr?.getElementById("home-streak");
             if (el) el.textContent = cloud.streakRecord;
+            changed = true;
         }
 
-        // Sync avatar and background if changed on other device
-        if (cloud.avatarSvg && cloud.avatarSvg !== localStorage.getItem("lastCloudAvatar")) {
+        // ── Background (always take cloud version) ──
+        const localBg = localStorage.getItem("appBg") || "light";
+        if (cloud.appBg && cloud.appBg !== localBg) {
+            localStorage.setItem("appBg", cloud.appBg);
+            // Restore background extras
+            const bgEx = cloud.bgExtra || {};
+            if (bgEx.gradColors) localStorage.setItem("gradColors", JSON.stringify(bgEx.gradColors));
+            if (bgEx.gradDir) localStorage.setItem("gradDir", bgEx.gradDir);
+            if (bgEx.gradAnimated) localStorage.setItem("gradAnimated", bgEx.gradAnimated);
+            if (bgEx.liveBgKey) localStorage.setItem("liveBgKey", bgEx.liveBgKey);
+            if (bgEx.appBgCustom) localStorage.setItem("appBgCustom", bgEx.appBgCustom);
+            changed = true;
+        }
+
+        // ── Avatar ──
+        const localAvatar = localStorage.getItem("lastCloudAvatar") || "";
+        if (cloud.avatarSvg && cloud.avatarSvg !== localAvatar) {
             localStorage.setItem("lastCloudAvatar", cloud.avatarSvg);
+            if (cloud.avatarSelection) localStorage.setItem("avatarSelection", JSON.stringify(cloud.avatarSelection));
+            changed = true;
+        }
+
+        // ── Update profile object ──
+        if (changed) {
             const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
             const p = list.find(p => p.id === id);
             if (p) {
-                p.avatarSvg = cloud.avatarSvg;
                 p.points = Math.max(p.points || 0, cloud.points);
                 p.streakRecord = Math.max(p.streakRecord || 0, cloud.streakRecord);
+                if (cloud.avatarSvg) p.avatarSvg = cloud.avatarSvg;
                 if (cloud.avatarSelection) p.avatarSelection = cloud.avatarSelection;
                 if (cloud.appBg) p.appBg = cloud.appBg;
                 localStorage.setItem("allProfiles", JSON.stringify(list));
             }
+            // Reload the page to apply all changes visually
+            console.log("[cloud-sync] changes detected from other device, reloading...");
+            location.reload();
         }
     } catch (e) {
         console.warn("[cloud-sync] pullFromCloud failed:", e);
@@ -254,7 +282,7 @@ export async function pullFromCloud() {
 // Wait for the app to be fully loaded before first sync
 setTimeout(() => {
     syncProfileToCloud();
-    // Pull + push loop: push every 45s, pull every 30s
-    setInterval(() => syncProfileToCloud(), 45000);
-    setInterval(() => pullFromCloud(), 30000);
+    // Push every 20s, pull every 15s for near-realtime sync
+    setInterval(() => syncProfileToCloud(), 20000);
+    setInterval(() => pullFromCloud(), 15000);
 }, 3000);
