@@ -182,6 +182,16 @@ class CloudLogin extends HTMLElement {
             };
         }
 
+        // New code button (replace existing code)
+        const btnNewCode = this.shadowRoot.getElementById("btn-new-code");
+        if (btnNewCode) {
+            btnNewCode.onclick = async () => {
+                localStorage.removeItem("myLoginCode");
+                const code = await createLoginCode();
+                if (code) this._render();
+            };
+        }
+
         // Login
         this.shadowRoot.getElementById("btn-login").onclick = async () => {
             const rawCode = this.shadowRoot.getElementById("login-code").value;
@@ -270,6 +280,7 @@ class CloudLogin extends HTMLElement {
                 <button class="copy-btn" id="btn-copy">Code kopieren</button>
             </div>
             <p class="hint">Dein Profil, Punkte, Avatar und Hintergrund werden automatisch synchronisiert.</p>
+            <button class="btn btn-gray" id="btn-new-code" style="font-size:0.8rem">Neuen Code erstellen</button>
         `;
     }
 
