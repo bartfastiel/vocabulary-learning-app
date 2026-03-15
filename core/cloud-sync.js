@@ -73,10 +73,44 @@ function fromCloudRow(row) {
 
 export async function syncProfileToCloud() {
     try {
-        saveSnapshot(); // make sure profile object has latest localStorage values
+        saveSnapshot();
         const profile = getActiveProfile();
         if (!profile) return null;
-        const rows = await supabaseUpsert("profiles", [toCloudRow(profile)]);
+        const local = toCloudRow(profile);
+
+        // Read current server state FIRST
+        const serverRows = await supabaseGet("profiles", `id=eq.${encodeURIComponent(local.id)}`);
+        const server = serverRows?.[0] || null;
+
+        if (server) {
+            // MERGE: take the MAX of points/streak (never lose progress from either device)
+            local.points = Math.max(local.points || 0, server.points || 0);
+            local.streak_record = Math.max(local.streak_record || 0, server.streak_record || 0);
+
+            // If server has more points, update local too
+            const localPts = parseInt(localStorage.getItem("points") || "0");
+            if (server.points > localPts) {
+                localStorage.setItem("points", String(server.points));
+            }
+            const localStreak = parseInt(localStorage.getItem("streakRecord") || "0");
+            if (server.streak_record > localStreak) {
+                localStorage.setItem("streakRecord", String(server.streak_record));
+            }
+
+            // For background/avatar: use the most recently changed one
+            // We detect "recently changed" by comparing with what we last pulled
+            const lastPulledBg = localStorage.getItem("_lastServerBg");
+            if (lastPulledBg && local.app_bg === lastPulledBg && server.app_bg !== lastPulledBg) {
+                // Server changed but local didn't → keep server version
+                local.app_bg = server.app_bg;
+                local.bg_extra = server.bg_extra;
+            }
+            // Save what the server has so we can detect changes next time
+            localStorage.setItem("_lastServerBg", local.app_bg);
+        }
+
+        const rows = await supabaseUpsert("profiles", [local]);
+        console.log("[cloud-sync] pushed:", local.name, "pts:", local.points, "streak:", local.streak_record);
         return rows ? rows[0] : null;
     } catch (e) {
         console.warn("[cloud-sync] sync failed:", e);
@@ -216,7 +250,7 @@ export async function pullFromCloud() {
         const cloud = fromCloudRow(rows[0]);
         const shell = document.querySelector("app-shell");
         const sr = shell?.shadowRoot;
-        let changed = false;
+        let needsReload = false;
 
         // ── Points & Streak (take the higher value) ──
         const localPoints = parseInt(localStorage.getItem("points") || "0");
@@ -226,51 +260,54 @@ export async function pullFromCloud() {
             localStorage.setItem("points", String(cloud.points));
             const el = sr?.getElementById("home-points");
             if (el) el.textContent = cloud.points;
-            changed = true;
         }
         if (cloud.streakRecord > localStreak) {
             localStorage.setItem("streakRecord", String(cloud.streakRecord));
             const el = sr?.getElementById("home-streak");
             if (el) el.textContent = cloud.streakRecord;
-            changed = true;
         }
 
-        // ── Background (always take cloud version) ──
+        // ── Background (detect if OTHER device changed it) ──
         const localBg = localStorage.getItem("appBg") || "light";
-        if (cloud.appBg && cloud.appBg !== localBg) {
+        const lastServerBg = localStorage.getItem("_lastServerBg") || localBg;
+        // If server bg changed AND it wasn't us who changed it
+        if (cloud.appBg && cloud.appBg !== localBg && cloud.appBg !== lastServerBg) {
             localStorage.setItem("appBg", cloud.appBg);
-            // Restore background extras
+            localStorage.setItem("_lastServerBg", cloud.appBg);
             const bgEx = cloud.bgExtra || {};
             if (bgEx.gradColors) localStorage.setItem("gradColors", JSON.stringify(bgEx.gradColors));
             if (bgEx.gradDir) localStorage.setItem("gradDir", bgEx.gradDir);
             if (bgEx.gradAnimated) localStorage.setItem("gradAnimated", bgEx.gradAnimated);
             if (bgEx.liveBgKey) localStorage.setItem("liveBgKey", bgEx.liveBgKey);
             if (bgEx.appBgCustom) localStorage.setItem("appBgCustom", bgEx.appBgCustom);
-            changed = true;
+            needsReload = true;
         }
 
-        // ── Avatar ──
-        const localAvatar = localStorage.getItem("lastCloudAvatar") || "";
-        if (cloud.avatarSvg && cloud.avatarSvg !== localAvatar) {
-            localStorage.setItem("lastCloudAvatar", cloud.avatarSvg);
+        // ── Avatar (detect if other device changed it) ──
+        const lastAvatar = localStorage.getItem("_lastServerAvatar") || "";
+        if (cloud.avatarSvg && cloud.avatarSvg !== lastAvatar) {
+            localStorage.setItem("_lastServerAvatar", cloud.avatarSvg);
             if (cloud.avatarSelection) localStorage.setItem("avatarSelection", JSON.stringify(cloud.avatarSelection));
-            changed = true;
+            // Update avatar display without full reload
+            const avatarEl = sr?.getElementById("avatar-mini");
+            if (avatarEl && cloud.avatarSvg) avatarEl.innerHTML = cloud.avatarSvg;
         }
 
         // ── Update profile object ──
-        if (changed) {
-            const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
-            const p = list.find(p => p.id === id);
-            if (p) {
-                p.points = Math.max(p.points || 0, cloud.points);
-                p.streakRecord = Math.max(p.streakRecord || 0, cloud.streakRecord);
-                if (cloud.avatarSvg) p.avatarSvg = cloud.avatarSvg;
-                if (cloud.avatarSelection) p.avatarSelection = cloud.avatarSelection;
-                if (cloud.appBg) p.appBg = cloud.appBg;
-                localStorage.setItem("allProfiles", JSON.stringify(list));
-            }
-            // Reload the page to apply all changes visually
-            console.log("[cloud-sync] changes detected from other device, reloading...");
+        const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
+        const p = list.find(p => p.id === id);
+        if (p) {
+            p.points = Math.max(p.points || 0, cloud.points);
+            p.streakRecord = Math.max(p.streakRecord || 0, cloud.streakRecord);
+            if (cloud.avatarSvg) p.avatarSvg = cloud.avatarSvg;
+            if (cloud.avatarSelection) p.avatarSelection = cloud.avatarSelection;
+            if (cloud.appBg) p.appBg = cloud.appBg;
+            localStorage.setItem("allProfiles", JSON.stringify(list));
+        }
+
+        // Only reload for background changes (points/avatar update live)
+        if (needsReload) {
+            console.log("[cloud-sync] background changed on other device, reloading...");
             location.reload();
         }
     } catch (e) {
