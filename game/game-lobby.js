@@ -35,7 +35,21 @@ import "./asteroids-game.js";
 import "./racing-game.js";
 import "./quiz-game.js";
 import "./craft-game.js";
-import { isPlayAllowedCloud, isGameAllowedCloud } from "../core/teacher-controls.js";
+// Teacher controls loaded async to not block game lobby
+let _cachedPlayAllowed = { allowed: true };
+let _cachedBlockedGames = {};
+async function _refreshTeacherRestrictions() {
+    try {
+        const { isPlayAllowedCloud, isGameAllowedCloud } = await import("../core/teacher-controls.js");
+        _cachedPlayAllowed = await isPlayAllowedCloud();
+        const GAME_IDS = GAMES.map(g => g.id);
+        for (const id of GAME_IDS) {
+            _cachedBlockedGames[id] = !(await isGameAllowedCloud(id));
+        }
+    } catch {}
+}
+// Refresh every 30 seconds
+setTimeout(() => { _refreshTeacherRestrictions(); setInterval(_refreshTeacherRestrictions, 30000); }, 2000);
 
 const HS_KEY = "gameHighscores";
 
@@ -500,7 +514,7 @@ class GameLobby extends HTMLElement {
 
     // ── game lifecycle ────────────────────────────────────────────────────────
 
-    async _renderCards() {
+    _renderCards() {
         const pm = this._pm();
         const pts = pm?.points ?? 0;
         const hs  = getHighscores();
@@ -509,16 +523,12 @@ class GameLobby extends HTMLElement {
         this.shadowRoot.getElementById("lobby-points").textContent =
             `${pts} Punkt${pts !== 1 ? "e" : ""}`;
 
-        // Check cloud-based teacher restrictions
-        const playCheck = await isPlayAllowedCloud();
-        const blockedGames = {};
-        for (const g of GAMES) {
-            blockedGames[g.id] = !(await isGameAllowedCloud(g.id));
-        }
+        // Use cached teacher restrictions (refreshed in background)
+        const playCheck = _cachedPlayAllowed;
 
         grid.innerHTML = GAMES.map(g => {
             const locked = pts < g.cost;
-            const blocked = blockedGames[g.id];
+            const blocked = _cachedBlockedGames[g.id] || false;
             const teacherBlocked = blocked || !playCheck.allowed;
             const hsVal  = hs[g.id] != null ? hs[g.id] : null;
             const hsText = hsVal != null && g.scoreLabel
