@@ -1617,5 +1617,570 @@
         "allowImage": true
       }
     ]
+  },
+  {
+    "name": "Klasse 3-4: Erste Worte",
+    "words": [
+      {
+        "de": "Hallo",
+        "en": "hello",
+        "allowImage": false
+      },
+      {
+        "de": "Tschüss",
+        "en": "goodbye",
+        "allowImage": false
+      },
+      {
+        "de": "ja",
+        "en": "yes",
+        "allowImage": false
+      },
+      {
+        "de": "nein",
+        "en": "no",
+        "allowImage": false
+      },
+      {
+        "de": "bitte",
+        "en": "please",
+        "allowImage": false
+      },
+      {
+        "de": "danke",
+        "en": "thank you",
+        "allowImage": false
+      },
+      {
+        "de": "Ich bin...",
+        "en": "I am...",
+        "allowImage": false
+      },
+      {
+        "de": "Wie geht es dir?",
+        "en": "How are you?",
+        "allowImage": false
+      },
+      {
+        "de": "gut",
+        "en": "good",
+        "allowImage": false
+      },
+      {
+        "de": "schlecht",
+        "en": "bad",
+        "allowImage": false
+      },
+      {
+        "de": "groß",
+        "en": "big",
+        "allowImage": false
+      },
+      {
+        "de": "klein",
+        "en": "small",
+        "allowImage": false
+      },
+      {
+        "de": "schön",
+        "en": "beautiful",
+        "allowImage": false
+      },
+      {
+        "de": "schnell",
+        "en": "fast",
+        "allowImage": false
+      },
+      {
+        "de": "langsam",
+        "en": "slow",
+        "allowImage": false
+      }
+    ]
+  },
+  {
+    "name": "Klasse 3-4: Farben",
+    "words": [
+      {
+        "de": "rot",
+        "en": "red",
+        "allowImage": false
+      },
+      {
+        "de": "blau",
+        "en": "blue",
+        "allowImage": false
+      },
+      {
+        "de": "grün",
+        "en": "green",
+        "allowImage": false
+      },
+      {
+        "de": "gelb",
+        "en": "yellow",
+        "allowImage": false
+      },
+      {
+        "de": "schwarz",
+        "en": "black",
+        "allowImage": false
+      },
+      {
+        "de": "weiß",
+        "en": "white",
+        "allowImage": false
+      },
+      {
+        "de": "orange",
+        "en": "orange",
+        "allowImage": false
+      },
+      {
+        "de": "lila",
+        "en": "purple",
+        "allowImage": false
+      },
+      {
+        "de": "rosa",
+        "en": "pink",
+        "allowImage": false
+      },
+      {
+        "de": "braun",
+        "en": "brown",
+        "allowImage": false
+      },
+      {
+        "de": "grau",
+        "en": "grey",
+        "allowImage": false
+      }
+    ]
+  },
+  {
+    "name": "Klasse 3-4: Zahlen",
+    "words": [
+      {
+        "de": "eins",
+        "en": "one",
+        "allowImage": false
+      },
+      {
+        "de": "zwei",
+        "en": "two",
+        "allowImage": false
+      },
+      {
+        "de": "drei",
+        "en": "three",
+        "allowImage": false
+      },
+      {
+        "de": "vier",
+        "en": "four",
+        "allowImage": false
+      },
+      {
+        "de": "fünf",
+        "en": "five",
+        "allowImage": false
+      },
+      {
+        "de": "sechs",
+        "en": "six",
+        "allowImage": false
+      },
+      {
+        "de": "sieben",
+        "en": "seven",
+        "allowImage": false
+      },
+      {
+        "de": "acht",
+        "en": "eight",
+        "allowImage": false
+      },
+      {
+        "de": "neun",
+        "en": "nine",
+        "allowImage": false
+      },
+      {
+        "de": "zehn",
+        "en": "ten",
+        "allowImage": false
+      },
+      {
+        "de": "elf",
+        "en": "eleven",
+        "allowImage": false
+      },
+      {
+        "de": "zwölf",
+        "en": "twelve",
+        "allowImage": false
+      },
+      {
+        "de": "zwanzig",
+        "en": "twenty",
+        "allowImage": false
+      },
+      {
+        "de": "hundert",
+        "en": "hundred",
+        "allowImage": false
+      }
+    ]
+  },
+  {
+    "name": "Klasse 4: Tiere",
+    "words": [
+      {
+        "de": "Hund",
+        "en": "dog",
+        "allowImage": true
+      },
+      {
+        "de": "Katze",
+        "en": "cat",
+        "allowImage": true
+      },
+      {
+        "de": "Vogel",
+        "en": "bird",
+        "allowImage": false
+      },
+      {
+        "de": "Fisch",
+        "en": "fish",
+        "allowImage": false
+      },
+      {
+        "de": "Pferd",
+        "en": "horse",
+        "allowImage": false
+      },
+      {
+        "de": "Maus",
+        "en": "mouse",
+        "allowImage": false
+      },
+      {
+        "de": "Kaninchen",
+        "en": "rabbit",
+        "allowImage": false
+      },
+      {
+        "de": "Schlange",
+        "en": "snake",
+        "allowImage": false
+      },
+      {
+        "de": "Bär",
+        "en": "bear",
+        "allowImage": false
+      },
+      {
+        "de": "Löwe",
+        "en": "lion",
+        "allowImage": false
+      },
+      {
+        "de": "Affe",
+        "en": "monkey",
+        "allowImage": false
+      },
+      {
+        "de": "Elefant",
+        "en": "elephant",
+        "allowImage": false
+      }
+    ]
+  },
+  {
+    "name": "Klasse 4: Essen",
+    "words": [
+      {
+        "de": "Brot",
+        "en": "bread",
+        "allowImage": false
+      },
+      {
+        "de": "Butter",
+        "en": "butter",
+        "allowImage": false
+      },
+      {
+        "de": "Käse",
+        "en": "cheese",
+        "allowImage": false
+      },
+      {
+        "de": "Milch",
+        "en": "milk",
+        "allowImage": false
+      },
+      {
+        "de": "Ei",
+        "en": "egg",
+        "allowImage": false
+      },
+      {
+        "de": "Apfel",
+        "en": "apple",
+        "allowImage": false
+      },
+      {
+        "de": "Banane",
+        "en": "banana",
+        "allowImage": false
+      },
+      {
+        "de": "Kuchen",
+        "en": "cake",
+        "allowImage": false
+      },
+      {
+        "de": "Schokolade",
+        "en": "chocolate",
+        "allowImage": false
+      },
+      {
+        "de": "Wasser",
+        "en": "water",
+        "allowImage": false
+      },
+      {
+        "de": "Saft",
+        "en": "juice",
+        "allowImage": false
+      },
+      {
+        "de": "Suppe",
+        "en": "soup",
+        "allowImage": false
+      }
+    ]
+  },
+  {
+    "name": "Klasse 6: Reisen & Verkehr",
+    "words": [
+      {
+        "de": "Flugzeug",
+        "en": "plane",
+        "allowImage": false
+      },
+      {
+        "de": "Zug",
+        "en": "train",
+        "allowImage": false
+      },
+      {
+        "de": "Bus",
+        "en": "bus",
+        "allowImage": false
+      },
+      {
+        "de": "Auto",
+        "en": "car",
+        "allowImage": false
+      },
+      {
+        "de": "Fahrrad",
+        "en": "bicycle",
+        "allowImage": false
+      },
+      {
+        "de": "Schiff",
+        "en": "ship",
+        "allowImage": false
+      },
+      {
+        "de": "Flughafen",
+        "en": "airport",
+        "allowImage": false
+      },
+      {
+        "de": "Bahnhof",
+        "en": "train station",
+        "allowImage": false
+      },
+      {
+        "de": "Fahrkarte",
+        "en": "ticket",
+        "allowImage": false
+      },
+      {
+        "de": "Koffer",
+        "en": "suitcase",
+        "allowImage": false
+      },
+      {
+        "de": "Reise",
+        "en": "journey",
+        "allowImage": false
+      },
+      {
+        "de": "Landkarte",
+        "en": "map",
+        "allowImage": false
+      },
+      {
+        "de": "Urlaub",
+        "en": "holiday",
+        "allowImage": false
+      },
+      {
+        "de": "Hotel",
+        "en": "hotel",
+        "allowImage": false
+      },
+      {
+        "de": "Strand",
+        "en": "beach",
+        "allowImage": false
+      }
+    ]
+  },
+  {
+    "name": "Klasse 6: Natur & Umwelt",
+    "words": [
+      {
+        "de": "Berg",
+        "en": "mountain",
+        "allowImage": false
+      },
+      {
+        "de": "Fluss",
+        "en": "river",
+        "allowImage": false
+      },
+      {
+        "de": "See",
+        "en": "lake",
+        "allowImage": false
+      },
+      {
+        "de": "Meer",
+        "en": "sea",
+        "allowImage": false
+      },
+      {
+        "de": "Wald",
+        "en": "forest",
+        "allowImage": false
+      },
+      {
+        "de": "Wiese",
+        "en": "meadow",
+        "allowImage": false
+      },
+      {
+        "de": "Insel",
+        "en": "island",
+        "allowImage": false
+      },
+      {
+        "de": "Wüste",
+        "en": "desert",
+        "allowImage": false
+      },
+      {
+        "de": "Regenwild",
+        "en": "rainforest",
+        "allowImage": false
+      },
+      {
+        "de": "Vulkan",
+        "en": "volcano",
+        "allowImage": false
+      },
+      {
+        "de": "Erdbeben",
+        "en": "earthquake",
+        "allowImage": false
+      },
+      {
+        "de": "Umwelt",
+        "en": "environment",
+        "allowImage": false
+      },
+      {
+        "de": "Recycling",
+        "en": "recycling",
+        "allowImage": false
+      },
+      {
+        "de": "Klima",
+        "en": "climate",
+        "allowImage": false
+      }
+    ]
+  },
+  {
+    "name": "Klasse 6: Schule & Berufe",
+    "words": [
+      {
+        "de": "Lehrer",
+        "en": "teacher",
+        "allowImage": false
+      },
+      {
+        "de": "Schüler",
+        "en": "student",
+        "allowImage": false
+      },
+      {
+        "de": "Hausaufgaben",
+        "en": "homework",
+        "allowImage": false
+      },
+      {
+        "de": "Prüfung",
+        "en": "exam",
+        "allowImage": false
+      },
+      {
+        "de": "Zeugnis",
+        "en": "report card",
+        "allowImage": false
+      },
+      {
+        "de": "Arzt",
+        "en": "doctor",
+        "allowImage": false
+      },
+      {
+        "de": "Polizist",
+        "en": "police officer",
+        "allowImage": false
+      },
+      {
+        "de": "Feuerwehrmann",
+        "en": "firefighter",
+        "allowImage": false
+      },
+      {
+        "de": "Koch",
+        "en": "cook",
+        "allowImage": false
+      },
+      {
+        "de": "Pilot",
+        "en": "pilot",
+        "allowImage": false
+      },
+      {
+        "de": "Ingenieur",
+        "en": "engineer",
+        "allowImage": false
+      },
+      {
+        "de": "Künstler",
+        "en": "artist",
+        "allowImage": false
+      }
+    ]
   }
 ]
