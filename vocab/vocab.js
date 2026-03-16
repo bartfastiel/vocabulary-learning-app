@@ -559,12 +559,11 @@ class VocabTrainer extends HTMLElement {
                     for (const w of set.words) { w._hasImage = false; w._hasAudio = false; }
                 }
             }
-            // Filter by user's grade if set
+            // Filter by user's grade — only show lessons for THAT grade
             if (userGrade > 0) {
                 this._builtinSets = data.filter(lesson => {
-                    if (!lesson.grade) return true; // no grade = show for everyone
-                    const g = parseInt(lesson.grade);
-                    return g <= userGrade; // show current grade and below
+                    if (!lesson.grade) return true;
+                    return parseInt(lesson.grade) === userGrade;
                 });
             } else {
                 this._builtinSets = data;
