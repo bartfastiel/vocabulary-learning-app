@@ -613,8 +613,15 @@ class AppShell extends HTMLElement {
             <h2>Neues Profil</h2>
             <input id="input-profile-name" type="text" placeholder="Dein Name..."
                    autocomplete="off" autocorrect="off" spellcheck="false"/>
+            <p style="font-size:0.85rem;color:#718096;margin:0.3rem 0 0.2rem;font-weight:600">Welche Klasse bist du?</p>
+            <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="grade-select">
+              <button class="grade-btn" data-grade="3" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">3</button>
+              <button class="grade-btn" data-grade="4" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">4</button>
+              <button class="grade-btn" data-grade="5" style="padding:0.5rem 1rem;border:2px solid #4299e1;border-radius:10px;background:#ebf8ff;font-size:1rem;font-weight:700;cursor:pointer;color:#2b6cb0">5</button>
+              <button class="grade-btn" data-grade="6" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">6</button>
+            </div>
             <div class="profile-form-btns">
-              <button id="btn-profile-cancel">Zurück</button>
+              <button id="btn-profile-cancel">Zur\u00fcck</button>
               <button id="btn-profile-create">Erstellen</button>
             </div>
           </div>
@@ -721,11 +728,19 @@ class AppShell extends HTMLElement {
             </div>
             <span class="card-arrow">\u203A</span>
           </button>
-          <button class="subject-card" data-subject="sachkunde">
-            <div class="card-icon sachkunde">\uD83C\uDF0D</div>
+          <button class="subject-card" data-subject="bio">
+            <div class="card-icon bio">\uD83E\uDDEC</div>
             <div class="card-info">
-              <p class="card-title">Sachkunde</p>
-              <p class="card-desc">Natur, Tiere, K\u00f6rper & Welt</p>
+              <p class="card-title">Biologie</p>
+              <p class="card-desc">Tiere, Pflanzen, K\u00f6rper</p>
+            </div>
+            <span class="card-arrow">\u203A</span>
+          </button>
+          <button class="subject-card" data-subject="geo">
+            <div class="card-icon geo">\uD83C\uDF0D</div>
+            <div class="card-info">
+              <p class="card-title">Geografie</p>
+              <p class="card-desc">Erde, Wetter, Klima & Energie</p>
             </div>
             <span class="card-arrow">\u203A</span>
           </button>
@@ -955,10 +970,27 @@ class AppShell extends HTMLElement {
         this.shadowRoot.getElementById("btn-new-profile").onclick = () => showNew();
         this.shadowRoot.getElementById("btn-profile-cancel").onclick = () => showPick();
 
+        // Grade selection
+        let selectedGrade = "5";
+        for (const btn of this.shadowRoot.querySelectorAll(".grade-btn")) {
+            btn.onclick = () => {
+                this.shadowRoot.querySelectorAll(".grade-btn").forEach(b => {
+                    b.style.borderColor = "#e2e8f0"; b.style.background = "white"; b.style.color = "#2d3748";
+                });
+                btn.style.borderColor = "#4299e1"; btn.style.background = "#ebf8ff"; btn.style.color = "#2b6cb0";
+                selectedGrade = btn.dataset.grade;
+            };
+        }
+
         const doCreate = () => {
             const name = nameInput.value.trim();
             if (!name) { nameInput.focus(); return; }
             const id = createProfile(name);
+            // Save grade to profile and localStorage
+            const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
+            const p = list.find(p => p.id === id);
+            if (p) { p.grade = selectedGrade; localStorage.setItem("allProfiles", JSON.stringify(list)); }
+            localStorage.setItem("userGrade", selectedGrade);
             finish(id);
         };
         this.shadowRoot.getElementById("btn-profile-create").onclick = doCreate;
@@ -1744,7 +1776,8 @@ class AppShell extends HTMLElement {
             mathe:         { title: "\uD83D\uDD22 Mathe", tag: "math-trainer" },
             deutsch:       { title: "\uD83D\uDCD6 Deutsch", tag: "deutsch-trainer" },
             franzoesisch:  { title: "\uD83C\uDDEB\uD83C\uDDF7 Franz\u00f6sisch", tag: "vocab-trainer" },
-            sachkunde:     { title: "\uD83C\uDF0D Sachkunde", tag: "vocab-trainer" },
+            bio:           { title: "\uD83E\uDDEC Biologie", tag: "vocab-trainer" },
+            geo:           { title: "\uD83C\uDF0D Geografie", tag: "vocab-trainer" },
         };
         const s = subjects[subject];
         title.textContent = s.title;

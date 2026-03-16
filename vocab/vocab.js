@@ -521,8 +521,11 @@ class VocabTrainer extends HTMLElement {
             const vocabFiles = {
                 englisch: "vocab/vocab.json",
                 franzoesisch: "vocab/vocab-franzoesisch.json",
-                sachkunde: "vocab/vocab-sachkunde.json",
+                bio: "vocab/vocab-bio.json",
+                geo: "vocab/vocab-geo.json",
             };
+            // Filter by grade if set
+            const userGrade = parseInt(localStorage.getItem("userGrade") || "0");
             const file = vocabFiles[subject];
             let data = [];
             if (file) {
@@ -557,7 +560,16 @@ class VocabTrainer extends HTMLElement {
                     for (const w of set.words) { w._hasImage = false; w._hasAudio = false; }
                 }
             }
-            this._builtinSets = data;
+            // Filter by user's grade if set
+            if (userGrade > 0) {
+                this._builtinSets = data.filter(lesson => {
+                    if (!lesson.grade) return true; // no grade = show for everyone
+                    const g = parseInt(lesson.grade);
+                    return g <= userGrade; // show current grade and below
+                });
+            } else {
+                this._builtinSets = data;
+            }
             this._mergeAndRender();
         } catch (err) {
             this.shadowRoot.querySelector("#question").textContent =
