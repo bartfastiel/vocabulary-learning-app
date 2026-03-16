@@ -520,7 +520,6 @@ class VocabTrainer extends HTMLElement {
             // Load the right vocab file for this subject
             const vocabFiles = {
                 englisch: "vocab/vocab.json",
-                franzoesisch: "vocab/vocab-franzoesisch.json",
                 bio: "vocab/vocab-bio.json",
                 geo: "vocab/vocab-geo.json",
             };
