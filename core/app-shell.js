@@ -690,28 +690,44 @@ class AppShell extends HTMLElement {
 
         <div class="subject-cards">
           <button class="subject-card" data-subject="englisch">
-            <div class="card-icon englisch">🇬🇧</div>
+            <div class="card-icon englisch">\uD83C\uDDEC\uD83C\uDDE7</div>
             <div class="card-info">
               <p class="card-title">Englisch</p>
-              <p class="card-desc">Vokabeln lernen, hören & schreiben</p>
+              <p class="card-desc">Vokabeln lernen, h\u00f6ren & schreiben</p>
             </div>
-            <span class="card-arrow">›</span>
+            <span class="card-arrow">\u203A</span>
           </button>
           <button class="subject-card" data-subject="mathe">
-            <div class="card-icon mathe">🔢</div>
+            <div class="card-icon mathe">\uD83D\uDD22</div>
             <div class="card-info">
               <p class="card-title">Mathe</p>
-              <p class="card-desc">Rechnen, Geometrie, Brüche & mehr</p>
+              <p class="card-desc">Rechnen, Geometrie, Br\u00fcche & mehr</p>
             </div>
-            <span class="card-arrow">›</span>
+            <span class="card-arrow">\u203A</span>
           </button>
           <button class="subject-card" data-subject="deutsch">
-            <div class="card-icon deutsch">📖</div>
+            <div class="card-icon deutsch">\uD83D\uDCD6</div>
             <div class="card-info">
               <p class="card-title">Deutsch</p>
               <p class="card-desc">Grammatik, Rechtschreibung & Wortarten</p>
             </div>
-            <span class="card-arrow">›</span>
+            <span class="card-arrow">\u203A</span>
+          </button>
+          <button class="subject-card" data-subject="franzoesisch">
+            <div class="card-icon franzoesisch">\uD83C\uDDEB\uD83C\uDDF7</div>
+            <div class="card-info">
+              <p class="card-title">Franz\u00f6sisch</p>
+              <p class="card-desc">Vokabeln & Grundlagen</p>
+            </div>
+            <span class="card-arrow">\u203A</span>
+          </button>
+          <button class="subject-card" data-subject="sachkunde">
+            <div class="card-icon sachkunde">\uD83C\uDF0D</div>
+            <div class="card-info">
+              <p class="card-title">Sachkunde</p>
+              <p class="card-desc">Natur, Tiere, K\u00f6rper & Welt</p>
+            </div>
+            <span class="card-arrow">\u203A</span>
           </button>
         </div>
 
@@ -1724,9 +1740,11 @@ class AppShell extends HTMLElement {
         trainer.style.display = "block";
 
         const subjects = {
-            englisch: { title: "🇬🇧 Englisch", tag: "vocab-trainer" },
-            mathe:    { title: "🔢 Mathe", tag: "math-trainer" },
-            deutsch:  { title: "📖 Deutsch", tag: "deutsch-trainer" },
+            englisch:      { title: "\uD83C\uDDEC\uD83C\uDDE7 Englisch", tag: "vocab-trainer" },
+            mathe:         { title: "\uD83D\uDD22 Mathe", tag: "math-trainer" },
+            deutsch:       { title: "\uD83D\uDCD6 Deutsch", tag: "deutsch-trainer" },
+            franzoesisch:  { title: "\uD83C\uDDEB\uD83C\uDDF7 Franz\u00f6sisch", tag: "vocab-trainer" },
+            sachkunde:     { title: "\uD83C\uDF0D Sachkunde", tag: "vocab-trainer" },
         };
         const s = subjects[subject];
         title.textContent = s.title;

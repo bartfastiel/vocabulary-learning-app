@@ -516,32 +516,48 @@ class VocabTrainer extends HTMLElement {
 
     async loadSets() {
         try {
-            const data = await fetch(`vocab/vocab.json`).then(r => r.json());
-            // Verify which resources actually exist for each word
-            const checks = [];
-            for (const set of data) {
-                for (const w of set.words) {
-                    const safe = w.en.toLowerCase().replaceAll(/[^a-z0-9]/g, "_");
-                    // Check image
-                    if (w.allowImage) {
+            const subject = this._subject || "englisch";
+            // Load the right vocab file for this subject
+            const vocabFiles = {
+                englisch: "vocab/vocab.json",
+                franzoesisch: "vocab/vocab-franzoesisch.json",
+                sachkunde: "vocab/vocab-sachkunde.json",
+            };
+            const file = vocabFiles[subject];
+            let data = [];
+            if (file) {
+                data = await fetch(file).then(r => r.json());
+            }
+            // Verify which resources actually exist for each word (only for englisch)
+            if (subject === "englisch") {
+                const checks = [];
+                for (const set of data) {
+                    for (const w of set.words) {
+                        const safe = w.en.toLowerCase().replaceAll(/[^a-z0-9]/g, "_");
+                        if (w.allowImage) {
+                            checks.push(
+                                fetch(`assets/img/${safe}.png`, { method: "HEAD" })
+                                    .then(r => { w._hasImage = r.ok; })
+                                    .catch(() => { w._hasImage = false; })
+                            );
+                        } else {
+                            w._hasImage = false;
+                        }
                         checks.push(
-                            fetch(`assets/img/${safe}.png`, { method: "HEAD" })
-                                .then(r => { w._hasImage = r.ok; })
-                                .catch(() => { w._hasImage = false; })
+                            fetch(`assets/audio/voice/${safe}_alloy.mp3`, { method: "HEAD" })
+                                .then(r => { w._hasAudio = r.ok; })
+                                .catch(() => { w._hasAudio = false; })
                         );
-                    } else {
-                        w._hasImage = false;
                     }
-                    // Check audio (just one voice variant is enough)
-                    checks.push(
-                        fetch(`assets/audio/voice/${safe}_alloy.mp3`, { method: "HEAD" })
-                            .then(r => { w._hasAudio = r.ok; })
-                            .catch(() => { w._hasAudio = false; })
-                    );
+                }
+                await Promise.all(checks);
+            } else {
+                // For other subjects, no image/audio checks
+                for (const set of data) {
+                    for (const w of set.words) { w._hasImage = false; w._hasAudio = false; }
                 }
             }
-            await Promise.all(checks);
-            this._builtinSets = (this._subject || "englisch") === "englisch" ? data : [];
+            this._builtinSets = data;
             this._mergeAndRender();
         } catch (err) {
             this.shadowRoot.querySelector("#question").textContent =
