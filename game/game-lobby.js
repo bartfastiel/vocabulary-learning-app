@@ -35,21 +35,21 @@ import "./asteroids-game.js";
 import "./racing-game.js";
 import "./quiz-game.js";
 import "./craft-game.js";
-// Teacher controls loaded async to not block game lobby
+// Teacher controls loaded in background — never blocks rendering
 let _cachedPlayAllowed = { allowed: true };
 let _cachedBlockedGames = {};
-async function _refreshTeacherRestrictions() {
-    try {
-        const { isPlayAllowedCloud, isGameAllowedCloud } = await import("../core/teacher-controls.js");
-        _cachedPlayAllowed = await isPlayAllowedCloud();
-        const GAME_IDS = GAMES.map(g => g.id);
-        for (const id of GAME_IDS) {
-            _cachedBlockedGames[id] = !(await isGameAllowedCloud(id));
-        }
-    } catch {}
+function _refreshTeacherRestrictions() {
+    import("../core/teacher-controls.js").then(async mod => {
+        try {
+            _cachedPlayAllowed = await mod.isPlayAllowedCloud();
+            for (const g of GAMES) {
+                _cachedBlockedGames[g.id] = !(await mod.isGameAllowedCloud(g.id));
+            }
+        } catch {}
+    }).catch(() => {});
 }
-// Refresh every 30 seconds
-setTimeout(() => { _refreshTeacherRestrictions(); setInterval(_refreshTeacherRestrictions, 30000); }, 2000);
+setTimeout(_refreshTeacherRestrictions, 3000);
+setInterval(_refreshTeacherRestrictions, 30000);
 
 const HS_KEY = "gameHighscores";
 
@@ -332,8 +332,10 @@ class GameLobby extends HTMLElement {
           transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
           color: white;
           display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
-          user-select: none;
+          user-select: none; -webkit-user-select: none;
           position: relative;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: rgba(77,208,225,0.3);
         }
         .game-card:not(.locked):hover {
           transform: translateY(-3px);
