@@ -1,5 +1,154 @@
 [
   {
+    "name": "Kl. 3: Mein Schulweg & Umgebung",
+    "grade": "3",
+    "words": [
+      {"de": "Was ist ein Stadtplan?", "en": "Eine Karte die eine Stadt zeigt", "allowImage": false},
+      {"de": "Was zeigt eine Legende?", "en": "Die Bedeutung der Zeichen und Farben auf einer Karte", "allowImage": false},
+      {"de": "Was sind Himmelsrichtungen?", "en": "Norden, Süden, Osten, Westen", "allowImage": false},
+      {"de": "Wo geht die Sonne auf?", "en": "Im Osten", "allowImage": false},
+      {"de": "Wo geht die Sonne unter?", "en": "Im Westen", "allowImage": false},
+      {"de": "Was ist ein Wohngebiet?", "en": "Ein Bereich in dem viele Menschen wohnen", "allowImage": false},
+      {"de": "Was ist ein Gewerbegebiet?", "en": "Ein Bereich mit Firmen und Geschäften", "allowImage": false},
+      {"de": "Was gehört zur Infrastruktur?", "en": "Straßen, Schulen, Krankenhäuser, Geschäfte", "allowImage": false},
+      {"de": "Was ist eine Kreuzung?", "en": "Stelle an der sich zwei Straßen kreuzen", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 3: Stadt & Land",
+    "grade": "3",
+    "words": [
+      {"de": "Was ist der Unterschied zwischen Stadt und Dorf?", "en": "Städte sind größer und haben mehr Einwohner", "allowImage": false},
+      {"de": "Was gibt es in der Stadt?", "en": "Geschäfte, Kinos, Krankenhäuser, viele Straßen", "allowImage": false},
+      {"de": "Was gibt es auf dem Land?", "en": "Bauernhöfe, Felder, Wiesen, Wälder", "allowImage": false},
+      {"de": "Was ist ein Bauernhof?", "en": "Ein Betrieb der Landwirtschaft betreibt", "allowImage": false},
+      {"de": "Was baut ein Bauer an?", "en": "Getreide, Kartoffeln, Gemüse, Obst", "allowImage": false},
+      {"de": "Was ist ein Feld?", "en": "Fläche auf der Pflanzen angebaut werden", "allowImage": false},
+      {"de": "Was macht ein Bäcker?", "en": "Er backt Brot und Brötchen aus Mehl", "allowImage": false},
+      {"de": "Woher kommt die Milch im Supermarkt?", "en": "Von Kühen auf dem Bauernhof", "allowImage": false},
+      {"de": "Was ist ein Markt?", "en": "Ort wo Bauern ihre Produkte direkt verkaufen", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 3: Wasser in unserer Umgebung",
+    "grade": "3",
+    "words": [
+      {"de": "Was ist ein Bach?", "en": "Ein kleiner Fluss", "allowImage": false},
+      {"de": "Wohin fließt das Wasser in Bächen?", "en": "In Flüsse und dann ins Meer", "allowImage": false},
+      {"de": "Was ist ein See?", "en": "Stehendes Gewässer das von Land umgeben ist", "allowImage": false},
+      {"de": "Woher kommt unser Trinkwasser?", "en": "Aus dem Grundwasser oder aus Seen", "allowImage": false},
+      {"de": "Was ist Grundwasser?", "en": "Wasser das tief im Boden gespeichert ist", "allowImage": false},
+      {"de": "Warum sollen wir Wasser sparen?", "en": "Sauberes Wasser ist kostbar und begrenzt", "allowImage": false},
+      {"de": "Was passiert mit Schmutzwasser?", "en": "Es wird in der Kläranlage gereinigt", "allowImage": false},
+      {"de": "Was ist eine Quelle?", "en": "Stelle an der Wasser aus dem Boden kommt", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 3: Wetter beobachten",
+    "grade": "3",
+    "words": [
+      {"de": "Was misst ein Thermometer?", "en": "Die Temperatur", "allowImage": false},
+      {"de": "Was zeigt eine Windfahne?", "en": "Die Windrichtung", "allowImage": false},
+      {"de": "Was ist Niederschlag?", "en": "Regen, Schnee, Hagel", "allowImage": false},
+      {"de": "Was ist Bewölkung?", "en": "Wie viele Wolken am Himmel sind", "allowImage": false},
+      {"de": "Wann gibt es Gewitter?", "en": "Bei schwülem Wetter im Sommer", "allowImage": false},
+      {"de": "Was ist Nebel?", "en": "Eine Wolke die am Boden liegt", "allowImage": false},
+      {"de": "Was macht ein Meteorologe?", "en": "Er erstellt Wettervorhersagen", "allowImage": false},
+      {"de": "Was ist Frost?", "en": "Temperaturen unter 0 Grad Celsius", "allowImage": false},
+      {"de": "Warum regnet es?", "en": "Wassertropfen in Wolken werden zu schwer", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 3: Verkehr & Wege",
+    "grade": "3",
+    "words": [
+      {"de": "Was ist öffentlicher Nahverkehr?", "en": "Bus, Straßenbahn, U-Bahn für alle", "allowImage": false},
+      {"de": "Was ist eine Autobahn?", "en": "Schnellstraße für Autos und LKW", "allowImage": false},
+      {"de": "Was ist ein Fußgängerweg?", "en": "Weg nur für Fußgänger (Bürgersteig)", "allowImage": false},
+      {"de": "Warum gibt es Verkehrsregeln?", "en": "Damit alle sicher unterwegs sind", "allowImage": false},
+      {"de": "Was bedeutet eine rote Ampel?", "en": "Stehen bleiben", "allowImage": false},
+      {"de": "Was ist ein Zebrastreifen?", "en": "Fußgängerüberweg mit weißen Streifen", "allowImage": false},
+      {"de": "Was ist eine Brücke?", "en": "Bauwerk das über Wasser oder Täler führt", "allowImage": false},
+      {"de": "Was ist ein Tunnel?", "en": "Durchgang durch einen Berg oder unter der Erde", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Mein Bundesland",
+    "grade": "4",
+    "words": [
+      {"de": "Was ist ein Bundesland?", "en": "Ein Teilstaat von Deutschland", "allowImage": false},
+      {"de": "Wie viele Bundesländer hat Deutschland?", "en": "16", "allowImage": false},
+      {"de": "Was ist eine Landeshauptstadt?", "en": "Die Hauptstadt eines Bundeslandes", "allowImage": false},
+      {"de": "Was ist Bayern die Hauptstadt?", "en": "München", "allowImage": false},
+      {"de": "Was ist die Hauptstadt von NRW?", "en": "Düsseldorf", "allowImage": false},
+      {"de": "Was sind Stadtstaaten?", "en": "Berlin, Hamburg, Bremen", "allowImage": false},
+      {"de": "Welches ist das größte Bundesland?", "en": "Bayern", "allowImage": false},
+      {"de": "Welches Bundesland liegt ganz im Norden?", "en": "Schleswig-Holstein", "allowImage": false},
+      {"de": "Was ist eine Grenze?", "en": "Linie die zwei Gebiete voneinander trennt", "allowImage": false},
+      {"de": "Was sind Nachbarländer?", "en": "Länder die direkt an Deutschland grenzen", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Landschaften in Deutschland",
+    "grade": "4",
+    "words": [
+      {"de": "Was ist das Norddeutsche Tiefland?", "en": "Flaches Gebiet im Norden mit Küsten", "allowImage": false},
+      {"de": "Was sind Mittelgebirge?", "en": "Gebirge mittlerer Höhe (z.B. Harz, Schwarzwald)", "allowImage": false},
+      {"de": "Was ist das Alpenvorland?", "en": "Hügeliges Gebiet zwischen Alpen und Donau", "allowImage": false},
+      {"de": "Was sind die Alpen?", "en": "Höchstes Gebirge Europas im Süden Deutschlands", "allowImage": false},
+      {"de": "Wie heißt der höchste Berg Deutschlands?", "en": "Zugspitze (2962 m)", "allowImage": false},
+      {"de": "Welcher große Fluss fließt durch Hamburg?", "en": "Die Elbe", "allowImage": false},
+      {"de": "Welcher Fluss fließt durch München?", "en": "Die Isar", "allowImage": false},
+      {"de": "Was ist die Nordseeküste?", "en": "Flache Küste mit Watt, Inseln und Deichen", "allowImage": false},
+      {"de": "Was ist das Wattenmeer?", "en": "Gebiet an der Nordsee das bei Ebbe trocken fällt", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Vom Rohstoff zum Produkt",
+    "grade": "4",
+    "words": [
+      {"de": "Was ist ein Rohstoff?", "en": "Material aus der Natur (z.B. Holz, Erz, Öl)", "allowImage": false},
+      {"de": "Was wird aus Getreide gemacht?", "en": "Mehl, Brot, Nudeln", "allowImage": false},
+      {"de": "Was wird aus Milch hergestellt?", "en": "Butter, Käse, Joghurt", "allowImage": false},
+      {"de": "Was ist Recycling?", "en": "Wiederverwertung von Abfällen", "allowImage": false},
+      {"de": "Warum trennen wir Müll?", "en": "Damit Rohstoffe wiederverwendet werden können", "allowImage": false},
+      {"de": "Was kommt in die gelbe Tonne?", "en": "Verpackungen aus Plastik und Metall", "allowImage": false},
+      {"de": "Was kommt in die blaue Tonne?", "en": "Papier und Karton", "allowImage": false},
+      {"de": "Was ist eine Fabrik?", "en": "Gebäude in dem Waren hergestellt werden", "allowImage": false},
+      {"de": "Was ist Landwirtschaft?", "en": "Anbau von Pflanzen und Haltung von Tieren", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Karten lesen lernen",
+    "grade": "4",
+    "words": [
+      {"de": "Was ist ein Maßstab?", "en": "Verhältnis von Karte zu Wirklichkeit", "allowImage": false},
+      {"de": "Was bedeutet Maßstab 1:10.000?", "en": "1 cm auf der Karte = 10.000 cm (100 m) in der Wirklichkeit", "allowImage": false},
+      {"de": "Was ist eine Höhenlinie?", "en": "Linie die Punkte gleicher Höhe verbindet", "allowImage": false},
+      {"de": "Was zeigt grün auf einer physischen Karte?", "en": "Tiefland (niedrig gelegene Gebiete)", "allowImage": false},
+      {"de": "Was zeigt braun auf einer physischen Karte?", "en": "Gebirge und Berge", "allowImage": false},
+      {"de": "Was zeigt blau auf einer Karte?", "en": "Wasser (Flüsse, Seen, Meere)", "allowImage": false},
+      {"de": "Was ist ein Kompass?", "en": "Gerät das immer nach Norden zeigt", "allowImage": false},
+      {"de": "Wo ist Norden auf den meisten Karten?", "en": "Oben", "allowImage": false},
+      {"de": "Was ist ein Atlas?", "en": "Buch mit vielen verschiedenen Karten", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Flüsse in Deutschland",
+    "grade": "4",
+    "words": [
+      {"de": "Welcher ist der längste Fluss Deutschlands?", "en": "Der Rhein (865 km in Deutschland)", "allowImage": false},
+      {"de": "Wohin fließt der Rhein?", "en": "In die Nordsee (durch die Niederlande)", "allowImage": false},
+      {"de": "Wohin fließt die Donau?", "en": "Ins Schwarze Meer", "allowImage": false},
+      {"de": "Welcher Fluss fließt durch Berlin?", "en": "Die Spree", "allowImage": false},
+      {"de": "Welcher Fluss fließt durch Frankfurt?", "en": "Der Main", "allowImage": false},
+      {"de": "Was ist eine Mündung?", "en": "Stelle wo ein Fluss ins Meer oder in einen anderen Fluss fließt", "allowImage": false},
+      {"de": "Was ist eine Quelle?", "en": "Stelle wo ein Fluss entspringt", "allowImage": false},
+      {"de": "Was ist ein Nebenfluss?", "en": "Fluss der in einen größeren Fluss fließt", "allowImage": false},
+      {"de": "Warum gibt es manchmal Hochwasser?", "en": "Bei starkem Regen oder Schneeschmelze steigt das Wasser", "allowImage": false}
+    ]
+  },
+  {
     "name": "Kl. 5: Planet Erde & Sonnensystem",
     "grade": "5",
     "words": [
@@ -10,22 +159,22 @@
       {"de": "Warum gibt es Tag und Nacht?", "en": "Die Erde dreht sich um ihre eigene Achse", "allowImage": false},
       {"de": "Warum gibt es Jahreszeiten?", "en": "Die Erdachse ist geneigt", "allowImage": false},
       {"de": "Was verursacht Ebbe und Flut?", "en": "Die Anziehungskraft des Mondes", "allowImage": false},
-      {"de": "Was ist der \u00c4quator?", "en": "Gedachte Linie um die Mitte der Erde", "allowImage": false}
+      {"de": "Was ist der Äquator?", "en": "Gedachte Linie um die Mitte der Erde", "allowImage": false}
     ]
   },
   {
     "name": "Kl. 5: Karten & Orientierung",
     "grade": "5",
     "words": [
-      {"de": "Was sind die 4 Himmelsrichtungen?", "en": "Norden, S\u00fcden, Osten, Westen", "allowImage": false},
+      {"de": "Was sind die 4 Himmelsrichtungen?", "en": "Norden, Süden, Osten, Westen", "allowImage": false},
       {"de": "Womit bestimmt man die Himmelsrichtung?", "en": "Kompass", "allowImage": false},
-      {"de": "Was ist ein Ma\u00dfstab?", "en": "Verh\u00e4ltnis von Karte zu Wirklichkeit", "allowImage": false},
-      {"de": "Was zeigt eine physische Karte?", "en": "Gebirge, Fl\u00fcsse, H\u00f6hen", "allowImage": false},
-      {"de": "Was zeigt eine thematische Karte?", "en": "Bestimmte Themen wie Bev\u00f6lkerung oder Klima", "allowImage": false},
-      {"de": "Was ist das Gradnetz?", "en": "Linien auf der Erde (L\u00e4ngen- und Breitengrade)", "allowImage": false},
-      {"de": "Was sind Breitengrade?", "en": "Horizontale Linien, messen Abstand zum \u00c4quator", "allowImage": false},
-      {"de": "Was sind L\u00e4ngengrade?", "en": "Vertikale Linien, messen Abstand zum Nullmeridian", "allowImage": false},
-      {"de": "Was ist eine Legende auf einer Karte?", "en": "Erkl\u00e4rung der Symbole und Farben", "allowImage": false}
+      {"de": "Was ist ein Maßstab?", "en": "Verhältnis von Karte zu Wirklichkeit", "allowImage": false},
+      {"de": "Was zeigt eine physische Karte?", "en": "Gebirge, Flüsse, Höhen", "allowImage": false},
+      {"de": "Was zeigt eine thematische Karte?", "en": "Bestimmte Themen wie Bevölkerung oder Klima", "allowImage": false},
+      {"de": "Was ist das Gradnetz?", "en": "Linien auf der Erde (Längen- und Breitengrade)", "allowImage": false},
+      {"de": "Was sind Breitengrade?", "en": "Horizontale Linien, messen Abstand zum Äquator", "allowImage": false},
+      {"de": "Was sind Längengrade?", "en": "Vertikale Linien, messen Abstand zum Nullmeridian", "allowImage": false},
+      {"de": "Was ist eine Legende auf einer Karte?", "en": "Erklärung der Symbole und Farben", "allowImage": false}
     ]
   },
   {
@@ -33,14 +182,14 @@
     "grade": "5",
     "words": [
       {"de": "Was ist die Hauptstadt von Deutschland?", "en": "Berlin", "allowImage": false},
-      {"de": "Wie viele Bundesl\u00e4nder hat Deutschland?", "en": "16", "allowImage": false},
-      {"de": "Welcher Fluss flie\u00dft durch K\u00f6ln?", "en": "Der Rhein", "allowImage": false},
-      {"de": "Wie hei\u00dft der h\u00f6chste Berg Deutschlands?", "en": "Zugspitze (2.962 m)", "allowImage": false},
+      {"de": "Wie viele Bundesländer hat Deutschland?", "en": "16", "allowImage": false},
+      {"de": "Welcher Fluss fließt durch Köln?", "en": "Der Rhein", "allowImage": false},
+      {"de": "Wie heißt der höchste Berg Deutschlands?", "en": "Zugspitze (2.962 m)", "allowImage": false},
       {"de": "Welche Meere grenzen an Deutschland?", "en": "Nordsee und Ostsee", "allowImage": false},
-      {"de": "Welches Gebirge liegt im S\u00fcden Deutschlands?", "en": "Die Alpen", "allowImage": false},
-      {"de": "Welche L\u00e4nder grenzen an Deutschland?", "en": "9 L\u00e4nder: D\u00e4nemark, Polen, Tschechien, \u00d6sterreich, Schweiz, Frankreich, Luxemburg, Belgien, Niederlande", "allowImage": false},
+      {"de": "Welches Gebirge liegt im Süden Deutschlands?", "en": "Die Alpen", "allowImage": false},
+      {"de": "Welche Länder grenzen an Deutschland?", "en": "9 Länder: Dänemark, Polen, Tschechien, Österreich, Schweiz, Frankreich, Luxemburg, Belgien, Niederlande", "allowImage": false},
       {"de": "Was ist das Norddeutsche Tiefland?", "en": "Flaches Gebiet im Norden Deutschlands", "allowImage": false},
-      {"de": "Was sind Mittelgebirge?", "en": "Gebirge mittlerer H\u00f6he wie Harz, Erzgebirge, Schwarzwald", "allowImage": false}
+      {"de": "Was sind Mittelgebirge?", "en": "Gebirge mittlerer Höhe wie Harz, Erzgebirge, Schwarzwald", "allowImage": false}
     ]
   },
   {
@@ -48,15 +197,15 @@
     "grade": "5",
     "words": [
       {"de": "Wie viele Kontinente gibt es?", "en": "7", "allowImage": false},
-      {"de": "Nenne die 7 Kontinente", "en": "Europa, Asien, Afrika, Nord- und S\u00fcdamerika, Australien, Antarktis", "allowImage": false},
-      {"de": "Was ist die EU?", "en": "Europ\u00e4ische Union - Zusammenschluss europ\u00e4ischer L\u00e4nder", "allowImage": false},
+      {"de": "Nenne die 7 Kontinente", "en": "Europa, Asien, Afrika, Nord- und Südamerika, Australien, Antarktis", "allowImage": false},
+      {"de": "Was ist die EU?", "en": "Europäische Union - Zusammenschluss europäischer Länder", "allowImage": false},
       {"de": "Hauptstadt von Frankreich?", "en": "Paris", "allowImage": false},
       {"de": "Hauptstadt von Italien?", "en": "Rom", "allowImage": false},
       {"de": "Hauptstadt von Spanien?", "en": "Madrid", "allowImage": false},
       {"de": "Hauptstadt von England?", "en": "London", "allowImage": false},
-      {"de": "Hauptstadt von \u00d6sterreich?", "en": "Wien", "allowImage": false},
-      {"de": "Was ist das h\u00f6chste Gebirge Europas?", "en": "Die Alpen", "allowImage": false},
-      {"de": "Welcher Fluss ist der l\u00e4ngste in Europa?", "en": "Die Wolga", "allowImage": false}
+      {"de": "Hauptstadt von Österreich?", "en": "Wien", "allowImage": false},
+      {"de": "Was ist das höchste Gebirge Europas?", "en": "Die Alpen", "allowImage": false},
+      {"de": "Welcher Fluss ist der längste in Europa?", "en": "Die Wolga", "allowImage": false}
     ]
   },
   {
@@ -64,13 +213,105 @@
     "grade": "5",
     "words": [
       {"de": "Aus welchen Schichten besteht die Erde?", "en": "Erdkruste, Erdmantel, Erdkern", "allowImage": false},
-      {"de": "Was sind tektonische Platten?", "en": "Gro\u00dfe Teile der Erdkruste die sich bewegen", "allowImage": false},
-      {"de": "Wie entsteht ein Erdbeben?", "en": "Tektonische Platten verschieben sich pl\u00f6tzlich", "allowImage": false},
+      {"de": "Was sind tektonische Platten?", "en": "Große Teile der Erdkruste die sich bewegen", "allowImage": false},
+      {"de": "Wie entsteht ein Erdbeben?", "en": "Tektonische Platten verschieben sich plötzlich", "allowImage": false},
       {"de": "Was ist Lava?", "en": "Geschmolzenes Gestein das aus einem Vulkan kommt", "allowImage": false},
       {"de": "Was ist Magma?", "en": "Geschmolzenes Gestein unter der Erde", "allowImage": false},
       {"de": "Wo gibt es besonders viele Vulkane?", "en": "Am Pazifischen Feuerring", "allowImage": false},
       {"de": "Was ist ein Tsunami?", "en": "Riesige Welle durch Erdbeben unter dem Meer", "allowImage": false},
-      {"de": "Wie entsteht ein Gebirge?", "en": "Tektonische Platten dr\u00fccken gegeneinander", "allowImage": false}
+      {"de": "Wie entsteht ein Gebirge?", "en": "Tektonische Platten drücken gegeneinander", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 5: Klimazonen der Erde",
+    "grade": "5",
+    "words": [
+      {"de": "Was ist eine Klimazone?", "en": "Gebiet der Erde mit ähnlichem Klima", "allowImage": false},
+      {"de": "Nenne die Klimazonen", "en": "Tropen, Subtropen, Gemäßigte Zone, Subpolare Zone, Polare Zone", "allowImage": false},
+      {"de": "Wo sind die Tropen?", "en": "Am Äquator, zwischen den Wendekreisen", "allowImage": false},
+      {"de": "Was ist typisch für die Tropen?", "en": "Ganzjährig warm und feucht, tropischer Regenwald", "allowImage": false},
+      {"de": "In welcher Klimazone liegt Deutschland?", "en": "In der gemäßigten Zone", "allowImage": false},
+      {"de": "Was ist typisch für die gemäßigte Zone?", "en": "4 Jahreszeiten, milde Temperaturen", "allowImage": false},
+      {"de": "Was ist typisch für die polare Zone?", "en": "Extrem kalt, Eis und Schnee, Permafrost", "allowImage": false},
+      {"de": "Was ist der Unterschied zwischen Wetter und Klima?", "en": "Wetter ist kurzfristig, Klima ist der Durchschnitt über 30 Jahre", "allowImage": false},
+      {"de": "Warum ist es am Äquator warm?", "en": "Die Sonnenstrahlen treffen dort senkrecht auf die Erde", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Afrika",
+    "grade": "6",
+    "words": [
+      {"de": "Wie heißt die größte Wüste Afrikas?", "en": "Die Sahara", "allowImage": false},
+      {"de": "Welcher Fluss ist der längste in Afrika?", "en": "Der Nil", "allowImage": false},
+      {"de": "Was ist die Savanne?", "en": "Graslandschaft mit einzelnen Bäumen zwischen Wüste und Regenwald", "allowImage": false},
+      {"de": "Was ist eine Oase?", "en": "Fruchtbare Stelle in der Wüste mit Wasser", "allowImage": false},
+      {"de": "Welcher Berg ist der höchste in Afrika?", "en": "Kilimandscharo (5895 m)", "allowImage": false},
+      {"de": "Was ist der Regenwald?", "en": "Dichter Wald am Äquator mit sehr viel Regen", "allowImage": false},
+      {"de": "Was sind die Big Five?", "en": "Löwe, Elefant, Büffel, Leopard, Nashorn", "allowImage": false},
+      {"de": "Welches Problem hat der afrikanische Regenwald?", "en": "Abholzung und Brandrodung", "allowImage": false},
+      {"de": "Was ist Desertifikation?", "en": "Ausbreitung der Wüste in fruchtbares Land", "allowImage": false},
+      {"de": "In welchen Klimazonen liegt Afrika?", "en": "Tropen, Subtropen, Wüstenklima", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Klima & Klimawandel",
+    "grade": "6",
+    "words": [
+      {"de": "Was ist der Treibhauseffekt?", "en": "Gase in der Atmosphäre halten Wärme zurück", "allowImage": false},
+      {"de": "Was ist CO2?", "en": "Kohlenstoffdioxid, ein Treibhausgas", "allowImage": false},
+      {"de": "Wodurch entsteht viel CO2?", "en": "Verbrennung von Kohle, Öl, Gas, Autoverkehr", "allowImage": false},
+      {"de": "Was passiert durch den Klimawandel?", "en": "Es wird wärmer, Eis schmilzt, Meeresspiegel steigt", "allowImage": false},
+      {"de": "Was sind erneuerbare Energien?", "en": "Wind, Sonne, Wasser, Biomasse", "allowImage": false},
+      {"de": "Was ist der Meeresspiegel?", "en": "Höhe der Meeresoberfläche", "allowImage": false},
+      {"de": "Was passiert wenn Gletscher schmelzen?", "en": "Der Meeresspiegel steigt", "allowImage": false},
+      {"de": "Was kann jeder gegen Klimawandel tun?", "en": "Energie sparen, Rad fahren, weniger Fleisch essen", "allowImage": false},
+      {"de": "Was ist ein Gletscher?", "en": "Große Eismasse die sich langsam bewegt", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Asien",
+    "grade": "6",
+    "words": [
+      {"de": "Welcher ist der größte Kontinent?", "en": "Asien", "allowImage": false},
+      {"de": "Welches Land hat die meisten Einwohner der Welt?", "en": "Indien (über 1,4 Milliarden)", "allowImage": false},
+      {"de": "Was ist der Himalaya?", "en": "Das höchste Gebirge der Welt (mit Mount Everest)", "allowImage": false},
+      {"de": "Wie hoch ist der Mount Everest?", "en": "8849 Meter", "allowImage": false},
+      {"de": "Was ist der Monsun?", "en": "Jahreszeitlich wechselnder Wind in Südasien mit Regenzeit", "allowImage": false},
+      {"de": "Welche Meere umgeben Asien?", "en": "Pazifik, Indischer Ozean, Arktischer Ozean", "allowImage": false},
+      {"de": "Was ist der längste Fluss Asiens?", "en": "Der Jangtse in China", "allowImage": false},
+      {"de": "Was ist ein Taifun?", "en": "Tropischer Wirbelsturm über dem Pazifik", "allowImage": false},
+      {"de": "Hauptstadt von Japan?", "en": "Tokio", "allowImage": false},
+      {"de": "Hauptstadt von China?", "en": "Peking", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Tropischer Regenwald",
+    "grade": "6",
+    "words": [
+      {"de": "Wo gibt es tropischen Regenwald?", "en": "Am Äquator: Südamerika, Afrika, Südostasien", "allowImage": false},
+      {"de": "Wie ist das Klima im Regenwald?", "en": "Ganzjährig warm (25-28°C) und sehr feucht", "allowImage": false},
+      {"de": "Nenne die Stockwerke des Regenwalds", "en": "Boden, Kraut, Strauch, Baumkronen, Urwaldriesen", "allowImage": false},
+      {"de": "Warum ist der Regenwald wichtig?", "en": "Produziert Sauerstoff, speichert CO2, große Artenvielfalt", "allowImage": false},
+      {"de": "Was ist Artenvielfalt?", "en": "Viele verschiedene Tier- und Pflanzenarten", "allowImage": false},
+      {"de": "Was ist Brandrodung?", "en": "Wald wird abgebrannt um Flächen zu gewinnen", "allowImage": false},
+      {"de": "Welche Tiere leben im Regenwald?", "en": "Affen, Papageien, Schlangen, Frösche, Insekten", "allowImage": false},
+      {"de": "Wie viel Prozent aller Tierarten leben im Regenwald?", "en": "Über 50 Prozent", "allowImage": false},
+      {"de": "Was ist der Amazonas?", "en": "Größter Regenwald der Welt in Südamerika", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Naturkatastrophen",
+    "grade": "6",
+    "words": [
+      {"de": "Was ist eine Naturkatastrophe?", "en": "Natürliches Ereignis das großen Schaden anrichtet", "allowImage": false},
+      {"de": "Was ist ein Hurrikan?", "en": "Tropischer Wirbelsturm über dem Atlantik", "allowImage": false},
+      {"de": "Was ist eine Überschwemmung?", "en": "Wasser tritt über die Ufer und überflutet Land", "allowImage": false},
+      {"de": "Was ist eine Dürre?", "en": "Sehr lange Trockenzeit ohne Regen", "allowImage": false},
+      {"de": "Wie misst man Erdbeben?", "en": "Mit der Richterskala", "allowImage": false},
+      {"de": "Was ist ein Deich?", "en": "Schutzwall gegen Hochwasser an Küsten und Flüssen", "allowImage": false},
+      {"de": "Was ist ein Frühwarnsystem?", "en": "Technik die vor Naturkatastrophen warnt", "allowImage": false},
+      {"de": "Was ist eine Lawine?", "en": "Schneemasse die einen Berg hinunterrutscht", "allowImage": false},
+      {"de": "Was ist ein Erdrutsch?", "en": "Erd- und Gesteinsmassen rutschen einen Hang hinunter", "allowImage": false}
     ]
   }
 ]

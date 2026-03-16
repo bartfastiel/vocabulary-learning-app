@@ -1,47 +1,199 @@
 [
   {
-    "name": "Kl. 5: Wirbeltiere & S\u00e4ugetiere",
+    "name": "Kl. 3: Haustiere & Nutztiere",
+    "grade": "3",
+    "words": [
+      {"de": "Was ist ein Haustier?", "en": "Ein Tier das bei Menschen zuhause lebt", "allowImage": false},
+      {"de": "Nenne 3 Haustiere", "en": "Hund, Katze, Hamster", "allowImage": false},
+      {"de": "Was ist ein Nutztier?", "en": "Ein Tier das dem Menschen Nutzen bringt (Milch, Eier, Wolle)", "allowImage": false},
+      {"de": "Nenne 3 Nutztiere", "en": "Kuh, Huhn, Schaf", "allowImage": false},
+      {"de": "Was gibt die Kuh?", "en": "Milch", "allowImage": false},
+      {"de": "Was gibt das Huhn?", "en": "Eier", "allowImage": false},
+      {"de": "Was gibt das Schaf?", "en": "Wolle", "allowImage": false},
+      {"de": "Was brauchen alle Tiere zum Leben?", "en": "Wasser, Futter, einen sicheren Platz", "allowImage": false},
+      {"de": "Was frisst ein Hund?", "en": "Fleisch, Hundefutter", "allowImage": false},
+      {"de": "Was frisst ein Kaninchen?", "en": "Heu, Gras, Gemüse", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 3: Pflanzen im Garten",
+    "grade": "3",
+    "words": [
+      {"de": "Was braucht eine Pflanze zum Wachsen?", "en": "Wasser, Licht, Erde", "allowImage": false},
+      {"de": "Welcher Teil der Pflanze ist in der Erde?", "en": "Die Wurzel", "allowImage": false},
+      {"de": "Was macht die Wurzel?", "en": "Sie nimmt Wasser aus der Erde auf", "allowImage": false},
+      {"de": "Was macht das Blatt?", "en": "Es fängt das Sonnenlicht ein", "allowImage": false},
+      {"de": "Was ist ein Samen?", "en": "Daraus wächst eine neue Pflanze", "allowImage": false},
+      {"de": "Was ist ein Baum?", "en": "Eine große Pflanze mit Stamm und Ästen", "allowImage": false},
+      {"de": "Was passiert im Frühling mit Pflanzen?", "en": "Sie bekommen neue Blätter und Blüten", "allowImage": false},
+      {"de": "Was passiert im Herbst mit Laubbäumen?", "en": "Die Blätter verfärben sich und fallen ab", "allowImage": false},
+      {"de": "Nenne eine Obstsorte", "en": "Apfel, Birne, Kirsche", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 3: Tiere im Wald",
+    "grade": "3",
+    "words": [
+      {"de": "Welche Tiere leben im Wald?", "en": "Reh, Fuchs, Eichhörnchen, Wildschwein", "allowImage": false},
+      {"de": "Was frisst ein Eichhörnchen?", "en": "Nüsse und Samen", "allowImage": false},
+      {"de": "Was frisst ein Fuchs?", "en": "Mäuse, Beeren, Insekten (Allesfresser)", "allowImage": false},
+      {"de": "Was macht der Igel im Winter?", "en": "Er hält Winterschlaf", "allowImage": false},
+      {"de": "Was sammelt das Eichhörnchen im Herbst?", "en": "Vorräte für den Winter (Nüsse)", "allowImage": false},
+      {"de": "Was ist ein Laubwald?", "en": "Ein Wald mit Bäumen die im Herbst Blätter verlieren", "allowImage": false},
+      {"de": "Was ist ein Nadelwald?", "en": "Ein Wald mit Tannen und Fichten", "allowImage": false},
+      {"de": "Welcher Vogel klopft an Bäume?", "en": "Der Specht", "allowImage": false},
+      {"de": "Was ist ein Nachtjäger?", "en": "Ein Tier das nachts jagt, z.B. die Eule", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 3: Mein Körper",
+    "grade": "3",
+    "words": [
+      {"de": "Mit welchem Sinn sehen wir?", "en": "Mit den Augen (Sehsinn)", "allowImage": false},
+      {"de": "Mit welchem Sinn hören wir?", "en": "Mit den Ohren (Hörsinn)", "allowImage": false},
+      {"de": "Mit welchem Sinn riechen wir?", "en": "Mit der Nase (Geruchssinn)", "allowImage": false},
+      {"de": "Mit welchem Sinn schmecken wir?", "en": "Mit der Zunge (Geschmackssinn)", "allowImage": false},
+      {"de": "Mit welchem Sinn fühlen wir?", "en": "Mit der Haut (Tastsinn)", "allowImage": false},
+      {"de": "Wie viele Sinne hat der Mensch?", "en": "5 Sinne", "allowImage": false},
+      {"de": "Warum müssen wir uns die Zähne putzen?", "en": "Damit sie gesund bleiben und kein Karies entsteht", "allowImage": false},
+      {"de": "Was schützt unseren Körper von außen?", "en": "Die Haut", "allowImage": false},
+      {"de": "Warum brauchen wir Schlaf?", "en": "Damit sich der Körper erholen kann", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 3: Jahreszeiten & Natur",
+    "grade": "3",
+    "words": [
+      {"de": "Nenne die 4 Jahreszeiten", "en": "Frühling, Sommer, Herbst, Winter", "allowImage": false},
+      {"de": "In welcher Jahreszeit blühen die Blumen?", "en": "Im Frühling", "allowImage": false},
+      {"de": "Wann ist es am wärmsten?", "en": "Im Sommer", "allowImage": false},
+      {"de": "Wann fallen die Blätter?", "en": "Im Herbst", "allowImage": false},
+      {"de": "Wann liegt oft Schnee?", "en": "Im Winter", "allowImage": false},
+      {"de": "Was machen Zugvögel im Herbst?", "en": "Sie fliegen in den Süden", "allowImage": false},
+      {"de": "Was ist ein Zugvogel?", "en": "Ein Vogel der im Winter in warme Länder fliegt", "allowImage": false},
+      {"de": "Was macht eine Raupe?", "en": "Sie frisst Blätter und wird zum Schmetterling", "allowImage": false},
+      {"de": "Was ist Metamorphose bei Schmetterlingen?", "en": "Ei, Raupe, Puppe, Schmetterling", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Zähne & Gebiss",
+    "grade": "4",
+    "words": [
+      {"de": "Wie heißen die ersten Zähne?", "en": "Milchzähne", "allowImage": false},
+      {"de": "Wie viele Milchzähne hat ein Kind?", "en": "20", "allowImage": false},
+      {"de": "Wie viele bleibende Zähne hat ein Erwachsener?", "en": "32", "allowImage": false},
+      {"de": "Nenne die Zahnarten", "en": "Schneidezähne, Eckzähne, Backenzähne", "allowImage": false},
+      {"de": "Wozu braucht man Schneidezähne?", "en": "Zum Abbeißen", "allowImage": false},
+      {"de": "Wozu braucht man Backenzähne?", "en": "Zum Zerkleinern und Kauen", "allowImage": false},
+      {"de": "Was ist Karies?", "en": "Bakterien zerstören den Zahnschmelz", "allowImage": false},
+      {"de": "Woraus besteht ein Zahn?", "en": "Zahnschmelz, Zahnbein, Zahnmark (Pulpa)", "allowImage": false},
+      {"de": "Wie oft soll man Zähne putzen?", "en": "Mindestens 2 mal am Tag", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Wasser & Wasserkreislauf",
+    "grade": "4",
+    "words": [
+      {"de": "Was passiert wenn Wasser erhitzt wird?", "en": "Es verdampft und wird zu Wasserdampf", "allowImage": false},
+      {"de": "Was passiert wenn Wasserdampf abkühlt?", "en": "Er wird wieder zu Wasser (Kondensation)", "allowImage": false},
+      {"de": "Was sind Wolken?", "en": "Winzige Wassertröpfchen in der Luft", "allowImage": false},
+      {"de": "Wie entsteht Regen?", "en": "Wassertröpfchen in Wolken werden zu schwer und fallen", "allowImage": false},
+      {"de": "Was ist der Wasserkreislauf?", "en": "Verdunstung, Wolkenbildung, Regen, Abfluss", "allowImage": false},
+      {"de": "Nenne die 3 Zustände von Wasser", "en": "Fest (Eis), flüssig (Wasser), gasförmig (Dampf)", "allowImage": false},
+      {"de": "Bei wie viel Grad gefriert Wasser?", "en": "Bei 0 Grad Celsius", "allowImage": false},
+      {"de": "Bei wie viel Grad kocht Wasser?", "en": "Bei 100 Grad Celsius", "allowImage": false},
+      {"de": "Warum ist Wasser wichtig für den Menschen?", "en": "Unser Körper besteht zu etwa 60% aus Wasser", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Ernährung & Verdauung",
+    "grade": "4",
+    "words": [
+      {"de": "Was sind Nährstoffe?", "en": "Stoffe in der Nahrung die der Körper braucht", "allowImage": false},
+      {"de": "Nenne die wichtigsten Nährstoffe", "en": "Kohlenhydrate, Fette, Eiweiße, Vitamine, Mineralstoffe", "allowImage": false},
+      {"de": "Was liefern Kohlenhydrate?", "en": "Energie", "allowImage": false},
+      {"de": "In welchen Lebensmitteln ist viel Eiweiß?", "en": "Fleisch, Fisch, Eier, Milch, Hülsenfrüchte", "allowImage": false},
+      {"de": "Warum brauchen wir Vitamine?", "en": "Um gesund zu bleiben und den Körper zu schützen", "allowImage": false},
+      {"de": "Wo beginnt die Verdauung?", "en": "Im Mund (durch Kauen und Speichel)", "allowImage": false},
+      {"de": "Was macht der Magen?", "en": "Er zerkleinert die Nahrung mit Magensäure", "allowImage": false},
+      {"de": "Was passiert im Dünndarm?", "en": "Nährstoffe werden ins Blut aufgenommen", "allowImage": false},
+      {"de": "Was ist die Ernährungspyramide?", "en": "Sie zeigt wie viel man von welchen Lebensmitteln essen soll", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Tiere auf dem Bauernhof",
+    "grade": "4",
+    "words": [
+      {"de": "Was ist ein Wiederkäuer?", "en": "Tier das Nahrung mehrmals kaut (z.B. Kuh)", "allowImage": false},
+      {"de": "Wie viele Mägen hat eine Kuh?", "en": "4 Mägen", "allowImage": false},
+      {"de": "Was frisst eine Kuh?", "en": "Gras und Heu (Pflanzenfresser)", "allowImage": false},
+      {"de": "Was ist ein Allesfresser auf dem Bauernhof?", "en": "Das Schwein", "allowImage": false},
+      {"de": "Was gibt das Schaf?", "en": "Wolle und Fleisch", "allowImage": false},
+      {"de": "Was ist ein Hahn?", "en": "Das männliche Huhn", "allowImage": false},
+      {"de": "Was ist eine Henne?", "en": "Das weibliche Huhn", "allowImage": false},
+      {"de": "Was ist ein Küken?", "en": "Ein junges Huhn", "allowImage": false},
+      {"de": "Wie nennt man das Junge der Kuh?", "en": "Kalb", "allowImage": false},
+      {"de": "Wie nennt man das Junge des Pferdes?", "en": "Fohlen", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 4: Lebensraum Wiese",
+    "grade": "4",
+    "words": [
+      {"de": "Was wächst auf einer Wiese?", "en": "Gräser, Klee, Löwenzahn, Gänseblümchen", "allowImage": false},
+      {"de": "Welche Tiere leben auf der Wiese?", "en": "Bienen, Schmetterlinge, Heuschrecken, Maulwurf", "allowImage": false},
+      {"de": "Warum sind Bienen wichtig?", "en": "Sie bestäuben Blüten", "allowImage": false},
+      {"de": "Was macht ein Maulwurf?", "en": "Er gräbt Tunnel unter der Erde und frisst Regenwürmer", "allowImage": false},
+      {"de": "Was sind Insekten?", "en": "Tiere mit 6 Beinen und 3 Körperteilen", "allowImage": false},
+      {"de": "Nenne die 3 Körperteile eines Insekts", "en": "Kopf, Brust, Hinterleib", "allowImage": false},
+      {"de": "Was ist eine Nahrungskette auf der Wiese?", "en": "Pflanze wird von Raupe gefressen, Raupe vom Vogel", "allowImage": false},
+      {"de": "Was ist Nektar?", "en": "Süßer Saft in Blüten, den Bienen sammeln", "allowImage": false},
+      {"de": "Was machen Bienen aus Nektar?", "en": "Honig", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 5: Wirbeltiere & Säugetiere",
     "grade": "5",
     "words": [
-      {"de": "Was sind Wirbeltiere?", "en": "Tiere mit Wirbels\u00e4ule", "allowImage": false},
-      {"de": "Nenne die 5 Klassen der Wirbeltiere", "en": "Fische, Amphibien, Reptilien, V\u00f6gel, S\u00e4ugetiere", "allowImage": false},
-      {"de": "Was ist typisch f\u00fcr S\u00e4ugetiere?", "en": "Fell, Milch f\u00fcr Junge, gleichwarm", "allowImage": false},
-      {"de": "Was bedeutet gleichwarm?", "en": "K\u00f6rpertemperatur bleibt immer gleich", "allowImage": false},
-      {"de": "Was bedeutet wechselwarm?", "en": "K\u00f6rpertemperatur passt sich der Umgebung an", "allowImage": false},
+      {"de": "Was sind Wirbeltiere?", "en": "Tiere mit Wirbelsäule", "allowImage": false},
+      {"de": "Nenne die 5 Klassen der Wirbeltiere", "en": "Fische, Amphibien, Reptilien, Vögel, Säugetiere", "allowImage": false},
+      {"de": "Was ist typisch für Säugetiere?", "en": "Fell, Milch für Junge, gleichwarm", "allowImage": false},
+      {"de": "Was bedeutet gleichwarm?", "en": "Körpertemperatur bleibt immer gleich", "allowImage": false},
+      {"de": "Was bedeutet wechselwarm?", "en": "Körpertemperatur passt sich der Umgebung an", "allowImage": false},
       {"de": "Welche Tiere sind wechselwarm?", "en": "Fische, Amphibien, Reptilien", "allowImage": false},
-      {"de": "Was ist ein Raubtier?", "en": "Fleischfresser mit Rei\u00dfz\u00e4hnen", "allowImage": false},
-      {"de": "Was ist ein Pflanzenfresser?", "en": "Tier das sich nur von Pflanzen ern\u00e4hrt", "allowImage": false},
+      {"de": "Was ist ein Raubtier?", "en": "Fleischfresser mit Reißzähnen", "allowImage": false},
+      {"de": "Was ist ein Pflanzenfresser?", "en": "Tier das sich nur von Pflanzen ernährt", "allowImage": false},
       {"de": "Was ist ein Allesfresser?", "en": "Tier das Pflanzen und Fleisch frisst", "allowImage": false},
       {"de": "Wie atmen Fische?", "en": "Mit Kiemen", "allowImage": false},
-      {"de": "Was haben V\u00f6gel statt Fell?", "en": "Federn", "allowImage": false},
-      {"de": "Was ist ein K\u00e4lteschlaf?", "en": "Winterschlaf bei dem der K\u00f6rper runterf\u00e4hrt", "allowImage": false}
+      {"de": "Was haben Vögel statt Fell?", "en": "Federn", "allowImage": false},
+      {"de": "Was ist ein Kälteschlaf?", "en": "Winterschlaf bei dem der Körper runterfährt", "allowImage": false}
     ]
   },
   {
-    "name": "Kl. 5: Bl\u00fctenpflanzen",
+    "name": "Kl. 5: Blütenpflanzen",
     "grade": "5",
     "words": [
-      {"de": "Welche Teile hat eine Bl\u00fctenpflanze?", "en": "Wurzel, Stängel, Blatt, Bl\u00fcte", "allowImage": false},
-      {"de": "Welche Teile hat eine Bl\u00fcte?", "en": "Kelchblatt, Kronblatt, Staubblatt, Fruchtblatt", "allowImage": false},
-      {"de": "Was machen die Staubbl\u00e4tter?", "en": "Produzieren Pollen", "allowImage": false},
-      {"de": "Was ist Best\u00e4ubung?", "en": "Pollen gelangt auf die Narbe einer Bl\u00fcte", "allowImage": false},
-      {"de": "Wer best\u00e4ubt Bl\u00fcten?", "en": "Insekten, Wind, Wasser", "allowImage": false},
+      {"de": "Welche Teile hat eine Blütenpflanze?", "en": "Wurzel, Stängel, Blatt, Blüte", "allowImage": false},
+      {"de": "Welche Teile hat eine Blüte?", "en": "Kelchblatt, Kronblatt, Staubblatt, Fruchtblatt", "allowImage": false},
+      {"de": "Was machen die Staubblätter?", "en": "Produzieren Pollen", "allowImage": false},
+      {"de": "Was ist Bestäubung?", "en": "Pollen gelangt auf die Narbe einer Blüte", "allowImage": false},
+      {"de": "Wer bestäubt Blüten?", "en": "Insekten, Wind, Wasser", "allowImage": false},
       {"de": "Was ist Fotosynthese?", "en": "Pflanze macht aus Licht, Wasser und CO2 Zucker und Sauerstoff", "allowImage": false},
-      {"de": "Wo findet Fotosynthese statt?", "en": "In den Chloroplasten der Bl\u00e4tter", "allowImage": false},
+      {"de": "Wo findet Fotosynthese statt?", "en": "In den Chloroplasten der Blätter", "allowImage": false},
       {"de": "Was nimmt die Wurzel auf?", "en": "Wasser und Mineralstoffe", "allowImage": false},
-      {"de": "Was ist eine Frucht?", "en": "Entsteht aus der Bl\u00fcte und enth\u00e4lt Samen", "allowImage": false},
-      {"de": "Nenne eine Pflanzenfamilie", "en": "Lippenbl\u00fctler, Korbbl\u00fctler, Kreuzbl\u00fctler", "allowImage": false}
+      {"de": "Was ist eine Frucht?", "en": "Entsteht aus der Blüte und enthält Samen", "allowImage": false},
+      {"de": "Nenne eine Pflanzenfamilie", "en": "Lippenblütler, Korbblütler, Kreuzblütler", "allowImage": false}
     ]
   },
   {
-    "name": "Kl. 5: Anpassung an Lebensr\u00e4ume",
+    "name": "Kl. 5: Anpassung an Lebensräume",
     "grade": "5",
     "words": [
       {"de": "Was ist ein Lebensraum?", "en": "Ort an dem ein Tier oder eine Pflanze lebt", "allowImage": false},
       {"de": "Was ist Tarnung?", "en": "Aussehen das an die Umgebung angepasst ist", "allowImage": false},
-      {"de": "Warum haben Kamele H\u00f6cker?", "en": "Fettspeicher f\u00fcr die W\u00fcste", "allowImage": false},
-      {"de": "Warum haben Eisb\u00e4ren dickes Fell?", "en": "Schutz vor K\u00e4lte", "allowImage": false},
-      {"de": "Was ist ein \u00d6kosystem?", "en": "Lebensgemeinschaft von Tieren, Pflanzen und ihrer Umgebung", "allowImage": false},
+      {"de": "Warum haben Kamele Höcker?", "en": "Fettspeicher für die Wüste", "allowImage": false},
+      {"de": "Warum haben Eisbären dickes Fell?", "en": "Schutz vor Kälte", "allowImage": false},
+      {"de": "Was ist ein Ökosystem?", "en": "Lebensgemeinschaft von Tieren, Pflanzen und ihrer Umgebung", "allowImage": false},
       {"de": "Was ist eine Nahrungskette?", "en": "Pflanze wird von Tier gefressen, das von anderem Tier gefressen wird", "allowImage": false},
       {"de": "Was sind Produzenten?", "en": "Pflanzen, die Nahrung aus Sonnenlicht herstellen", "allowImage": false},
       {"de": "Was sind Konsumenten?", "en": "Tiere, die andere Lebewesen fressen", "allowImage": false},
@@ -49,19 +201,112 @@
     ]
   },
   {
-    "name": "Kl. 5: Der menschliche K\u00f6rper",
+    "name": "Kl. 5: Der menschliche Körper",
     "grade": "5",
     "words": [
       {"de": "Welches Organ pumpt das Blut?", "en": "Das Herz", "allowImage": false},
-      {"de": "Was transportiert das Blut?", "en": "Sauerstoff und N\u00e4hrstoffe", "allowImage": false},
-      {"de": "Wo wird Nahrung verdaut?", "en": "Im Magen und D\u00fcnndarm", "allowImage": false},
+      {"de": "Was transportiert das Blut?", "en": "Sauerstoff und Nährstoffe", "allowImage": false},
+      {"de": "Wo wird Nahrung verdaut?", "en": "Im Magen und Dünndarm", "allowImage": false},
       {"de": "Was macht die Lunge?", "en": "Nimmt Sauerstoff auf, gibt CO2 ab", "allowImage": false},
-      {"de": "Was sch\u00fctzt unsere Organe?", "en": "Das Skelett (Knochen)", "allowImage": false},
-      {"de": "Was steuert den ganzen K\u00f6rper?", "en": "Das Gehirn und das Nervensystem", "allowImage": false},
-      {"de": "Was sind die 5 Sinne?", "en": "Sehen, H\u00f6ren, Riechen, Schmecken, Tasten", "allowImage": false},
+      {"de": "Was schützt unsere Organe?", "en": "Das Skelett (Knochen)", "allowImage": false},
+      {"de": "Was steuert den ganzen Körper?", "en": "Das Gehirn und das Nervensystem", "allowImage": false},
+      {"de": "Was sind die 5 Sinne?", "en": "Sehen, Hören, Riechen, Schmecken, Tasten", "allowImage": false},
       {"de": "Warum brauchen wir Muskeln?", "en": "Um uns zu bewegen", "allowImage": false},
       {"de": "Wie viele Knochen hat ein Erwachsener?", "en": "Etwa 206", "allowImage": false},
-      {"de": "Was ist gesunde Ern\u00e4hrung?", "en": "Viel Obst, Gem\u00fcse, Wasser, wenig Zucker und Fett", "allowImage": false}
+      {"de": "Was ist gesunde Ernährung?", "en": "Viel Obst, Gemüse, Wasser, wenig Zucker und Fett", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 5: Amphibien & Reptilien",
+    "grade": "5",
+    "words": [
+      {"de": "Was ist typisch für Amphibien?", "en": "Leben als Junge im Wasser, als Erwachsene an Land", "allowImage": false},
+      {"de": "Nenne 3 Amphibien", "en": "Frosch, Kröte, Salamander", "allowImage": false},
+      {"de": "Was ist die Metamorphose beim Frosch?", "en": "Ei, Kaulquappe, Frosch", "allowImage": false},
+      {"de": "Wie atmen Kaulquappen?", "en": "Mit Kiemen", "allowImage": false},
+      {"de": "Wie atmen erwachsene Frösche?", "en": "Mit Lunge und über die Haut", "allowImage": false},
+      {"de": "Was ist typisch für Reptilien?", "en": "Schuppen, legen Eier an Land, wechselwarm", "allowImage": false},
+      {"de": "Nenne 3 Reptilien", "en": "Eidechse, Schildkröte, Krokodil", "allowImage": false},
+      {"de": "Warum sonnen sich Eidechsen?", "en": "Sie sind wechselwarm und brauchen Wärme von außen", "allowImage": false},
+      {"de": "Was ist der Unterschied zwischen Frosch und Kröte?", "en": "Frösche haben glatte Haut, Kröten haben warzige Haut", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Zellen & Mikroskop",
+    "grade": "6",
+    "words": [
+      {"de": "Was ist eine Zelle?", "en": "Kleinster Baustein aller Lebewesen", "allowImage": false},
+      {"de": "Was hat eine Pflanzenzelle, aber keine Tierzelle?", "en": "Zellwand, Chloroplasten, große Vakuole", "allowImage": false},
+      {"de": "Was ist der Zellkern?", "en": "Steuerzentrale der Zelle, enthält die DNA", "allowImage": false},
+      {"de": "Was ist das Zellplasma?", "en": "Flüssigkeit in der Zelle, in der Stoffwechsel stattfindet", "allowImage": false},
+      {"de": "Was macht die Zellmembran?", "en": "Umhüllt die Zelle und kontrolliert was rein und raus geht", "allowImage": false},
+      {"de": "Was sind Chloroplasten?", "en": "Ort der Fotosynthese, enthalten grünen Farbstoff", "allowImage": false},
+      {"de": "Wozu braucht man ein Mikroskop?", "en": "Um sehr kleine Dinge wie Zellen sichtbar zu machen", "allowImage": false},
+      {"de": "Was ist ein Einzeller?", "en": "Lebewesen das nur aus einer Zelle besteht", "allowImage": false},
+      {"de": "Was ist ein Vielzeller?", "en": "Lebewesen das aus vielen Zellen besteht", "allowImage": false},
+      {"de": "Was sind Gewebe?", "en": "Viele gleiche Zellen die zusammenarbeiten", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Blutkreislauf & Herz",
+    "grade": "6",
+    "words": [
+      {"de": "Aus welchen Teilen besteht das Blut?", "en": "Rote Blutkörperchen, weiße Blutkörperchen, Blutplättchen, Blutplasma", "allowImage": false},
+      {"de": "Was machen rote Blutkörperchen?", "en": "Transportieren Sauerstoff", "allowImage": false},
+      {"de": "Was machen weiße Blutkörperchen?", "en": "Bekämpfen Krankheitserreger", "allowImage": false},
+      {"de": "Was machen Blutplättchen?", "en": "Helfen bei der Blutgerinnung (Wundheilung)", "allowImage": false},
+      {"de": "Was sind Arterien?", "en": "Blutgefäße die Blut vom Herzen wegführen", "allowImage": false},
+      {"de": "Was sind Venen?", "en": "Blutgefäße die Blut zum Herzen hinführen", "allowImage": false},
+      {"de": "Was sind Kapillaren?", "en": "Feinste Blutgefäße für den Stoffaustausch", "allowImage": false},
+      {"de": "Was ist der kleine Blutkreislauf?", "en": "Herz - Lunge - Herz (Sauerstoffaufnahme)", "allowImage": false},
+      {"de": "Was ist der große Blutkreislauf?", "en": "Herz - Körper - Herz (Sauerstoffabgabe)", "allowImage": false},
+      {"de": "Wie oft schlägt das Herz pro Minute?", "en": "Etwa 60-80 mal", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Atmung & Lunge",
+    "grade": "6",
+    "words": [
+      {"de": "Was passiert beim Einatmen?", "en": "Luft strömt durch Nase/Mund in die Lunge", "allowImage": false},
+      {"de": "Welches Gas atmen wir ein?", "en": "Sauerstoff (O2)", "allowImage": false},
+      {"de": "Welches Gas atmen wir aus?", "en": "Kohlenstoffdioxid (CO2)", "allowImage": false},
+      {"de": "Was ist das Zwerchfell?", "en": "Muskel unter der Lunge der die Atmung steuert", "allowImage": false},
+      {"de": "Was sind Lungenbläschen?", "en": "Winzige Bläschen in der Lunge für den Gasaustausch", "allowImage": false},
+      {"de": "Wie heißt die Luftröhre?", "en": "Trachea", "allowImage": false},
+      {"de": "Woraus bestehen die Bronchien?", "en": "Verzweigungen der Luftröhre in der Lunge", "allowImage": false},
+      {"de": "Warum ist Rauchen schädlich für die Lunge?", "en": "Zerstört Lungenbläschen und verursacht Krebs", "allowImage": false},
+      {"de": "Was ist Zellatmung?", "en": "Zellen verbrennen Zucker mit Sauerstoff zu Energie", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Skelett & Bewegung",
+    "grade": "6",
+    "words": [
+      {"de": "Was ist die Aufgabe des Skeletts?", "en": "Stütze, Schutz der Organe, Bewegung", "allowImage": false},
+      {"de": "Aus was bestehen Knochen?", "en": "Aus Kalk und Kollagen (hart aber elastisch)", "allowImage": false},
+      {"de": "Was ist ein Gelenk?", "en": "Verbindung zwischen zwei Knochen die Bewegung ermöglicht", "allowImage": false},
+      {"de": "Was ist ein Kugelgelenk?", "en": "Gelenk das Bewegung in alle Richtungen erlaubt (Schulter, Hüfte)", "allowImage": false},
+      {"de": "Was ist ein Scharniergelenk?", "en": "Gelenk das nur Beugung und Streckung erlaubt (Knie, Ellbogen)", "allowImage": false},
+      {"de": "Was ist die Wirbelsäule?", "en": "Reihe von Wirbeln die das Rückenmark schützt", "allowImage": false},
+      {"de": "Was ist der Gegenspieler-Prinzip?", "en": "Muskeln arbeiten paarweise (Beuger und Strecker)", "allowImage": false},
+      {"de": "Was ist eine Sehne?", "en": "Verbindet Muskel mit Knochen", "allowImage": false},
+      {"de": "Was ist ein Band?", "en": "Verbindet Knochen mit Knochen am Gelenk", "allowImage": false},
+      {"de": "Was schützt der Schädel?", "en": "Das Gehirn", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 6: Sinnesorgane",
+    "grade": "6",
+    "words": [
+      {"de": "Wie funktioniert das Auge?", "en": "Licht fällt durch Pupille und Linse auf die Netzhaut", "allowImage": false},
+      {"de": "Was macht die Pupille?", "en": "Reguliert den Lichteinfall (wird größer/kleiner)", "allowImage": false},
+      {"de": "Was macht die Linse im Auge?", "en": "Bündelt das Licht auf die Netzhaut", "allowImage": false},
+      {"de": "Was ist Kurzsichtigkeit?", "en": "Man sieht nah gut aber fern schlecht", "allowImage": false},
+      {"de": "Wie funktioniert das Ohr?", "en": "Schallwellen bringen Trommelfell zum Schwingen", "allowImage": false},
+      {"de": "Wo sitzt der Gleichgewichtssinn?", "en": "Im Innenohr", "allowImage": false},
+      {"de": "Was ist die Netzhaut?", "en": "Schicht im Auge mit Sinneszellen für Licht und Farbe", "allowImage": false},
+      {"de": "Was leitet Reize ans Gehirn weiter?", "en": "Die Nerven", "allowImage": false},
+      {"de": "Wie schützen wir unsere Ohren?", "en": "Laute Geräusche vermeiden, Gehörschutz tragen", "allowImage": false}
     ]
   }
 ]
