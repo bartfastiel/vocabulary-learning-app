@@ -201,7 +201,6 @@ const GAMES = [
         scoreLabel: "Punkte",
     },
     {
-    {
         id: "quiz", label: "Vokabel-Million\u00e4r",   emoji: "\uD83C\uDFC6",
         cost: 2,  maxEarn: 0,
         component: "quiz-game",

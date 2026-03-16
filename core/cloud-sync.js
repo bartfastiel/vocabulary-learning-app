@@ -28,13 +28,14 @@ function toCloudRow(p) {
     let svg = "";
     try { svg = getAvatarSVG(); } catch { svg = p.avatarSvg || ""; }
 
-    // Collect all background-related settings
+    // Collect all background-related settings + particle animation
     const bgExtra = {};
     try { bgExtra.gradColors = JSON.parse(localStorage.getItem("gradColors") || "null"); } catch {}
     bgExtra.gradDir = localStorage.getItem("gradDir") || null;
     bgExtra.gradAnimated = localStorage.getItem("gradAnimated") || null;
     bgExtra.liveBgKey = localStorage.getItem("liveBgKey") || null;
     bgExtra.appBgCustom = localStorage.getItem("appBgCustom") || null;
+    bgExtra.appAnim = localStorage.getItem("appAnim") || "none";
 
     const row = {
         id:               p.id,
@@ -269,19 +270,31 @@ export async function pullFromCloud() {
             if (el) el.textContent = cloud.streakRecord;
         }
 
-        // ── Background (detect if OTHER device changed it) ──
+        // ── Background + Animation (detect if OTHER device changed it) ──
         const localBg = localStorage.getItem("appBg") || "light";
+        const localAnim = localStorage.getItem("appAnim") || "none";
         const lastServerBg = localStorage.getItem("_lastServerBg") || localBg;
-        // If server bg changed AND it wasn't us who changed it
-        if (cloud.appBg && cloud.appBg !== localBg && cloud.appBg !== lastServerBg) {
-            localStorage.setItem("appBg", cloud.appBg);
-            localStorage.setItem("_lastServerBg", cloud.appBg);
+        const lastServerAnim = localStorage.getItem("_lastServerAnim") || localAnim;
+        const cloudAnim = cloud.bgExtra?.appAnim || "none";
+
+        const bgChanged = cloud.appBg && cloud.appBg !== localBg && cloud.appBg !== lastServerBg;
+        const animChanged = cloudAnim !== localAnim && cloudAnim !== lastServerAnim;
+
+        if (bgChanged || animChanged) {
+            if (bgChanged) {
+                localStorage.setItem("appBg", cloud.appBg);
+                localStorage.setItem("_lastServerBg", cloud.appBg);
+            }
             const bgEx = cloud.bgExtra || {};
             if (bgEx.gradColors) localStorage.setItem("gradColors", JSON.stringify(bgEx.gradColors));
             if (bgEx.gradDir) localStorage.setItem("gradDir", bgEx.gradDir);
             if (bgEx.gradAnimated) localStorage.setItem("gradAnimated", bgEx.gradAnimated);
             if (bgEx.liveBgKey) localStorage.setItem("liveBgKey", bgEx.liveBgKey);
             if (bgEx.appBgCustom) localStorage.setItem("appBgCustom", bgEx.appBgCustom);
+            if (bgEx.appAnim) {
+                localStorage.setItem("appAnim", bgEx.appAnim);
+                localStorage.setItem("_lastServerAnim", bgEx.appAnim);
+            }
             needsReload = true;
         }
 
