@@ -1,77 +1,67 @@
 [
   {
-    "name": "Klasse 3: Tiere",
-    "grade": "3",
-    "words": [
-      {"de": "Welches Tier hat 8 Beine?", "en": "Spinne", "allowImage": false},
-      {"de": "Welches Tier macht Honig?", "en": "Biene", "allowImage": false},
-      {"de": "Was ist das gr\u00f6\u00dfte Tier der Welt?", "en": "Blauwal", "allowImage": false},
-      {"de": "Welches Tier h\u00e4lt Winterschlaf?", "en": "Igel", "allowImage": false},
-      {"de": "Wie nennt man ein junges Pferd?", "en": "Fohlen", "allowImage": false},
-      {"de": "Was ist ein Amphibium?", "en": "Frosch", "allowImage": false},
-      {"de": "Welches Tier hat einen R\u00fcssel?", "en": "Elefant", "allowImage": false},
-      {"de": "Was frisst ein Koala?", "en": "Eukalyptus", "allowImage": false},
-      {"de": "Wie hei\u00dft das schnellste Landtier?", "en": "Gepard", "allowImage": false},
-      {"de": "Welcher Vogel kann nicht fliegen?", "en": "Pinguin", "allowImage": false},
-      {"de": "Welches Tier wechselt seine Farbe?", "en": "Cham\u00e4leon", "allowImage": false},
-      {"de": "Was ist eine Larve vom Schmetterling?", "en": "Raupe", "allowImage": false}
-    ]
-  },
-  {
-    "name": "Klasse 3: Pflanzen",
-    "grade": "3",
-    "words": [
-      {"de": "Was brauchen Pflanzen zum Wachsen? (3 Dinge)", "en": "Wasser, Licht, Erde", "allowImage": false},
-      {"de": "Wie hei\u00dft der Vorgang bei dem Pflanzen Sauerstoff herstellen?", "en": "Fotosynthese", "allowImage": false},
-      {"de": "Was machen Bl\u00e4tter im Herbst?", "en": "Sie verf\u00e4rben sich und fallen ab", "allowImage": false},
-      {"de": "Nenne einen Nadelbaum", "en": "Fichte", "allowImage": false},
-      {"de": "Nenne einen Laubbaum", "en": "Eiche", "allowImage": false},
-      {"de": "Was ist ein Pilz?", "en": "Kein Tier und keine Pflanze", "allowImage": false},
-      {"de": "Was ist Best\u00e4ubung?", "en": "Pollen wird von Bl\u00fcte zu Bl\u00fcte getragen", "allowImage": false},
-      {"de": "Wer best\u00e4ubt Bl\u00fcten?", "en": "Bienen, Schmetterlinge, Wind", "allowImage": false}
-    ]
-  },
-  {
-    "name": "Klasse 4: Der K\u00f6rper",
-    "grade": "4",
-    "words": [
-      {"de": "Wie viele Knochen hat ein Erwachsener?", "en": "206", "allowImage": false},
-      {"de": "Was pumpt das Blut durch den K\u00f6rper?", "en": "Das Herz", "allowImage": false},
-      {"de": "Wo wird die Nahrung verdaut?", "en": "Im Magen und Darm", "allowImage": false},
-      {"de": "Was sch\u00fctzt unser Gehirn?", "en": "Der Sch\u00e4del", "allowImage": false},
-      {"de": "Was brauchen Muskeln um sich zu bewegen?", "en": "Energie und Sauerstoff", "allowImage": false},
-      {"de": "Welches Organ filtert das Blut?", "en": "Die Niere", "allowImage": false},
-      {"de": "Wie hei\u00dft das gr\u00f6\u00dfte Organ?", "en": "Die Haut", "allowImage": false},
-      {"de": "Was sind die 5 Sinne?", "en": "Sehen, H\u00f6ren, Riechen, Schmecken, F\u00fchlen", "allowImage": false},
-      {"de": "Welches Organ steuert den K\u00f6rper?", "en": "Das Gehirn", "allowImage": false}
-    ]
-  },
-  {
-    "name": "Klasse 5: Zellen & Lebewesen",
+    "name": "Kl. 5: Wirbeltiere & S\u00e4ugetiere",
     "grade": "5",
     "words": [
-      {"de": "Was ist die kleinste Einheit des Lebens?", "en": "Die Zelle", "allowImage": false},
-      {"de": "Was hat eine Pflanzenzelle, aber keine Tierzelle?", "en": "Zellwand und Chloroplasten", "allowImage": false},
-      {"de": "Was sind Einzeller?", "en": "Lebewesen aus nur einer Zelle", "allowImage": false},
-      {"de": "Was ist ein Wirbeltier?", "en": "Tier mit Wirbels\u00e4ule", "allowImage": false},
-      {"de": "Nenne 5 Klassen von Wirbeltieren", "en": "Fische, Amphibien, Reptilien, V\u00f6gel, S\u00e4ugetiere", "allowImage": false},
-      {"de": "Was ist ein Ökosystem?", "en": "Lebensgemeinschaft von Tieren und Pflanzen", "allowImage": false},
-      {"de": "Was ist eine Nahrungskette?", "en": "Wer frisst wen", "allowImage": false},
-      {"de": "Was sind Produzenten in der Nahrungskette?", "en": "Pflanzen", "allowImage": false}
+      {"de": "Was sind Wirbeltiere?", "en": "Tiere mit Wirbels\u00e4ule", "allowImage": false},
+      {"de": "Nenne die 5 Klassen der Wirbeltiere", "en": "Fische, Amphibien, Reptilien, V\u00f6gel, S\u00e4ugetiere", "allowImage": false},
+      {"de": "Was ist typisch f\u00fcr S\u00e4ugetiere?", "en": "Fell, Milch f\u00fcr Junge, gleichwarm", "allowImage": false},
+      {"de": "Was bedeutet gleichwarm?", "en": "K\u00f6rpertemperatur bleibt immer gleich", "allowImage": false},
+      {"de": "Was bedeutet wechselwarm?", "en": "K\u00f6rpertemperatur passt sich der Umgebung an", "allowImage": false},
+      {"de": "Welche Tiere sind wechselwarm?", "en": "Fische, Amphibien, Reptilien", "allowImage": false},
+      {"de": "Was ist ein Raubtier?", "en": "Fleischfresser mit Rei\u00dfz\u00e4hnen", "allowImage": false},
+      {"de": "Was ist ein Pflanzenfresser?", "en": "Tier das sich nur von Pflanzen ern\u00e4hrt", "allowImage": false},
+      {"de": "Was ist ein Allesfresser?", "en": "Tier das Pflanzen und Fleisch frisst", "allowImage": false},
+      {"de": "Wie atmen Fische?", "en": "Mit Kiemen", "allowImage": false},
+      {"de": "Was haben V\u00f6gel statt Fell?", "en": "Federn", "allowImage": false},
+      {"de": "Was ist ein K\u00e4lteschlaf?", "en": "Winterschlaf bei dem der K\u00f6rper runterf\u00e4hrt", "allowImage": false}
     ]
   },
   {
-    "name": "Klasse 6: Evolution & Anpassung",
-    "grade": "6",
+    "name": "Kl. 5: Bl\u00fctenpflanzen",
+    "grade": "5",
     "words": [
-      {"de": "Was bedeutet Evolution?", "en": "Entwicklung der Arten \u00fcber lange Zeit", "allowImage": false},
-      {"de": "Wer hat die Evolutionstheorie aufgestellt?", "en": "Charles Darwin", "allowImage": false},
-      {"de": "Was ist nat\u00fcrliche Selektion?", "en": "Die best Angepassten \u00fcberleben", "allowImage": false},
-      {"de": "Was sind Fossilien?", "en": "Versteinerte \u00dcberreste von fr\u00fcheren Lebewesen", "allowImage": false},
-      {"de": "Was ist Tarnung bei Tieren?", "en": "Anpassung an die Umgebung zum Schutz", "allowImage": false},
-      {"de": "Was ist Symbiose?", "en": "Zwei Arten leben zusammen und profitieren", "allowImage": false},
-      {"de": "Was ist ein Parasit?", "en": "Lebt auf Kosten eines anderen Lebewesens", "allowImage": false},
-      {"de": "Was sind bedrohte Arten?", "en": "Tiere oder Pflanzen die aussterben k\u00f6nnten", "allowImage": false}
+      {"de": "Welche Teile hat eine Bl\u00fctenpflanze?", "en": "Wurzel, Stängel, Blatt, Bl\u00fcte", "allowImage": false},
+      {"de": "Welche Teile hat eine Bl\u00fcte?", "en": "Kelchblatt, Kronblatt, Staubblatt, Fruchtblatt", "allowImage": false},
+      {"de": "Was machen die Staubbl\u00e4tter?", "en": "Produzieren Pollen", "allowImage": false},
+      {"de": "Was ist Best\u00e4ubung?", "en": "Pollen gelangt auf die Narbe einer Bl\u00fcte", "allowImage": false},
+      {"de": "Wer best\u00e4ubt Bl\u00fcten?", "en": "Insekten, Wind, Wasser", "allowImage": false},
+      {"de": "Was ist Fotosynthese?", "en": "Pflanze macht aus Licht, Wasser und CO2 Zucker und Sauerstoff", "allowImage": false},
+      {"de": "Wo findet Fotosynthese statt?", "en": "In den Chloroplasten der Bl\u00e4tter", "allowImage": false},
+      {"de": "Was nimmt die Wurzel auf?", "en": "Wasser und Mineralstoffe", "allowImage": false},
+      {"de": "Was ist eine Frucht?", "en": "Entsteht aus der Bl\u00fcte und enth\u00e4lt Samen", "allowImage": false},
+      {"de": "Nenne eine Pflanzenfamilie", "en": "Lippenbl\u00fctler, Korbbl\u00fctler, Kreuzbl\u00fctler", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 5: Anpassung an Lebensr\u00e4ume",
+    "grade": "5",
+    "words": [
+      {"de": "Was ist ein Lebensraum?", "en": "Ort an dem ein Tier oder eine Pflanze lebt", "allowImage": false},
+      {"de": "Was ist Tarnung?", "en": "Aussehen das an die Umgebung angepasst ist", "allowImage": false},
+      {"de": "Warum haben Kamele H\u00f6cker?", "en": "Fettspeicher f\u00fcr die W\u00fcste", "allowImage": false},
+      {"de": "Warum haben Eisb\u00e4ren dickes Fell?", "en": "Schutz vor K\u00e4lte", "allowImage": false},
+      {"de": "Was ist ein \u00d6kosystem?", "en": "Lebensgemeinschaft von Tieren, Pflanzen und ihrer Umgebung", "allowImage": false},
+      {"de": "Was ist eine Nahrungskette?", "en": "Pflanze wird von Tier gefressen, das von anderem Tier gefressen wird", "allowImage": false},
+      {"de": "Was sind Produzenten?", "en": "Pflanzen, die Nahrung aus Sonnenlicht herstellen", "allowImage": false},
+      {"de": "Was sind Konsumenten?", "en": "Tiere, die andere Lebewesen fressen", "allowImage": false},
+      {"de": "Was sind Destruenten?", "en": "Zersetzer wie Pilze und Bakterien", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 5: Der menschliche K\u00f6rper",
+    "grade": "5",
+    "words": [
+      {"de": "Welches Organ pumpt das Blut?", "en": "Das Herz", "allowImage": false},
+      {"de": "Was transportiert das Blut?", "en": "Sauerstoff und N\u00e4hrstoffe", "allowImage": false},
+      {"de": "Wo wird Nahrung verdaut?", "en": "Im Magen und D\u00fcnndarm", "allowImage": false},
+      {"de": "Was macht die Lunge?", "en": "Nimmt Sauerstoff auf, gibt CO2 ab", "allowImage": false},
+      {"de": "Was sch\u00fctzt unsere Organe?", "en": "Das Skelett (Knochen)", "allowImage": false},
+      {"de": "Was steuert den ganzen K\u00f6rper?", "en": "Das Gehirn und das Nervensystem", "allowImage": false},
+      {"de": "Was sind die 5 Sinne?", "en": "Sehen, H\u00f6ren, Riechen, Schmecken, Tasten", "allowImage": false},
+      {"de": "Warum brauchen wir Muskeln?", "en": "Um uns zu bewegen", "allowImage": false},
+      {"de": "Wie viele Knochen hat ein Erwachsener?", "en": "Etwa 206", "allowImage": false},
+      {"de": "Was ist gesunde Ern\u00e4hrung?", "en": "Viel Obst, Gem\u00fcse, Wasser, wenig Zucker und Fett", "allowImage": false}
     ]
   }
 ]

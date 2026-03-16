@@ -720,14 +720,6 @@ class AppShell extends HTMLElement {
             </div>
             <span class="card-arrow">\u203A</span>
           </button>
-          <button class="subject-card" data-subject="franzoesisch">
-            <div class="card-icon franzoesisch">\uD83C\uDDEB\uD83C\uDDF7</div>
-            <div class="card-info">
-              <p class="card-title">Franz\u00f6sisch</p>
-              <p class="card-desc">Vokabeln & Grundlagen</p>
-            </div>
-            <span class="card-arrow">\u203A</span>
-          </button>
           <button class="subject-card" data-subject="bio">
             <div class="card-icon bio">\uD83E\uDDEC</div>
             <div class="card-info">
@@ -1775,7 +1767,6 @@ class AppShell extends HTMLElement {
             englisch:      { title: "\uD83C\uDDEC\uD83C\uDDE7 Englisch", tag: "vocab-trainer" },
             mathe:         { title: "\uD83D\uDD22 Mathe", tag: "math-trainer" },
             deutsch:       { title: "\uD83D\uDCD6 Deutsch", tag: "deutsch-trainer" },
-            franzoesisch:  { title: "\uD83C\uDDEB\uD83C\uDDF7 Franz\u00f6sisch", tag: "vocab-trainer" },
             bio:           { title: "\uD83E\uDDEC Biologie", tag: "vocab-trainer" },
             geo:           { title: "\uD83C\uDF0D Geografie", tag: "vocab-trainer" },
         };

@@ -1,79 +1,76 @@
 [
   {
-    "name": "Klasse 3: Wetter",
-    "grade": "3",
-    "words": [
-      {"de": "Wie entsteht Regen?", "en": "Wasser verdunstet und bildet Wolken", "allowImage": false},
-      {"de": "Was ist Nebel?", "en": "Eine Wolke am Boden", "allowImage": false},
-      {"de": "Was misst ein Thermometer?", "en": "Die Temperatur", "allowImage": false},
-      {"de": "Bei wie viel Grad gefriert Wasser?", "en": "0 Grad Celsius", "allowImage": false},
-      {"de": "Was ist ein Regenbogen?", "en": "Licht das in Farben aufgespalten wird", "allowImage": false},
-      {"de": "Was ist Hagel?", "en": "Eisk\u00f6rner die vom Himmel fallen", "allowImage": false},
-      {"de": "Woher kommt Wind?", "en": "Unterschiedlich warme Luftmassen", "allowImage": false}
-    ]
-  },
-  {
-    "name": "Klasse 4: Jahreszeiten & Himmelsrichtungen",
-    "grade": "4",
-    "words": [
-      {"de": "Wann ist Sommeranfang?", "en": "21. Juni", "allowImage": false},
-      {"de": "Wann ist Winteranfang?", "en": "21. Dezember", "allowImage": false},
-      {"de": "Warum gibt es Jahreszeiten?", "en": "Die Erde ist zur Sonne geneigt", "allowImage": false},
-      {"de": "Wie hei\u00dfen die 4 Himmelsrichtungen?", "en": "Norden, S\u00fcden, Osten, Westen", "allowImage": false},
-      {"de": "Womit findet man Norden?", "en": "Mit einem Kompass", "allowImage": false},
-      {"de": "Was zeigt eine Landkarte?", "en": "Gebiete von oben gesehen", "allowImage": false},
-      {"de": "Was ist der Ma\u00dfstab einer Karte?", "en": "Verh\u00e4ltnis von Karte zu Wirklichkeit", "allowImage": false},
-      {"de": "In welchem Land leben wir?", "en": "Deutschland", "allowImage": false},
-      {"de": "Was ist die Hauptstadt von Deutschland?", "en": "Berlin", "allowImage": false}
-    ]
-  },
-  {
-    "name": "Klasse 5: Erde & Weltraum",
+    "name": "Kl. 5: Planet Erde & Sonnensystem",
     "grade": "5",
     "words": [
       {"de": "Wie viele Planeten hat unser Sonnensystem?", "en": "8", "allowImage": false},
-      {"de": "Wie hei\u00dft unser Planet?", "en": "Erde", "allowImage": false},
-      {"de": "Was ist der n\u00e4chste Stern zur Erde?", "en": "Die Sonne", "allowImage": false},
-      {"de": "Wie lange braucht die Erde um die Sonne?", "en": "365 Tage", "allowImage": false},
-      {"de": "Was verursacht Ebbe und Flut?", "en": "Der Mond", "allowImage": false},
-      {"de": "Wie hei\u00dft der gr\u00f6\u00dfte Planet?", "en": "Jupiter", "allowImage": false},
-      {"de": "Wie hei\u00dft der rote Planet?", "en": "Mars", "allowImage": false},
-      {"de": "Wie hei\u00dft unsere Galaxie?", "en": "Milchstra\u00dfe", "allowImage": false},
-      {"de": "Wie viele Kontinente gibt es?", "en": "7", "allowImage": false},
-      {"de": "Was ist der \u00c4quator?", "en": "Die gedachte Linie um die Mitte der Erde", "allowImage": false},
-      {"de": "Nenne die 7 Kontinente", "en": "Europa, Asien, Afrika, Nordamerika, S\u00fcdamerika, Australien, Antarktis", "allowImage": false}
+      {"de": "Nenne die Planeten in der richtigen Reihenfolge", "en": "Merkur, Venus, Erde, Mars, Jupiter, Saturn, Uranus, Neptun", "allowImage": false},
+      {"de": "Was ist die Sonne?", "en": "Ein Stern", "allowImage": false},
+      {"de": "Wie lange braucht die Erde um die Sonne?", "en": "Ein Jahr (365 Tage)", "allowImage": false},
+      {"de": "Warum gibt es Tag und Nacht?", "en": "Die Erde dreht sich um ihre eigene Achse", "allowImage": false},
+      {"de": "Warum gibt es Jahreszeiten?", "en": "Die Erdachse ist geneigt", "allowImage": false},
+      {"de": "Was verursacht Ebbe und Flut?", "en": "Die Anziehungskraft des Mondes", "allowImage": false},
+      {"de": "Was ist der \u00c4quator?", "en": "Gedachte Linie um die Mitte der Erde", "allowImage": false}
     ]
   },
   {
-    "name": "Klasse 5: Deutschland & Europa",
+    "name": "Kl. 5: Karten & Orientierung",
     "grade": "5",
     "words": [
+      {"de": "Was sind die 4 Himmelsrichtungen?", "en": "Norden, S\u00fcden, Osten, Westen", "allowImage": false},
+      {"de": "Womit bestimmt man die Himmelsrichtung?", "en": "Kompass", "allowImage": false},
+      {"de": "Was ist ein Ma\u00dfstab?", "en": "Verh\u00e4ltnis von Karte zu Wirklichkeit", "allowImage": false},
+      {"de": "Was zeigt eine physische Karte?", "en": "Gebirge, Fl\u00fcsse, H\u00f6hen", "allowImage": false},
+      {"de": "Was zeigt eine thematische Karte?", "en": "Bestimmte Themen wie Bev\u00f6lkerung oder Klima", "allowImage": false},
+      {"de": "Was ist das Gradnetz?", "en": "Linien auf der Erde (L\u00e4ngen- und Breitengrade)", "allowImage": false},
+      {"de": "Was sind Breitengrade?", "en": "Horizontale Linien, messen Abstand zum \u00c4quator", "allowImage": false},
+      {"de": "Was sind L\u00e4ngengrade?", "en": "Vertikale Linien, messen Abstand zum Nullmeridian", "allowImage": false},
+      {"de": "Was ist eine Legende auf einer Karte?", "en": "Erkl\u00e4rung der Symbole und Farben", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 5: Deutschland",
+    "grade": "5",
+    "words": [
+      {"de": "Was ist die Hauptstadt von Deutschland?", "en": "Berlin", "allowImage": false},
       {"de": "Wie viele Bundesl\u00e4nder hat Deutschland?", "en": "16", "allowImage": false},
       {"de": "Welcher Fluss flie\u00dft durch K\u00f6ln?", "en": "Der Rhein", "allowImage": false},
-      {"de": "Was ist das h\u00f6chste Gebirge Europas?", "en": "Die Alpen", "allowImage": false},
-      {"de": "Wie hei\u00dft der h\u00f6chste Berg Deutschlands?", "en": "Zugspitze", "allowImage": false},
-      {"de": "Welches Meer liegt n\u00f6rdlich von Deutschland?", "en": "Nordsee und Ostsee", "allowImage": false},
+      {"de": "Wie hei\u00dft der h\u00f6chste Berg Deutschlands?", "en": "Zugspitze (2.962 m)", "allowImage": false},
+      {"de": "Welche Meere grenzen an Deutschland?", "en": "Nordsee und Ostsee", "allowImage": false},
+      {"de": "Welches Gebirge liegt im S\u00fcden Deutschlands?", "en": "Die Alpen", "allowImage": false},
+      {"de": "Welche L\u00e4nder grenzen an Deutschland?", "en": "9 L\u00e4nder: D\u00e4nemark, Polen, Tschechien, \u00d6sterreich, Schweiz, Frankreich, Luxemburg, Belgien, Niederlande", "allowImage": false},
+      {"de": "Was ist das Norddeutsche Tiefland?", "en": "Flaches Gebiet im Norden Deutschlands", "allowImage": false},
+      {"de": "Was sind Mittelgebirge?", "en": "Gebirge mittlerer H\u00f6he wie Harz, Erzgebirge, Schwarzwald", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 5: Europa",
+    "grade": "5",
+    "words": [
+      {"de": "Wie viele Kontinente gibt es?", "en": "7", "allowImage": false},
+      {"de": "Nenne die 7 Kontinente", "en": "Europa, Asien, Afrika, Nord- und S\u00fcdamerika, Australien, Antarktis", "allowImage": false},
+      {"de": "Was ist die EU?", "en": "Europ\u00e4ische Union - Zusammenschluss europ\u00e4ischer L\u00e4nder", "allowImage": false},
       {"de": "Hauptstadt von Frankreich?", "en": "Paris", "allowImage": false},
       {"de": "Hauptstadt von Italien?", "en": "Rom", "allowImage": false},
       {"de": "Hauptstadt von Spanien?", "en": "Madrid", "allowImage": false},
       {"de": "Hauptstadt von England?", "en": "London", "allowImage": false},
-      {"de": "Was ist die EU?", "en": "Europ\u00e4ische Union", "allowImage": false}
+      {"de": "Hauptstadt von \u00d6sterreich?", "en": "Wien", "allowImage": false},
+      {"de": "Was ist das h\u00f6chste Gebirge Europas?", "en": "Die Alpen", "allowImage": false},
+      {"de": "Welcher Fluss ist der l\u00e4ngste in Europa?", "en": "Die Wolga", "allowImage": false}
     ]
   },
   {
-    "name": "Klasse 6: Klima & Energie",
-    "grade": "6",
+    "name": "Kl. 5: Vulkane & Erdbeben",
+    "grade": "5",
     "words": [
-      {"de": "Was ist der Treibhauseffekt?", "en": "Gase halten W\u00e4rme in der Atmosph\u00e4re", "allowImage": false},
-      {"de": "Was ist Klimawandel?", "en": "Langfristige Ver\u00e4nderung des Klimas", "allowImage": false},
-      {"de": "Was ist CO2?", "en": "Kohlendioxid, ein Treibhausgas", "allowImage": false},
-      {"de": "Was ist erneuerbare Energie?", "en": "Energie die nicht aufgebraucht wird", "allowImage": false},
-      {"de": "Nenne 3 erneuerbare Energien", "en": "Sonne, Wind, Wasser", "allowImage": false},
-      {"de": "Was ist ein Vulkan?", "en": "Berg aus dem Lava kommt", "allowImage": false},
-      {"de": "Was ist ein Erdbeben?", "en": "Die Erde bebt durch Plattenverschiebung", "allowImage": false},
-      {"de": "Was sind Klimazonen?", "en": "Gebiete mit \u00e4hnlichem Klima", "allowImage": false},
-      {"de": "Was ist eine W\u00fcste?", "en": "Sehr trockenes Gebiet mit wenig Regen", "allowImage": false},
-      {"de": "Was ist ein Regenwald?", "en": "Tropischer Wald mit viel Regen und Artenvielfalt", "allowImage": false}
+      {"de": "Aus welchen Schichten besteht die Erde?", "en": "Erdkruste, Erdmantel, Erdkern", "allowImage": false},
+      {"de": "Was sind tektonische Platten?", "en": "Gro\u00dfe Teile der Erdkruste die sich bewegen", "allowImage": false},
+      {"de": "Wie entsteht ein Erdbeben?", "en": "Tektonische Platten verschieben sich pl\u00f6tzlich", "allowImage": false},
+      {"de": "Was ist Lava?", "en": "Geschmolzenes Gestein das aus einem Vulkan kommt", "allowImage": false},
+      {"de": "Was ist Magma?", "en": "Geschmolzenes Gestein unter der Erde", "allowImage": false},
+      {"de": "Wo gibt es besonders viele Vulkane?", "en": "Am Pazifischen Feuerring", "allowImage": false},
+      {"de": "Was ist ein Tsunami?", "en": "Riesige Welle durch Erdbeben unter dem Meer", "allowImage": false},
+      {"de": "Wie entsteht ein Gebirge?", "en": "Tektonische Platten dr\u00fccken gegeneinander", "allowImage": false}
     ]
   }
 ]
