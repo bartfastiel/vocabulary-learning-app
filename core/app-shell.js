@@ -132,17 +132,35 @@ class AppShell extends HTMLElement {
 
         /* ── Action buttons on home ── */
         .home-actions {
-          display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem;
-          margin-bottom: 1.2rem;
+          display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.5rem;
+          margin-bottom: 1rem;
         }
+        .settings-menu {
+          display: none; flex-direction: column; gap: 0.3rem;
+          margin-bottom: 1rem; background: white; border-radius: 14px;
+          padding: 0.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .settings-menu.open { display: flex; }
+        :host([data-bg="dark"]) .settings-menu { background: #2d3748; }
+        .settings-item {
+          display: flex; align-items: center; gap: 0.5rem;
+          padding: 0.7rem 0.8rem; border: none; border-radius: 10px;
+          background: transparent; cursor: pointer; font-family: inherit;
+          font-size: 0.9rem; font-weight: 600; color: #4a5568;
+          text-align: left; width: 100%; transition: background 0.15s;
+        }
+        .settings-item:hover { background: #f0f4f8; }
+        :host([data-bg="dark"]) .settings-item { color: #e2e8f0; }
+        :host([data-bg="dark"]) .settings-item:hover { background: #4a5568; }
         .action-card {
-          display: flex; align-items: center; gap: 0.7rem;
-          padding: 0.9rem 1rem;
+          display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+          padding: 0.7rem 0.5rem;
           background: white; border-radius: 14px;
           border: none; cursor: pointer;
           box-shadow: 0 2px 8px rgba(0,0,0,0.05);
           transition: transform 0.15s, box-shadow 0.15s;
-          font-family: inherit; text-align: left; width: 100%;
+          font-family: inherit; text-align: center; width: 100%;
+          touch-action: manipulation;
         }
         .action-card:hover {
           transform: translateY(-2px);
@@ -699,45 +717,31 @@ class AppShell extends HTMLElement {
 
         <div class="home-actions">
           <button class="action-card" id="home-games">
-            <span class="action-icon">🎮</span>
+            <span class="action-icon">\uD83C\uDFAE</span>
             <span class="action-label">Spiele</span>
           </button>
-          <button class="action-card" id="home-groups">
-            <span class="action-icon">👥</span>
-            <span class="action-label">Gruppen</span>
-          </button>
-          <button class="action-card" id="home-vocab-edit">
-            <span class="action-icon">✏️</span>
-            <span class="action-label">Vokabeln</span>
-          </button>
-          <button class="action-card" id="home-avatar">
-            <span class="action-icon">😊</span>
-            <span class="action-label">Avatar</span>
-          </button>
-          <button class="action-card" id="home-bg">
-            <span class="action-icon">🎨</span>
-            <span class="action-label">Hintergrund</span>
-          </button>
-          <button class="action-card" id="home-friends">
-            <span class="action-icon">📲</span>
-            <span class="action-label">Freunde</span>
-          </button>
-          <button class="action-card" id="home-teacher">
-            <span class="action-icon">\uD83C\uDF93</span>
-            <span class="action-label">Lehrer</span>
-          </button>
-          <button class="action-card" id="home-design">
-            <span class="action-icon">🚀</span>
-            <span class="action-label">Klassisch</span>
-          </button>
           <button class="action-card" id="home-cloud">
-            <span class="action-icon">\u2601\uFE0F</span>
+            <span class="action-icon">\uD83C\uDF10</span>
             <span class="action-label">Online</span>
           </button>
-          <button class="action-card" id="home-profile">
-            <span class="action-icon">🔄</span>
-            <span class="action-label">Profil</span>
+          <button class="action-card" id="home-avatar">
+            <span class="action-icon">\uD83D\uDE0A</span>
+            <span class="action-label">Avatar</span>
           </button>
+          <button class="action-card" id="home-settings">
+            <span class="action-icon">\u2699\uFE0F</span>
+            <span class="action-label">Mehr</span>
+          </button>
+        </div>
+
+        <!-- Settings dropdown (hidden) -->
+        <div class="settings-menu" id="settings-menu">
+          <button class="settings-item" id="home-bg">\uD83C\uDFA8 Hintergrund</button>
+          <button class="settings-item" id="home-vocab-edit">\u270F\uFE0F Vokabeln bearbeiten</button>
+          <button class="settings-item" id="home-teacher">\uD83C\uDF93 Lehrer-Bereich</button>
+          <button class="settings-item" id="home-groups">\uD83D\uDC65 Gruppen</button>
+          <button class="settings-item" id="home-profile">\uD83D\uDD04 Profil wechseln</button>
+          <button class="settings-item" id="home-design">\uD83D\uDE80 Klassisches Design</button>
         </div>
 
       </div>
@@ -1051,11 +1055,11 @@ class AppShell extends HTMLElement {
         // Home action buttons
         this.shadowRoot.getElementById("home-games").onclick = () => gameLobby.open();
         const groupBoard = this.shadowRoot.querySelector("group-board");
-        this.shadowRoot.getElementById("home-groups").onclick = () => groupBoard.open();
+        this.shadowRoot.getElementById("home-groups").onclick = () => { settingsMenu.classList.remove("open"); groupBoard.open(); };
         this.shadowRoot.getElementById("group-btn").onclick = () => groupBoard.open();
 
         const vocabEditor = this.shadowRoot.querySelector("vocab-editor");
-        this.shadowRoot.getElementById("home-vocab-edit").onclick = () => vocabEditor.open();
+        this.shadowRoot.getElementById("home-vocab-edit").onclick = () => { settingsMenu.classList.remove("open"); vocabEditor.open(); };
         vocabEditor.onSaved = () => {
             // Reload all vocab trainers so custom lists appear under the right subject
             for (const key of Object.keys(this._trainers)) {
@@ -1075,12 +1079,13 @@ class AppShell extends HTMLElement {
             }
         });
 
-        const inviteQR = this.shadowRoot.querySelector("invite-qr");
-        this.shadowRoot.getElementById("home-friends").onclick = () => inviteQR.open();
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
+        // Settings menu toggle
+        const settingsMenu = this.shadowRoot.getElementById("settings-menu");
+        this.shadowRoot.getElementById("home-settings").onclick = () => settingsMenu.classList.toggle("open");
         const teacherCtrl = this.shadowRoot.querySelector("teacher-controls");
-        this.shadowRoot.getElementById("home-teacher").onclick = () => teacherCtrl.open();
+        this.shadowRoot.getElementById("home-teacher").onclick = () => { settingsMenu.classList.remove("open"); teacherCtrl.open(); };
         const cloudLogin = this.shadowRoot.querySelector("cloud-login");
         this.shadowRoot.getElementById("home-cloud").onclick = () => cloudLogin.open();
         this.shadowRoot.getElementById("home-design").onclick = () => {
@@ -1089,9 +1094,10 @@ class AppShell extends HTMLElement {
         };
         // Background settings overlay
         const bgOverlay = this.shadowRoot.getElementById("bg-overlay");
-        this.shadowRoot.getElementById("home-bg").onclick = () => bgOverlay.classList.add("active");
+        this.shadowRoot.getElementById("home-bg").onclick = () => { settingsMenu.classList.remove("open"); bgOverlay.classList.add("active"); };
         this.shadowRoot.getElementById("bg-close").onclick = () => bgOverlay.classList.remove("active");
         this.shadowRoot.getElementById("home-profile").onclick = () => {
+            settingsMenu.classList.remove("open");
             saveSnapshot();
             this._showProfileOverlay(false, () => location.reload());
         };
