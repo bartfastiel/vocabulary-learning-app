@@ -1783,19 +1783,8 @@ class AppShell extends HTMLElement {
             this._trainers[subject] = el;
         }
 
-        // For mathe/deutsch, also create a vocab-trainer for custom vocab lists
-        if (subject !== "englisch" && !this._trainers[subject + "_vocab"]) {
-            const vt = document.createElement("vocab-trainer");
-            vt.points = this._pointsManager;
-            vt._subject = subject;
-            this._trainers[subject + "_vocab"] = vt;
-        }
-
         slot.innerHTML = "";
         slot.appendChild(this._trainers[subject]);
-        if (subject !== "englisch") {
-            slot.appendChild(this._trainers[subject + "_vocab"]);
-        }
     }
 
     _showHome() {
