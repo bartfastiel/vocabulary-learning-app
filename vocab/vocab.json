@@ -1400,7 +1400,8 @@
         "en": "finish",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "5"
   },
   {
     "name": "Unit 3 - Vorträge",
@@ -1451,7 +1452,8 @@
         "en": "smile",
         "allowImage": true
       }
-    ]
+    ],
+    "grade": "5"
   },
   {
     "name": "Unit 3 - Einkaufen & Essen",
@@ -1516,7 +1518,8 @@
         "en": "ice cream",
         "allowImage": true
       }
-    ]
+    ],
+    "grade": "5"
   },
   {
     "name": "Pets",
@@ -1616,7 +1619,8 @@
         "en": "mice",
         "allowImage": true
       }
-    ]
+    ],
+    "grade": "5"
   },
   {
     "name": "Klasse 3-4: Erste Worte",
@@ -1696,7 +1700,8 @@
         "en": "slow",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "3"
   },
   {
     "name": "Klasse 3-4: Farben",
@@ -1756,7 +1761,8 @@
         "en": "grey",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "3"
   },
   {
     "name": "Klasse 3-4: Zahlen",
@@ -1831,7 +1837,8 @@
         "en": "hundred",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "3"
   },
   {
     "name": "Klasse 4: Tiere",
@@ -1896,7 +1903,8 @@
         "en": "elephant",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "4"
   },
   {
     "name": "Klasse 4: Essen",
@@ -1961,7 +1969,8 @@
         "en": "soup",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "4"
   },
   {
     "name": "Klasse 6: Reisen & Verkehr",
@@ -2041,7 +2050,8 @@
         "en": "beach",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "6"
   },
   {
     "name": "Klasse 6: Natur & Umwelt",
@@ -2116,7 +2126,8 @@
         "en": "climate",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "6"
   },
   {
     "name": "Klasse 6: Schule & Berufe",
@@ -2181,6 +2192,7 @@
         "en": "artist",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "6"
   }
 ]

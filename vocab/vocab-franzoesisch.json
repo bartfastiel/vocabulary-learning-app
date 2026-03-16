@@ -2,95 +2,376 @@
   {
     "name": "Klasse 3-4: Erste Worte",
     "words": [
-      {"de": "Hallo", "en": "Bonjour", "allowImage": false},
-      {"de": "Auf Wiedersehen", "en": "Au revoir", "allowImage": false},
-      {"de": "ja", "en": "oui", "allowImage": false},
-      {"de": "nein", "en": "non", "allowImage": false},
-      {"de": "bitte", "en": "s'il vous plait", "allowImage": false},
-      {"de": "danke", "en": "merci", "allowImage": false},
-      {"de": "guten Tag", "en": "bonjour", "allowImage": false},
-      {"de": "guten Abend", "en": "bonsoir", "allowImage": false},
-      {"de": "gute Nacht", "en": "bonne nuit", "allowImage": false},
-      {"de": "Entschuldigung", "en": "excusez-moi", "allowImage": false},
-      {"de": "Wie geht es dir?", "en": "Comment vas-tu?", "allowImage": false},
-      {"de": "Mir geht es gut", "en": "Je vais bien", "allowImage": false},
-      {"de": "Ich hei\u00dfe...", "en": "Je m'appelle...", "allowImage": false},
-      {"de": "Freund", "en": "ami", "allowImage": false},
-      {"de": "Freundin", "en": "amie", "allowImage": false}
-    ]
+      {
+        "de": "Hallo",
+        "en": "Bonjour",
+        "allowImage": false
+      },
+      {
+        "de": "Auf Wiedersehen",
+        "en": "Au revoir",
+        "allowImage": false
+      },
+      {
+        "de": "ja",
+        "en": "oui",
+        "allowImage": false
+      },
+      {
+        "de": "nein",
+        "en": "non",
+        "allowImage": false
+      },
+      {
+        "de": "bitte",
+        "en": "s'il vous plait",
+        "allowImage": false
+      },
+      {
+        "de": "danke",
+        "en": "merci",
+        "allowImage": false
+      },
+      {
+        "de": "guten Tag",
+        "en": "bonjour",
+        "allowImage": false
+      },
+      {
+        "de": "guten Abend",
+        "en": "bonsoir",
+        "allowImage": false
+      },
+      {
+        "de": "gute Nacht",
+        "en": "bonne nuit",
+        "allowImage": false
+      },
+      {
+        "de": "Entschuldigung",
+        "en": "excusez-moi",
+        "allowImage": false
+      },
+      {
+        "de": "Wie geht es dir?",
+        "en": "Comment vas-tu?",
+        "allowImage": false
+      },
+      {
+        "de": "Mir geht es gut",
+        "en": "Je vais bien",
+        "allowImage": false
+      },
+      {
+        "de": "Ich heiße...",
+        "en": "Je m'appelle...",
+        "allowImage": false
+      },
+      {
+        "de": "Freund",
+        "en": "ami",
+        "allowImage": false
+      },
+      {
+        "de": "Freundin",
+        "en": "amie",
+        "allowImage": false
+      }
+    ],
+    "grade": "3"
   },
   {
     "name": "Klasse 3-4: Zahlen",
     "words": [
-      {"de": "eins", "en": "un", "allowImage": false},
-      {"de": "zwei", "en": "deux", "allowImage": false},
-      {"de": "drei", "en": "trois", "allowImage": false},
-      {"de": "vier", "en": "quatre", "allowImage": false},
-      {"de": "f\u00fcnf", "en": "cinq", "allowImage": false},
-      {"de": "sechs", "en": "six", "allowImage": false},
-      {"de": "sieben", "en": "sept", "allowImage": false},
-      {"de": "acht", "en": "huit", "allowImage": false},
-      {"de": "neun", "en": "neuf", "allowImage": false},
-      {"de": "zehn", "en": "dix", "allowImage": false},
-      {"de": "elf", "en": "onze", "allowImage": false},
-      {"de": "zw\u00f6lf", "en": "douze", "allowImage": false},
-      {"de": "zwanzig", "en": "vingt", "allowImage": false},
-      {"de": "hundert", "en": "cent", "allowImage": false}
-    ]
+      {
+        "de": "eins",
+        "en": "un",
+        "allowImage": false
+      },
+      {
+        "de": "zwei",
+        "en": "deux",
+        "allowImage": false
+      },
+      {
+        "de": "drei",
+        "en": "trois",
+        "allowImage": false
+      },
+      {
+        "de": "vier",
+        "en": "quatre",
+        "allowImage": false
+      },
+      {
+        "de": "fünf",
+        "en": "cinq",
+        "allowImage": false
+      },
+      {
+        "de": "sechs",
+        "en": "six",
+        "allowImage": false
+      },
+      {
+        "de": "sieben",
+        "en": "sept",
+        "allowImage": false
+      },
+      {
+        "de": "acht",
+        "en": "huit",
+        "allowImage": false
+      },
+      {
+        "de": "neun",
+        "en": "neuf",
+        "allowImage": false
+      },
+      {
+        "de": "zehn",
+        "en": "dix",
+        "allowImage": false
+      },
+      {
+        "de": "elf",
+        "en": "onze",
+        "allowImage": false
+      },
+      {
+        "de": "zwölf",
+        "en": "douze",
+        "allowImage": false
+      },
+      {
+        "de": "zwanzig",
+        "en": "vingt",
+        "allowImage": false
+      },
+      {
+        "de": "hundert",
+        "en": "cent",
+        "allowImage": false
+      }
+    ],
+    "grade": "3"
   },
   {
     "name": "Klasse 5: Familie",
     "words": [
-      {"de": "die Familie", "en": "la famille", "allowImage": false},
-      {"de": "die Mutter", "en": "la m\u00e8re", "allowImage": false},
-      {"de": "der Vater", "en": "le p\u00e8re", "allowImage": false},
-      {"de": "der Bruder", "en": "le fr\u00e8re", "allowImage": false},
-      {"de": "die Schwester", "en": "la soeur", "allowImage": false},
-      {"de": "die Gro\u00dfmutter", "en": "la grand-m\u00e8re", "allowImage": false},
-      {"de": "der Gro\u00dfvater", "en": "le grand-p\u00e8re", "allowImage": false},
-      {"de": "das Kind", "en": "l'enfant", "allowImage": false},
-      {"de": "der Sohn", "en": "le fils", "allowImage": false},
-      {"de": "die Tochter", "en": "la fille", "allowImage": false},
-      {"de": "der Onkel", "en": "l'oncle", "allowImage": false},
-      {"de": "die Tante", "en": "la tante", "allowImage": false}
-    ]
+      {
+        "de": "die Familie",
+        "en": "la famille",
+        "allowImage": false
+      },
+      {
+        "de": "die Mutter",
+        "en": "la mère",
+        "allowImage": false
+      },
+      {
+        "de": "der Vater",
+        "en": "le père",
+        "allowImage": false
+      },
+      {
+        "de": "der Bruder",
+        "en": "le frère",
+        "allowImage": false
+      },
+      {
+        "de": "die Schwester",
+        "en": "la soeur",
+        "allowImage": false
+      },
+      {
+        "de": "die Großmutter",
+        "en": "la grand-mère",
+        "allowImage": false
+      },
+      {
+        "de": "der Großvater",
+        "en": "le grand-père",
+        "allowImage": false
+      },
+      {
+        "de": "das Kind",
+        "en": "l'enfant",
+        "allowImage": false
+      },
+      {
+        "de": "der Sohn",
+        "en": "le fils",
+        "allowImage": false
+      },
+      {
+        "de": "die Tochter",
+        "en": "la fille",
+        "allowImage": false
+      },
+      {
+        "de": "der Onkel",
+        "en": "l'oncle",
+        "allowImage": false
+      },
+      {
+        "de": "die Tante",
+        "en": "la tante",
+        "allowImage": false
+      }
+    ],
+    "grade": "5"
   },
   {
     "name": "Klasse 5: Essen & Trinken",
     "words": [
-      {"de": "das Brot", "en": "le pain", "allowImage": false},
-      {"de": "die Butter", "en": "le beurre", "allowImage": false},
-      {"de": "der K\u00e4se", "en": "le fromage", "allowImage": false},
-      {"de": "die Milch", "en": "le lait", "allowImage": false},
-      {"de": "das Wasser", "en": "l'eau", "allowImage": false},
-      {"de": "der Saft", "en": "le jus", "allowImage": false},
-      {"de": "der Apfel", "en": "la pomme", "allowImage": false},
-      {"de": "die Schokolade", "en": "le chocolat", "allowImage": false},
-      {"de": "das Eis", "en": "la glace", "allowImage": false},
-      {"de": "der Kuchen", "en": "le g\u00e2teau", "allowImage": false},
-      {"de": "das Fleisch", "en": "la viande", "allowImage": false},
-      {"de": "der Fisch", "en": "le poisson", "allowImage": false},
-      {"de": "die Suppe", "en": "la soupe", "allowImage": false},
-      {"de": "der Reis", "en": "le riz", "allowImage": false}
-    ]
+      {
+        "de": "das Brot",
+        "en": "le pain",
+        "allowImage": false
+      },
+      {
+        "de": "die Butter",
+        "en": "le beurre",
+        "allowImage": false
+      },
+      {
+        "de": "der Käse",
+        "en": "le fromage",
+        "allowImage": false
+      },
+      {
+        "de": "die Milch",
+        "en": "le lait",
+        "allowImage": false
+      },
+      {
+        "de": "das Wasser",
+        "en": "l'eau",
+        "allowImage": false
+      },
+      {
+        "de": "der Saft",
+        "en": "le jus",
+        "allowImage": false
+      },
+      {
+        "de": "der Apfel",
+        "en": "la pomme",
+        "allowImage": false
+      },
+      {
+        "de": "die Schokolade",
+        "en": "le chocolat",
+        "allowImage": false
+      },
+      {
+        "de": "das Eis",
+        "en": "la glace",
+        "allowImage": false
+      },
+      {
+        "de": "der Kuchen",
+        "en": "le gâteau",
+        "allowImage": false
+      },
+      {
+        "de": "das Fleisch",
+        "en": "la viande",
+        "allowImage": false
+      },
+      {
+        "de": "der Fisch",
+        "en": "le poisson",
+        "allowImage": false
+      },
+      {
+        "de": "die Suppe",
+        "en": "la soupe",
+        "allowImage": false
+      },
+      {
+        "de": "der Reis",
+        "en": "le riz",
+        "allowImage": false
+      }
+    ],
+    "grade": "5"
   },
   {
     "name": "Klasse 6: Farben & Kleidung",
     "words": [
-      {"de": "rot", "en": "rouge", "allowImage": false},
-      {"de": "blau", "en": "bleu", "allowImage": false},
-      {"de": "gr\u00fcn", "en": "vert", "allowImage": false},
-      {"de": "gelb", "en": "jaune", "allowImage": false},
-      {"de": "wei\u00df", "en": "blanc", "allowImage": false},
-      {"de": "schwarz", "en": "noir", "allowImage": false},
-      {"de": "das T-Shirt", "en": "le t-shirt", "allowImage": false},
-      {"de": "die Hose", "en": "le pantalon", "allowImage": false},
-      {"de": "der Pullover", "en": "le pull", "allowImage": false},
-      {"de": "die Schuhe", "en": "les chaussures", "allowImage": false},
-      {"de": "die Jacke", "en": "la veste", "allowImage": false},
-      {"de": "der Rock", "en": "la jupe", "allowImage": false},
-      {"de": "das Kleid", "en": "la robe", "allowImage": false},
-      {"de": "die M\u00fctze", "en": "le bonnet", "allowImage": false}
-    ]
+      {
+        "de": "rot",
+        "en": "rouge",
+        "allowImage": false
+      },
+      {
+        "de": "blau",
+        "en": "bleu",
+        "allowImage": false
+      },
+      {
+        "de": "grün",
+        "en": "vert",
+        "allowImage": false
+      },
+      {
+        "de": "gelb",
+        "en": "jaune",
+        "allowImage": false
+      },
+      {
+        "de": "weiß",
+        "en": "blanc",
+        "allowImage": false
+      },
+      {
+        "de": "schwarz",
+        "en": "noir",
+        "allowImage": false
+      },
+      {
+        "de": "das T-Shirt",
+        "en": "le t-shirt",
+        "allowImage": false
+      },
+      {
+        "de": "die Hose",
+        "en": "le pantalon",
+        "allowImage": false
+      },
+      {
+        "de": "der Pullover",
+        "en": "le pull",
+        "allowImage": false
+      },
+      {
+        "de": "die Schuhe",
+        "en": "les chaussures",
+        "allowImage": false
+      },
+      {
+        "de": "die Jacke",
+        "en": "la veste",
+        "allowImage": false
+      },
+      {
+        "de": "der Rock",
+        "en": "la jupe",
+        "allowImage": false
+      },
+      {
+        "de": "das Kleid",
+        "en": "la robe",
+        "allowImage": false
+      },
+      {
+        "de": "die Mütze",
+        "en": "le bonnet",
+        "allowImage": false
+      }
+    ],
+    "grade": "6"
   }
 ]
