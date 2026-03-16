@@ -5,13 +5,13 @@
 const PM_CELL = 20;
 const PM_MAP = [
     "#####################",
-    "#.........#.........#",
+    "#P........#.........#",
     "#.###.###.#.###.###.#",
     "#.#...#.......#...#.#",
     "#.#.#.#.#####.#.#.#.#",
     "#...#.....#.....#...#",
     "###.#####.#.#####.###",
-    "#.........P.........#",
+    "#.........#.........#",
     "#.###.#.#####.#.###.#",
     "#.#...#...#...#...#.#",
     "#.#.#####.#.#####.#.#",
@@ -85,9 +85,9 @@ class PacmanGame extends HTMLElement {
             }
         }
 
-        // ghosts — start in corners, far from player
+        // ghosts — start in the middle, player starts in corner
         const ghostStarts = [
-            { x: 1, y: 1 }, { x: 19, y: 1 }, { x: 1, y: 13 }, { x: 19, y: 13 }
+            { x: 9, y: 7 }, { x: 11, y: 7 }, { x: 9, y: 5 }, { x: 11, y: 5 }
         ];
         this._ghosts = GHOST_COLORS.map((color, i) => ({
             x: ghostStarts[i].x, y: ghostStarts[i].y,
