@@ -32,24 +32,9 @@ import "./doodlejump-game.js";
 import "./2048-game.js";
 import "./minesweeper-game.js";
 import "./asteroids-game.js";
-import "./racing-game.js";
+// racing-game removed
 import "./quiz-game.js";
 import "./craft-game.js";
-// Teacher controls loaded in background — never blocks rendering
-let _cachedPlayAllowed = { allowed: true };
-let _cachedBlockedGames = {};
-function _refreshTeacherRestrictions() {
-    import("../core/teacher-controls.js").then(async mod => {
-        try {
-            _cachedPlayAllowed = await mod.isPlayAllowedCloud();
-            for (const g of GAMES) {
-                _cachedBlockedGames[g.id] = !(await mod.isGameAllowedCloud(g.id));
-            }
-        } catch {}
-    }).catch(() => {});
-}
-setTimeout(_refreshTeacherRestrictions, 3000);
-setInterval(_refreshTeacherRestrictions, 30000);
 
 const HS_KEY = "gameHighscores";
 
@@ -216,12 +201,6 @@ const GAMES = [
         scoreLabel: "Punkte",
     },
     {
-        id: "racing", label: "Turbo Racer",          emoji: "🏎️",
-        cost: 2,  maxEarn: 0,
-        component: "racing-game",
-        desc: "Rase über die Autobahn und weiche dem Verkehr aus!",
-        scoreLabel: "Punkte",
-    },
     {
         id: "quiz", label: "Vokabel-Million\u00e4r",   emoji: "\uD83C\uDFC6",
         cost: 2,  maxEarn: 0,
@@ -246,6 +225,22 @@ function saveHighscore(id, score) {
     if (score > (hs[id] ?? -1)) { hs[id] = score; localStorage.setItem(HS_KEY, JSON.stringify(hs)); return true; }
     return false;
 }
+
+// ─── teacher restrictions (cached, loaded in background) ─────────────────────
+let _cachedPlayAllowed = { allowed: true };
+let _cachedBlockedGames = {};
+setTimeout(() => {
+    const refresh = () => {
+        import("../core/teacher-controls.js").then(async mod => {
+            try {
+                _cachedPlayAllowed = await mod.isPlayAllowedCloud();
+                for (const g of GAMES) _cachedBlockedGames[g.id] = !(await mod.isGameAllowedCloud(g.id));
+            } catch {}
+        }).catch(() => {});
+    };
+    refresh();
+    setInterval(refresh, 30000);
+}, 3000);
 
 // ─── component ────────────────────────────────────────────────────────────────
 
@@ -565,7 +560,6 @@ class GameLobby extends HTMLElement {
 
         pm.updatePoints(-game.cost);
         this._activeGame = game;
-        trackPlayStart();
         this._showPlay(game);
     }
 
@@ -576,7 +570,6 @@ class GameLobby extends HTMLElement {
 
     _handleGameOver(e) {
         if (!this._activeGame) return;
-        trackPlayEnd();
         const { score } = e.detail ?? {};
         const isNew = saveHighscore(this._activeGame.id, score ?? 0);
         this._showResult(score ?? null, 0, isNew);
