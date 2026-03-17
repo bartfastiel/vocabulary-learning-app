@@ -35,6 +35,9 @@ import "./asteroids-game.js";
 // racing-game removed
 import "./quiz-game.js";
 import "./craft-game.js";
+import "./simon-game.js";
+import "./quickmath-game.js";
+import "./tap-game.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -212,6 +215,27 @@ const GAMES = [
         cost: 2,  maxEarn: 0,
         component: "craft-game",
         desc: "Baue, grabe und entdecke eine Welt aus Bl\u00f6cken!",
+        scoreLabel: "Punkte",
+    },
+    {
+        id: "simon", label: "Farb-Folge",             emoji: "\uD83C\uDFA8",
+        cost: 1,  maxEarn: 0,
+        component: "simon-game",
+        desc: "Merk dir die Farben und wiederhole die Reihenfolge!",
+        scoreLabel: "Runden",
+    },
+    {
+        id: "quickmath", label: "Blitz-Rechnen",      emoji: "\u26A1",
+        cost: 1,  maxEarn: 0,
+        component: "quickmath-game",
+        desc: "Rechne so schnell du kannst! Wird immer schwerer!",
+        scoreLabel: "Punkte",
+    },
+    {
+        id: "tap", label: "Ziel-Jagd",                emoji: "\uD83C\uDFAF",
+        cost: 1,  maxEarn: 0,
+        component: "tap-game",
+        desc: "Triff die Ziele bevor sie verschwinden! Immer schneller!",
         scoreLabel: "Punkte",
     },
 ];
