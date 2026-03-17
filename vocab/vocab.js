@@ -674,11 +674,18 @@ class VocabTrainer extends HTMLElement {
         ];
         const otherWithImage = this.vocab.filter(v => v !== word && v._hasImage).length;
         const otherWithAudio = this.vocab.filter(v => v !== word && v._hasAudio).length;
-        const availableModes = MODES.filter(mode => {
+        // For non-English subjects (bio, geo): only use simple Q&A modes
+        const isQuizSubject = this._subject && this._subject !== "englisch";
+        const QUIZ_MODES = [
+            { question: "vocab-question-wordgerman", answer: "vocab-answer-choosewordenglish" },
+            { question: "vocab-question-wordenglish", answer: "vocab-answer-choosewordgerman" },
+        ];
+        const baseModes = isQuizSubject ? QUIZ_MODES : MODES;
+
+        const availableModes = baseModes.filter(mode => {
             if (!word._hasImage && (mode.question === "vocab-question-image" || mode.answer === "vocab-answer-chooseimage")) return false;
             if (!word._hasAudio && (mode.question === "vocab-question-voiceenglish" || mode.answer === "vocab-answer-choosevoiceenglish")) return false;
             if (this.vocab.length < 4 && needsDistractors.includes(mode.answer)) return false;
-            // Need enough distractors with matching resources
             if (mode.answer === "vocab-answer-chooseimage" && otherWithImage < 3) return false;
             if (mode.answer === "vocab-answer-choosevoiceenglish" && otherWithAudio < 3) return false;
             return true;
