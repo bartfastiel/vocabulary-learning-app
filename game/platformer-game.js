@@ -78,7 +78,7 @@ const LEVELS = [
 
 // Power-up types
 const POWERUPS = [
-    { type: "wings",  emoji: "\u{1F985}", label: "Flügel",       color: "#60a5fa", duration: 8  },
+    // wings removed
     { type: "star",   emoji: "\u2B50",    label: "Stern",        color: "#fbbf24", duration: 6  },
     { type: "speed",  emoji: "\u26A1",    label: "Blitz",        color: "#f472b6", duration: 7  },
     { type: "shield", emoji: "\u{1F6E1}", label: "Schild",       color: "#34d399", duration: 10 },
@@ -89,7 +89,7 @@ const POWERUPS = [
 // Persistent inventory
 const INV_KEY = "huepfeltInventory";
 function loadInventory() {
-    try { return JSON.parse(localStorage.getItem(INV_KEY)) || []; } catch { return []; }
+    try { return (JSON.parse(localStorage.getItem(INV_KEY)) || []).filter(t => t !== "wings"); } catch { return []; }
 }
 function saveInventory(inv) {
     localStorage.setItem(INV_KEY, JSON.stringify(inv));
@@ -184,7 +184,7 @@ class PlatformerGame extends HTMLElement {
         const grid = this.shadowRoot.getElementById("pgrid");
         let selected = null;
         const POWER_DESCS = {
-            wings: "Doppelsprung + Gleiten",
+            // wings removed
             star: "Gegner besiegen bei Berührung",
             speed: "Schnellere Bewegung",
             shield: "Absorbiert einen Treffer",
@@ -403,7 +403,6 @@ class PlatformerGame extends HTMLElement {
         else this._walkFrame = 0;
 
         // jump
-        const hasWings = this._activePower?.type === "wings";
         const jumpPressed = this._keys.jump && !this._jumpHeld;
         if (this._keys.jump) this._jumpHeld = true;
         else this._jumpHeld = false;
@@ -411,25 +410,11 @@ class PlatformerGame extends HTMLElement {
         if (jumpPressed && this._onGround) {
             this._pvy = JUMP_VEL;
             this._onGround = false;
-        } else if (jumpPressed && hasWings && !this._onGround) {
-            // Wings: flap! Can flap multiple times to fly higher
-            this._pvy = Math.max(this._pvy - 180, -280);
-            // Wing flap particles
-            for (let i = 0; i < 5; i++) {
-                this._particles.push({
-                    x: this._px + 10 + (Math.random() - 0.5) * 16, y: this._py + 16,
-                    vx: (Math.random() - 0.5) * 30, vy: 30 + Math.random() * 25,
-                    life: 0.5, color: "#93c5fd", size: 2 + Math.random(),
-                });
-            }
         }
 
-        // gravity (wings = floatier; holding jump while falling = glide)
-        const gliding = hasWings && this._keys.jump && !this._onGround && this._pvy > 0;
-        const gravMul = gliding ? 0.3 : (hasWings ? 0.55 : 1);
-        this._pvy += GRAVITY * gravMul * dt;
-        const maxFall = gliding ? 60 : (hasWings ? 150 : 500);
-        if (this._pvy > maxFall) this._pvy = maxFall;
+        // gravity
+        this._pvy += GRAVITY * dt;
+        if (this._pvy > 500) this._pvy = 500;
 
         // move X
         this._px += this._pvx * dt;
@@ -1064,8 +1049,7 @@ class PlatformerGame extends HTMLElement {
         }
 
         // player power-up aura (no shadowBlur for performance)
-        // Skip aura for wings — just show the wing sprites
-        if (this._activePower && this._activePower.type !== "wings") {
+        if (this._activePower) {
             ctx.save();
             ctx.globalAlpha = 0.18 + Math.sin(now / 200) * 0.08;
             ctx.fillStyle = this._activePower.color;
@@ -1120,32 +1104,9 @@ class PlatformerGame extends HTMLElement {
             }
         }
 
-        // player (wings drawn behind, then body on top)
+        // player
         const blink = this._invincible > 0 && Math.floor(now / 80) % 2;
         if (!blink) {
-            // Draw wings BEHIND player
-            if (this._activePower?.type === "wings") {
-                const isGliding = this._keys.jump && !this._onGround && this._pvy > 0;
-                const flapSpeed = isGliding ? 200 : 100;
-                const wingSpread = isGliding ? 16 : 12;
-                const wingFlap = Math.sin(now / flapSpeed) * (isGliding ? 4 : 8);
-                ctx.fillStyle = isGliding ? "rgba(100,170,255,0.85)" : "rgba(100,170,255,0.7)";
-                ctx.beginPath();
-                ctx.ellipse(this._px - 2, this._py + 6, wingSpread, 6 + wingFlap, -0.3, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.ellipse(this._px + 22, this._py + 6, wingSpread, 6 + wingFlap, 0.3, 0, Math.PI * 2);
-                ctx.fill();
-                // Glide feather trail
-                if (isGliding && Math.random() < 0.25) {
-                    this._particles.push({
-                        x: this._px + 10 + (Math.random() - 0.5) * 20,
-                        y: this._py + 15,
-                        vx: (Math.random() - 0.5) * 15, vy: 15 + Math.random() * 10,
-                        life: 0.6, color: "#bfdbfe", size: 1.5 + Math.random(),
-                    });
-                }
-            }
             const tinyScale = (this._activePower?.type === "tiny") ? 0.6 : 1;
             this._drawPlayer(ctx, this._px, this._py, this._facingRight, this._walkFrame, this._onGround, this._pvy, tinyScale);
         }

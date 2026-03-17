@@ -32,10 +32,9 @@ import "./doodlejump-game.js";
 import "./2048-game.js";
 import "./minesweeper-game.js";
 import "./asteroids-game.js";
-import "./racing-game.js";
+// racing-game removed
 import "./quiz-game.js";
 import "./craft-game.js";
-import { isPlayAllowed, isGameAllowed, trackPlayStart, trackPlayEnd } from "../core/teacher-controls.js";
 
 const HS_KEY = "gameHighscores";
 
@@ -202,13 +201,6 @@ const GAMES = [
         scoreLabel: "Punkte",
     },
     {
-        id: "racing", label: "Turbo Racer",          emoji: "🏎️",
-        cost: 2,  maxEarn: 0,
-        component: "racing-game",
-        desc: "Rase über die Autobahn und weiche dem Verkehr aus!",
-        scoreLabel: "Punkte",
-    },
-    {
         id: "quiz", label: "Vokabel-Million\u00e4r",   emoji: "\uD83C\uDFC6",
         cost: 2,  maxEarn: 0,
         component: "quiz-game",
@@ -232,6 +224,22 @@ function saveHighscore(id, score) {
     if (score > (hs[id] ?? -1)) { hs[id] = score; localStorage.setItem(HS_KEY, JSON.stringify(hs)); return true; }
     return false;
 }
+
+// ─── teacher restrictions (cached, loaded in background) ─────────────────────
+let _cachedPlayAllowed = { allowed: true };
+let _cachedBlockedGames = {};
+setTimeout(() => {
+    const refresh = () => {
+        import("../core/teacher-controls.js").then(async mod => {
+            try {
+                _cachedPlayAllowed = await mod.isPlayAllowedCloud();
+                for (const g of GAMES) _cachedBlockedGames[g.id] = !(await mod.isGameAllowedCloud(g.id));
+            } catch {}
+        }).catch(() => {});
+    };
+    refresh();
+    setInterval(refresh, 30000);
+}, 3000);
 
 // ─── component ────────────────────────────────────────────────────────────────
 
@@ -318,8 +326,10 @@ class GameLobby extends HTMLElement {
           transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
           color: white;
           display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
-          user-select: none;
+          user-select: none; -webkit-user-select: none;
           position: relative;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: rgba(77,208,225,0.3);
         }
         .game-card:not(.locked):hover {
           transform: translateY(-3px);
@@ -509,19 +519,17 @@ class GameLobby extends HTMLElement {
         this.shadowRoot.getElementById("lobby-points").textContent =
             `${pts} Punkt${pts !== 1 ? "e" : ""}`;
 
-        // Teacher controls: only check if a PIN was set
-        const playCheck = isPlayAllowed();
-        const hasTeacher = !playCheck.allowed || playCheck.reason;
+        // Use cached teacher restrictions (refreshed in background)
+        const playCheck = _cachedPlayAllowed;
 
         grid.innerHTML = GAMES.map(g => {
             const locked = pts < g.cost;
-            const blocked = !isGameAllowed(g.id);
+            const blocked = _cachedBlockedGames[g.id] || false;
             const teacherBlocked = blocked || !playCheck.allowed;
             const hsVal  = hs[g.id] != null ? hs[g.id] : null;
             const hsText = hsVal != null && g.scoreLabel
                 ? `Highscore: ${hsVal} ${g.scoreLabel}`
                 : hsVal != null ? `Gespielt` : `Noch nicht gespielt`;
-            // Only show teacher lock if actually blocked by teacher
             const isLocked = locked || teacherBlocked;
             const lockReason = teacherBlocked && blocked ? "Vom Lehrer gesperrt"
                 : teacherBlocked && !playCheck.allowed ? playCheck.reason
@@ -551,7 +559,6 @@ class GameLobby extends HTMLElement {
 
         pm.updatePoints(-game.cost);
         this._activeGame = game;
-        trackPlayStart();
         this._showPlay(game);
     }
 
@@ -562,7 +569,6 @@ class GameLobby extends HTMLElement {
 
     _handleGameOver(e) {
         if (!this._activeGame) return;
-        trackPlayEnd();
         const { score } = e.detail ?? {};
         const isNew = saveHighscore(this._activeGame.id, score ?? 0);
         this._showResult(score ?? null, 0, isNew);

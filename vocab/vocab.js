@@ -516,32 +516,58 @@ class VocabTrainer extends HTMLElement {
 
     async loadSets() {
         try {
-            const data = await fetch(`vocab/vocab.json`).then(r => r.json());
-            // Verify which resources actually exist for each word
-            const checks = [];
-            for (const set of data) {
-                for (const w of set.words) {
-                    const safe = w.en.toLowerCase().replaceAll(/[^a-z0-9]/g, "_");
-                    // Check image
-                    if (w.allowImage) {
+            const subject = this._subject || "englisch";
+            // Load the right vocab file for this subject
+            const vocabFiles = {
+                englisch: "vocab/vocab.json",
+                bio: "vocab/vocab-bio.json",
+                geo: "vocab/vocab-geo.json",
+            };
+            // Filter by grade if set
+            const userGrade = parseInt(localStorage.getItem("userGrade") || "0");
+            const file = vocabFiles[subject];
+            let data = [];
+            if (file) {
+                data = await fetch(file).then(r => r.json());
+            }
+            // Verify which resources actually exist for each word (only for englisch)
+            if (subject === "englisch") {
+                const checks = [];
+                for (const set of data) {
+                    for (const w of set.words) {
+                        const safe = w.en.toLowerCase().replaceAll(/[^a-z0-9]/g, "_");
+                        if (w.allowImage) {
+                            checks.push(
+                                fetch(`assets/img/${safe}.png`, { method: "HEAD" })
+                                    .then(r => { w._hasImage = r.ok; })
+                                    .catch(() => { w._hasImage = false; })
+                            );
+                        } else {
+                            w._hasImage = false;
+                        }
                         checks.push(
-                            fetch(`assets/img/${safe}.png`, { method: "HEAD" })
-                                .then(r => { w._hasImage = r.ok; })
-                                .catch(() => { w._hasImage = false; })
+                            fetch(`assets/audio/voice/${safe}_alloy.mp3`, { method: "HEAD" })
+                                .then(r => { w._hasAudio = r.ok; })
+                                .catch(() => { w._hasAudio = false; })
                         );
-                    } else {
-                        w._hasImage = false;
                     }
-                    // Check audio (just one voice variant is enough)
-                    checks.push(
-                        fetch(`assets/audio/voice/${safe}_alloy.mp3`, { method: "HEAD" })
-                            .then(r => { w._hasAudio = r.ok; })
-                            .catch(() => { w._hasAudio = false; })
-                    );
+                }
+                await Promise.all(checks);
+            } else {
+                // For other subjects, no image/audio checks
+                for (const set of data) {
+                    for (const w of set.words) { w._hasImage = false; w._hasAudio = false; }
                 }
             }
-            await Promise.all(checks);
-            this._builtinSets = (this._subject || "englisch") === "englisch" ? data : [];
+            // Filter by user's grade — only show lessons for THAT grade
+            if (userGrade > 0) {
+                this._builtinSets = data.filter(lesson => {
+                    if (!lesson.grade) return true;
+                    return parseInt(lesson.grade) === userGrade;
+                });
+            } else {
+                this._builtinSets = data;
+            }
             this._mergeAndRender();
         } catch (err) {
             this.shadowRoot.querySelector("#question").textContent =
@@ -648,11 +674,18 @@ class VocabTrainer extends HTMLElement {
         ];
         const otherWithImage = this.vocab.filter(v => v !== word && v._hasImage).length;
         const otherWithAudio = this.vocab.filter(v => v !== word && v._hasAudio).length;
-        const availableModes = MODES.filter(mode => {
+        // For non-English subjects (bio, geo): only use simple Q&A modes
+        const isQuizSubject = this._subject && this._subject !== "englisch";
+        const QUIZ_MODES = [
+            { question: "vocab-question-wordgerman", answer: "vocab-answer-choosewordenglish" },
+            { question: "vocab-question-wordenglish", answer: "vocab-answer-choosewordgerman" },
+        ];
+        const baseModes = isQuizSubject ? QUIZ_MODES : MODES;
+
+        const availableModes = baseModes.filter(mode => {
             if (!word._hasImage && (mode.question === "vocab-question-image" || mode.answer === "vocab-answer-chooseimage")) return false;
             if (!word._hasAudio && (mode.question === "vocab-question-voiceenglish" || mode.answer === "vocab-answer-choosevoiceenglish")) return false;
             if (this.vocab.length < 4 && needsDistractors.includes(mode.answer)) return false;
-            // Need enough distractors with matching resources
             if (mode.answer === "vocab-answer-chooseimage" && otherWithImage < 3) return false;
             if (mode.answer === "vocab-answer-choosevoiceenglish" && otherWithAudio < 3) return false;
             return true;

@@ -4,15 +4,18 @@
 import "./help-overlay.js";
 import "./group-board.js";
 import "./invite-qr.js";
+import "./teacher-controls.js";
+import { syncProfileToCloud } from "./cloud-sync.js";
+import "./cloud-login.js";
 import "../vocab/vocab.js";
 import "../vocab/vocab-editor.js";
 import "../game/game-lobby.js";
 import "../math/math-trainer.js";
 import "../deutsch/deutsch-trainer.js";
 import { PointsManager } from "../vocab/points.js";
-import { getAvatarSVG } from "./avatar-builder.js";
+import { getAvatarSVG, generateRandomAvatar } from "./avatar-builder.js";
 import { getProfiles, getActiveId, getActiveProfile, createProfile, deleteProfile,
-         activateProfile, saveSnapshot, setAvatarSvg } from "./profiles.js";
+         activateProfile, saveSnapshot, setAvatarSvg, assignRandomAvatarIfNeeded } from "./profiles.js";
 
 class AppShell extends HTMLElement {
     constructor() {
@@ -129,17 +132,35 @@ class AppShell extends HTMLElement {
 
         /* ── Action buttons on home ── */
         .home-actions {
-          display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem;
-          margin-bottom: 1.2rem;
+          display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.5rem;
+          margin-bottom: 1rem;
         }
+        .settings-menu {
+          display: none; flex-direction: column; gap: 0.3rem;
+          margin-bottom: 1rem; background: white; border-radius: 14px;
+          padding: 0.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .settings-menu.open { display: flex; }
+        :host([data-bg="dark"]) .settings-menu { background: #2d3748; }
+        .settings-item {
+          display: flex; align-items: center; gap: 0.5rem;
+          padding: 0.7rem 0.8rem; border: none; border-radius: 10px;
+          background: transparent; cursor: pointer; font-family: inherit;
+          font-size: 0.9rem; font-weight: 600; color: #4a5568;
+          text-align: left; width: 100%; transition: background 0.15s;
+        }
+        .settings-item:hover { background: #f0f4f8; }
+        :host([data-bg="dark"]) .settings-item { color: #e2e8f0; }
+        :host([data-bg="dark"]) .settings-item:hover { background: #4a5568; }
         .action-card {
-          display: flex; align-items: center; gap: 0.7rem;
-          padding: 0.9rem 1rem;
+          display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+          padding: 0.7rem 0.5rem;
           background: white; border-radius: 14px;
           border: none; cursor: pointer;
           box-shadow: 0 2px 8px rgba(0,0,0,0.05);
           transition: transform 0.15s, box-shadow 0.15s;
-          font-family: inherit; text-align: left; width: 100%;
+          font-family: inherit; text-align: center; width: 100%;
+          touch-action: manipulation;
         }
         .action-card:hover {
           transform: translateY(-2px);
@@ -592,8 +613,15 @@ class AppShell extends HTMLElement {
             <h2>Neues Profil</h2>
             <input id="input-profile-name" type="text" placeholder="Dein Name..."
                    autocomplete="off" autocorrect="off" spellcheck="false"/>
+            <p style="font-size:0.85rem;color:#718096;margin:0.3rem 0 0.2rem;font-weight:600">Welche Klasse bist du?</p>
+            <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="grade-select">
+              <button class="grade-btn" data-grade="3" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">3</button>
+              <button class="grade-btn" data-grade="4" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">4</button>
+              <button class="grade-btn" data-grade="5" style="padding:0.5rem 1rem;border:2px solid #4299e1;border-radius:10px;background:#ebf8ff;font-size:1rem;font-weight:700;cursor:pointer;color:#2b6cb0">5</button>
+              <button class="grade-btn" data-grade="6" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">6</button>
+            </div>
             <div class="profile-form-btns">
-              <button id="btn-profile-cancel">Zurück</button>
+              <button id="btn-profile-cancel">Zur\u00fcck</button>
               <button id="btn-profile-create">Erstellen</button>
             </div>
           </div>
@@ -648,6 +676,8 @@ class AppShell extends HTMLElement {
       <group-board></group-board>
       <game-lobby></game-lobby>
       <invite-qr></invite-qr>
+      <teacher-controls></teacher-controls>
+      <cloud-login></cloud-login>
 
       <!-- Home / Dashboard -->
       <div id="home-screen">
@@ -667,64 +697,74 @@ class AppShell extends HTMLElement {
 
         <div class="subject-cards">
           <button class="subject-card" data-subject="englisch">
-            <div class="card-icon englisch">🇬🇧</div>
+            <div class="card-icon englisch">\uD83C\uDDEC\uD83C\uDDE7</div>
             <div class="card-info">
               <p class="card-title">Englisch</p>
-              <p class="card-desc">Vokabeln lernen, hören & schreiben</p>
+              <p class="card-desc">Vokabeln lernen, h\u00f6ren & schreiben</p>
             </div>
-            <span class="card-arrow">›</span>
+            <span class="card-arrow">\u203A</span>
           </button>
           <button class="subject-card" data-subject="mathe">
-            <div class="card-icon mathe">🔢</div>
+            <div class="card-icon mathe">\uD83D\uDD22</div>
             <div class="card-info">
               <p class="card-title">Mathe</p>
-              <p class="card-desc">Rechnen, Geometrie, Brüche & mehr</p>
+              <p class="card-desc">Rechnen, Geometrie, Br\u00fcche & mehr</p>
             </div>
-            <span class="card-arrow">›</span>
+            <span class="card-arrow">\u203A</span>
           </button>
           <button class="subject-card" data-subject="deutsch">
-            <div class="card-icon deutsch">📖</div>
+            <div class="card-icon deutsch">\uD83D\uDCD6</div>
             <div class="card-info">
               <p class="card-title">Deutsch</p>
               <p class="card-desc">Grammatik, Rechtschreibung & Wortarten</p>
             </div>
-            <span class="card-arrow">›</span>
+            <span class="card-arrow">\u203A</span>
+          </button>
+          <button class="subject-card" data-subject="bio">
+            <div class="card-icon bio">\uD83E\uDDEC</div>
+            <div class="card-info">
+              <p class="card-title">Biologie</p>
+              <p class="card-desc">Tiere, Pflanzen, K\u00f6rper</p>
+            </div>
+            <span class="card-arrow">\u203A</span>
+          </button>
+          <button class="subject-card" data-subject="geo">
+            <div class="card-icon geo">\uD83C\uDF0D</div>
+            <div class="card-info">
+              <p class="card-title">Geografie</p>
+              <p class="card-desc">Erde, Wetter, Klima & Energie</p>
+            </div>
+            <span class="card-arrow">\u203A</span>
           </button>
         </div>
 
         <div class="home-actions">
           <button class="action-card" id="home-games">
-            <span class="action-icon">🎮</span>
+            <span class="action-icon">\uD83C\uDFAE</span>
             <span class="action-label">Spiele</span>
           </button>
-          <button class="action-card" id="home-groups">
-            <span class="action-icon">👥</span>
-            <span class="action-label">Gruppen</span>
-          </button>
-          <button class="action-card" id="home-vocab-edit">
-            <span class="action-icon">✏️</span>
-            <span class="action-label">Vokabeln</span>
+          <button class="action-card" id="home-cloud">
+            <span class="action-icon">\uD83C\uDF10</span>
+            <span class="action-label">Online</span>
           </button>
           <button class="action-card" id="home-avatar">
-            <span class="action-icon">😊</span>
+            <span class="action-icon">\uD83D\uDE0A</span>
             <span class="action-label">Avatar</span>
           </button>
-          <button class="action-card" id="home-bg">
-            <span class="action-icon">🎨</span>
-            <span class="action-label">Hintergrund</span>
+          <button class="action-card" id="home-settings">
+            <span class="action-icon">\u2699\uFE0F</span>
+            <span class="action-label">Mehr</span>
           </button>
-          <button class="action-card" id="home-friends">
-            <span class="action-icon">📲</span>
-            <span class="action-label">Freunde</span>
-          </button>
-          <button class="action-card" id="home-design">
-            <span class="action-icon">🚀</span>
-            <span class="action-label">Klassisch</span>
-          </button>
-          <button class="action-card" id="home-profile">
-            <span class="action-icon">🔄</span>
-            <span class="action-label">Profil</span>
-          </button>
+        </div>
+
+        <!-- Settings dropdown (hidden) -->
+        <div class="settings-menu" id="settings-menu">
+          <button class="settings-item" id="home-bg">\uD83C\uDFA8 Hintergrund</button>
+          <button class="settings-item" id="home-vocab-edit">\u270F\uFE0F Vokabeln bearbeiten</button>
+          <button class="settings-item" id="home-teacher">\uD83C\uDF93 Lehrer-Bereich</button>
+          <button class="settings-item" id="home-groups">\uD83D\uDC65 Gruppen</button>
+          <button class="settings-item" id="home-profile">\uD83D\uDD04 Profil wechseln</button>
+          <button class="settings-item" id="home-design">\uD83D\uDE80 Klassisches Design</button>
         </div>
 
       </div>
@@ -874,6 +914,9 @@ class AppShell extends HTMLElement {
     // ── Startup ──────────────────────────────────────────────────────────────
 
     _startup() {
+        // Assign random avatars to any new profiles that need them
+        assignRandomAvatarIfNeeded(generateRandomAvatar);
+
         const profiles = getProfiles();
         const activeId = getActiveId();
         const active = profiles.find(p => p.id === activeId);
@@ -919,10 +962,27 @@ class AppShell extends HTMLElement {
         this.shadowRoot.getElementById("btn-new-profile").onclick = () => showNew();
         this.shadowRoot.getElementById("btn-profile-cancel").onclick = () => showPick();
 
+        // Grade selection
+        let selectedGrade = "5";
+        for (const btn of this.shadowRoot.querySelectorAll(".grade-btn")) {
+            btn.onclick = () => {
+                this.shadowRoot.querySelectorAll(".grade-btn").forEach(b => {
+                    b.style.borderColor = "#e2e8f0"; b.style.background = "white"; b.style.color = "#2d3748";
+                });
+                btn.style.borderColor = "#4299e1"; btn.style.background = "#ebf8ff"; btn.style.color = "#2b6cb0";
+                selectedGrade = btn.dataset.grade;
+            };
+        }
+
         const doCreate = () => {
             const name = nameInput.value.trim();
             if (!name) { nameInput.focus(); return; }
             const id = createProfile(name);
+            // Save grade to profile and localStorage
+            const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
+            const p = list.find(p => p.id === id);
+            if (p) { p.grade = selectedGrade; localStorage.setItem("allProfiles", JSON.stringify(list)); }
+            localStorage.setItem("userGrade", selectedGrade);
             finish(id);
         };
         this.shadowRoot.getElementById("btn-profile-create").onclick = doCreate;
@@ -1014,7 +1074,7 @@ class AppShell extends HTMLElement {
             saveSnapshot();
             this._showProfileOverlay(false, () => location.reload());
         };
-        window.addEventListener("beforeunload", () => saveSnapshot());
+        window.addEventListener("beforeunload", () => { saveSnapshot(); syncProfileToCloud(); });
 
         // Welcome text
         if (profile) {
@@ -1035,11 +1095,11 @@ class AppShell extends HTMLElement {
         // Home action buttons
         this.shadowRoot.getElementById("home-games").onclick = () => gameLobby.open();
         const groupBoard = this.shadowRoot.querySelector("group-board");
-        this.shadowRoot.getElementById("home-groups").onclick = () => groupBoard.open();
+        this.shadowRoot.getElementById("home-groups").onclick = () => { settingsMenu.classList.remove("open"); groupBoard.open(); };
         this.shadowRoot.getElementById("group-btn").onclick = () => groupBoard.open();
 
         const vocabEditor = this.shadowRoot.querySelector("vocab-editor");
-        this.shadowRoot.getElementById("home-vocab-edit").onclick = () => vocabEditor.open();
+        this.shadowRoot.getElementById("home-vocab-edit").onclick = () => { settingsMenu.classList.remove("open"); vocabEditor.open(); };
         vocabEditor.onSaved = () => {
             // Reload all vocab trainers so custom lists appear under the right subject
             for (const key of Object.keys(this._trainers)) {
@@ -1059,19 +1119,25 @@ class AppShell extends HTMLElement {
             }
         });
 
-        const inviteQR = this.shadowRoot.querySelector("invite-qr");
-        this.shadowRoot.getElementById("home-friends").onclick = () => inviteQR.open();
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
+        // Settings menu toggle
+        const settingsMenu = this.shadowRoot.getElementById("settings-menu");
+        this.shadowRoot.getElementById("home-settings").onclick = () => settingsMenu.classList.toggle("open");
+        const teacherCtrl = this.shadowRoot.querySelector("teacher-controls");
+        this.shadowRoot.getElementById("home-teacher").onclick = () => { settingsMenu.classList.remove("open"); teacherCtrl.open(); };
+        const cloudLogin = this.shadowRoot.querySelector("cloud-login");
+        this.shadowRoot.getElementById("home-cloud").onclick = () => cloudLogin.open();
         this.shadowRoot.getElementById("home-design").onclick = () => {
             localStorage.setItem("appDesign", "classic");
             location.reload();
         };
         // Background settings overlay
         const bgOverlay = this.shadowRoot.getElementById("bg-overlay");
-        this.shadowRoot.getElementById("home-bg").onclick = () => bgOverlay.classList.add("active");
+        this.shadowRoot.getElementById("home-bg").onclick = () => { settingsMenu.classList.remove("open"); bgOverlay.classList.add("active"); };
         this.shadowRoot.getElementById("bg-close").onclick = () => bgOverlay.classList.remove("active");
         this.shadowRoot.getElementById("home-profile").onclick = () => {
+            settingsMenu.classList.remove("open");
             saveSnapshot();
             this._showProfileOverlay(false, () => location.reload());
         };
@@ -1698,9 +1764,11 @@ class AppShell extends HTMLElement {
         trainer.style.display = "block";
 
         const subjects = {
-            englisch: { title: "🇬🇧 Englisch", tag: "vocab-trainer" },
-            mathe:    { title: "🔢 Mathe", tag: "math-trainer" },
-            deutsch:  { title: "📖 Deutsch", tag: "deutsch-trainer" },
+            englisch:      { title: "\uD83C\uDDEC\uD83C\uDDE7 Englisch", tag: "vocab-trainer" },
+            mathe:         { title: "\uD83D\uDD22 Mathe", tag: "math-trainer" },
+            deutsch:       { title: "\uD83D\uDCD6 Deutsch", tag: "deutsch-trainer" },
+            bio:           { title: "\uD83E\uDDEC Biologie", tag: "vocab-trainer" },
+            geo:           { title: "\uD83C\uDF0D Geografie", tag: "vocab-trainer" },
         };
         const s = subjects[subject];
         title.textContent = s.title;
@@ -1715,19 +1783,8 @@ class AppShell extends HTMLElement {
             this._trainers[subject] = el;
         }
 
-        // For mathe/deutsch, also create a vocab-trainer for custom vocab lists
-        if (subject !== "englisch" && !this._trainers[subject + "_vocab"]) {
-            const vt = document.createElement("vocab-trainer");
-            vt.points = this._pointsManager;
-            vt._subject = subject;
-            this._trainers[subject + "_vocab"] = vt;
-        }
-
         slot.innerHTML = "";
         slot.appendChild(this._trainers[subject]);
-        if (subject !== "englisch") {
-            slot.appendChild(this._trainers[subject + "_vocab"]);
-        }
     }
 
     _showHome() {

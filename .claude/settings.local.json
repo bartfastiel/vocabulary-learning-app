@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check core/app-shell.js 2>&1)",
+      "Bash(git add:*)",
+      "Bash(gh run:*)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:bartfastiel.github.io)",
+      "Bash(ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFucndqZmlkcXFqaXZhdGphcnJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1NjQyNjYsImV4cCI6MjA4OTE0MDI2Nn0.Pxq5uXvFqk5UF8hrnT94A8WT1ZUEVeiWfu2_OZZA8us\"\ncurl -s \"https://anrwjfidqqjivatjarrg.supabase.co/rest/v1/\" -H \"apikey: $ANON_KEY\" -H \"Authorization: Bearer $ANON_KEY\" 2>&1 | head -5)",
+      "Bash(export PGPASSWORD='!X,?N7mT%umv,YJ'\npsql \"postgresql://postgres@db.anrwjfidqqjivatjarrg.supabase.co:5432/postgres\" -c \"SELECT 1 as test\" 2>&1)",
+      "Bash(npx supabase:*)",
+      "Bash(export SUPABASE_ACCESS_TOKEN=sbp_23ccfd1c50eaeb01ac4a2024e36f155d44c53438\n\ncurl -s -X POST \"https://api.supabase.com/v1/projects/anrwjfidqqjivatjarrg/database/query\" \\\\\n  -H \"Authorization: Bearer $SUPABASE_ACCESS_TOKEN\" \\\\\n  -H \"Content-Type: application/json\" \\\\\n  -d '{\"query\":\"ALTER TABLE profiles ENABLE ROW LEVEL SECURITY; ALTER TABLE groups ENABLE ROW LEVEL SECURITY; ALTER TABLE group_members ENABLE ROW LEVEL SECURITY; CREATE POLICY p1 ON profiles FOR ALL USING \\(true\\) WITH CHECK \\(true\\); CREATE POLICY p2 ON groups FOR ALL USING \\(true\\) WITH CHECK \\(true\\); CREATE POLICY p3 ON group_members FOR ALL USING \\(true\\) WITH CHECK \\(true\\); NOTIFY pgrst, '\\\\''reload schema'\\\\'';\"}' 2>&1)"
+    ]
+  }
+}
