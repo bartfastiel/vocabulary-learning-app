@@ -40,6 +40,11 @@
     window.onerror = function(msg, url, line) {
         document.body.innerHTML += '<div style="color:red;padding:1rem;font-size:0.8rem;word-break:break-all">ERROR: ' + msg + '<br>File: ' + url + '<br>Line: ' + line + '</div>';
     };
+    // Emergency reset: add ?reset=1 to URL to clear everything
+    if (location.search.includes("reset=1")) {
+        localStorage.clear();
+        location.href = location.pathname;
+    }
     const design = localStorage.getItem("appDesign") || "modern";
     const file = design === "classic" ? "app-shell-classic.js" : "app-shell.js";
     const s = document.createElement("script");
