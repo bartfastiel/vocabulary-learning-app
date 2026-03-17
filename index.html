@@ -37,11 +37,6 @@
 
 <!-- main entrypoint — cache-busting via timestamp, design switcher -->
 <script>
-    // Emergency reset
-    if (location.search.includes("reset=1")) {
-        localStorage.clear();
-        location.href = location.pathname;
-    }
     const design = localStorage.getItem("appDesign") || "modern";
     const file = design === "classic" ? "app-shell-classic.js" : "app-shell.js";
     const s = document.createElement("script");
