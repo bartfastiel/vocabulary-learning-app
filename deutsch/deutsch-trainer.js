@@ -2,22 +2,18 @@
 // Deutsch-Trainer für die 5. Klasse.
 // Aufgabentypen: Wortarten, Rechtschreibung, Zeitformen, Satzglieder, Grammatik
 
-const _deGrade = () => parseInt(localStorage.getItem("userGrade") || "5");
-
-const ALL_DE_CATEGORIES = [
-    { id: "wortarten",       name: "\uD83D\uDCDD Wortarten",           generate: genWortarten, grades: [3,4,5,6] },
-    { id: "nomen",           name: "\uD83C\uDFF7\uFE0F Nomen & Artikel",     generate: genNomen, grades: [3,4,5,6] },
-    { id: "verben",          name: "\uD83C\uDFC3 Verben konjugieren",  generate: genVerben, grades: [4,5,6] },
-    { id: "zeitformen",      name: "\u23F0 Zeitformen",           generate: genZeitformen, grades: [5,6] },
-    { id: "rechtschreibung", name: "\u270F\uFE0F Rechtschreibung",     generate: genRechtschreibung, grades: [3,4,5,6] },
-    { id: "satzzeichen",     name: "\u2757 Satzzeichen",          generate: genSatzzeichen, grades: [3,4,5] },
-    { id: "einzahl_mehrzahl",name: "\uD83D\uDC65 Einzahl & Mehrzahl",  generate: genEinzahlMehrzahl, grades: [3,4] },
-    { id: "gegenteil",       name: "\u2194\uFE0F Gegenteile",          generate: genGegenteil, grades: [3,4,5] },
-    { id: "wortfamilien",    name: "\uD83C\uDF33 Wortfamilien",        generate: genWortfamilien, grades: [4,5,6] },
-    { id: "satzglieder",     name: "\uD83E\uDDE9 Satzglieder",         generate: genSatzglieder, grades: [5,6] },
+const DE_CATEGORIES = [
+    { id: "wortarten",       name: "📝 Wortarten",           generate: genWortarten },
+    { id: "nomen",           name: "🏷️ Nomen & Artikel",     generate: genNomen },
+    { id: "verben",          name: "🏃 Verben konjugieren",  generate: genVerben },
+    { id: "zeitformen",      name: "⏰ Zeitformen",           generate: genZeitformen },
+    { id: "rechtschreibung", name: "✏️ Rechtschreibung",     generate: genRechtschreibung },
+    { id: "satzzeichen",     name: "❗ Satzzeichen",          generate: genSatzzeichen },
+    { id: "einzahl_mehrzahl",name: "👥 Einzahl & Mehrzahl",  generate: genEinzahlMehrzahl },
+    { id: "gegenteil",       name: "↔️ Gegenteile",          generate: genGegenteil },
+    { id: "wortfamilien",    name: "🌳 Wortfamilien",        generate: genWortfamilien },
+    { id: "satzglieder",     name: "🧩 Satzglieder",         generate: genSatzglieder },
 ];
-
-const DE_CATEGORIES = ALL_DE_CATEGORIES.filter(c => c.grades.includes(_deGrade()));
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }

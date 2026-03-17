@@ -26,14 +26,9 @@ class VocabQuestionWordGerman extends HTMLElement {
 
         const q = this.shadowRoot.querySelector(".question");
 
-        // For English vocab: “Wie heißt X auf Englisch?”
-        // For other subjects (bio, geo): just show the question directly
-        const isQuiz = this.vocab.de && this.vocab.de.includes(“?”);
-        if (isQuiz) {
-            q.textContent = this.vocab.de;
-        } else {
-            q.textContent = `Wie hei\u00dft \u201e${this.vocab.de}\u201c auf Englisch?`;
-        }
+        // exactly the same text shown in the original code
+        // for mode "text" (German → English)
+        q.textContent = `Wie heißt „${this.vocab.de}” auf Englisch?`;
     }
 }
 
