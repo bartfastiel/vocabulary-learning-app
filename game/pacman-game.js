@@ -5,13 +5,13 @@
 const PM_CELL = 20;
 const PM_MAP = [
     "#####################",
-    "#.........#.........#",
+    "#P........#.........#",
     "#.###.###.#.###.###.#",
     "#.#...#.......#...#.#",
     "#.#.#.#.#####.#.#.#.#",
     "#...#.....#.....#...#",
     "###.#####.#.#####.###",
-    "#.........P.........#",
+    "#.........#.........#",
     "#.###.#.#####.#.###.#",
     "#.#...#...#...#...#.#",
     "#.#.#####.#.#####.#.#",
@@ -85,15 +85,19 @@ class PacmanGame extends HTMLElement {
             }
         }
 
-        // ghosts
+        // ghosts — start in the middle, player starts in corner
+        const ghostStarts = [
+            { x: 9, y: 7 }, { x: 11, y: 7 }, { x: 9, y: 5 }, { x: 11, y: 5 }
+        ];
         this._ghosts = GHOST_COLORS.map((color, i) => ({
-            x: 9 + (i % 2) * 2, y: 5 + Math.floor(i / 2) * 2,
+            x: ghostStarts[i].x, y: ghostStarts[i].y,
             color, dir: { x: 0, y: 0 },
             moveTimer: 0,
+            frozen: 3 + i * 1.5, // each ghost unfreezes later (3s, 4.5s, 6s, 7.5s)
         }));
 
         this._moveTimer = 0;
-        this._ghostSpeed = 0.18;
+        this._ghostSpeed = 0.22;
     }
 
     _isWall(x, y) {
@@ -170,6 +174,8 @@ class PacmanGame extends HTMLElement {
 
         // ghost movement
         for (const g of this._ghosts) {
+            // Frozen ghosts don't move or kill
+            if (g.frozen > 0) { g.frozen -= dt; continue; }
             g.moveTimer += dt;
             if (g.moveTimer >= this._ghostSpeed) {
                 g.moveTimer = 0;

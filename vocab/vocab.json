@@ -1400,7 +1400,8 @@
         "en": "finish",
         "allowImage": false
       }
-    ]
+    ],
+    "grade": "5"
   },
   {
     "name": "Unit 3 - Vorträge",
@@ -1451,7 +1452,8 @@
         "en": "smile",
         "allowImage": true
       }
-    ]
+    ],
+    "grade": "5"
   },
   {
     "name": "Unit 3 - Einkaufen & Essen",
@@ -1516,7 +1518,8 @@
         "en": "ice cream",
         "allowImage": true
       }
-    ]
+    ],
+    "grade": "5"
   },
   {
     "name": "Pets",
@@ -1616,6 +1619,780 @@
         "en": "mice",
         "allowImage": true
       }
-    ]
+    ],
+    "grade": "5"
+  },
+  {
+    "name": "Klasse 3-4: Erste Worte",
+    "words": [
+      {
+        "de": "Hallo",
+        "en": "hello",
+        "allowImage": false
+      },
+      {
+        "de": "Tschüss",
+        "en": "goodbye",
+        "allowImage": false
+      },
+      {
+        "de": "ja",
+        "en": "yes",
+        "allowImage": false
+      },
+      {
+        "de": "nein",
+        "en": "no",
+        "allowImage": false
+      },
+      {
+        "de": "bitte",
+        "en": "please",
+        "allowImage": false
+      },
+      {
+        "de": "danke",
+        "en": "thank you",
+        "allowImage": false
+      },
+      {
+        "de": "Ich bin...",
+        "en": "I am...",
+        "allowImage": false
+      },
+      {
+        "de": "Wie geht es dir?",
+        "en": "How are you?",
+        "allowImage": false
+      },
+      {
+        "de": "gut",
+        "en": "good",
+        "allowImage": false
+      },
+      {
+        "de": "schlecht",
+        "en": "bad",
+        "allowImage": false
+      },
+      {
+        "de": "groß",
+        "en": "big",
+        "allowImage": false
+      },
+      {
+        "de": "klein",
+        "en": "small",
+        "allowImage": false
+      },
+      {
+        "de": "schön",
+        "en": "beautiful",
+        "allowImage": false
+      },
+      {
+        "de": "schnell",
+        "en": "fast",
+        "allowImage": false
+      },
+      {
+        "de": "langsam",
+        "en": "slow",
+        "allowImage": false
+      }
+    ],
+    "grade": "3"
+  },
+  {
+    "name": "Klasse 3-4: Farben",
+    "words": [
+      {
+        "de": "rot",
+        "en": "red",
+        "allowImage": false
+      },
+      {
+        "de": "blau",
+        "en": "blue",
+        "allowImage": false
+      },
+      {
+        "de": "grün",
+        "en": "green",
+        "allowImage": false
+      },
+      {
+        "de": "gelb",
+        "en": "yellow",
+        "allowImage": false
+      },
+      {
+        "de": "schwarz",
+        "en": "black",
+        "allowImage": false
+      },
+      {
+        "de": "weiß",
+        "en": "white",
+        "allowImage": false
+      },
+      {
+        "de": "orange",
+        "en": "orange",
+        "allowImage": false
+      },
+      {
+        "de": "lila",
+        "en": "purple",
+        "allowImage": false
+      },
+      {
+        "de": "rosa",
+        "en": "pink",
+        "allowImage": false
+      },
+      {
+        "de": "braun",
+        "en": "brown",
+        "allowImage": false
+      },
+      {
+        "de": "grau",
+        "en": "grey",
+        "allowImage": false
+      }
+    ],
+    "grade": "3"
+  },
+  {
+    "name": "Klasse 3-4: Zahlen",
+    "words": [
+      {
+        "de": "eins",
+        "en": "one",
+        "allowImage": false
+      },
+      {
+        "de": "zwei",
+        "en": "two",
+        "allowImage": false
+      },
+      {
+        "de": "drei",
+        "en": "three",
+        "allowImage": false
+      },
+      {
+        "de": "vier",
+        "en": "four",
+        "allowImage": false
+      },
+      {
+        "de": "fünf",
+        "en": "five",
+        "allowImage": false
+      },
+      {
+        "de": "sechs",
+        "en": "six",
+        "allowImage": false
+      },
+      {
+        "de": "sieben",
+        "en": "seven",
+        "allowImage": false
+      },
+      {
+        "de": "acht",
+        "en": "eight",
+        "allowImage": false
+      },
+      {
+        "de": "neun",
+        "en": "nine",
+        "allowImage": false
+      },
+      {
+        "de": "zehn",
+        "en": "ten",
+        "allowImage": false
+      },
+      {
+        "de": "elf",
+        "en": "eleven",
+        "allowImage": false
+      },
+      {
+        "de": "zwölf",
+        "en": "twelve",
+        "allowImage": false
+      },
+      {
+        "de": "zwanzig",
+        "en": "twenty",
+        "allowImage": false
+      },
+      {
+        "de": "hundert",
+        "en": "hundred",
+        "allowImage": false
+      }
+    ],
+    "grade": "3"
+  },
+  {
+    "name": "Klasse 4: Tiere",
+    "words": [
+      {
+        "de": "Hund",
+        "en": "dog",
+        "allowImage": true
+      },
+      {
+        "de": "Katze",
+        "en": "cat",
+        "allowImage": true
+      },
+      {
+        "de": "Vogel",
+        "en": "bird",
+        "allowImage": false
+      },
+      {
+        "de": "Fisch",
+        "en": "fish",
+        "allowImage": false
+      },
+      {
+        "de": "Pferd",
+        "en": "horse",
+        "allowImage": false
+      },
+      {
+        "de": "Maus",
+        "en": "mouse",
+        "allowImage": false
+      },
+      {
+        "de": "Kaninchen",
+        "en": "rabbit",
+        "allowImage": false
+      },
+      {
+        "de": "Schlange",
+        "en": "snake",
+        "allowImage": false
+      },
+      {
+        "de": "Bär",
+        "en": "bear",
+        "allowImage": false
+      },
+      {
+        "de": "Löwe",
+        "en": "lion",
+        "allowImage": false
+      },
+      {
+        "de": "Affe",
+        "en": "monkey",
+        "allowImage": false
+      },
+      {
+        "de": "Elefant",
+        "en": "elephant",
+        "allowImage": false
+      }
+    ],
+    "grade": "4"
+  },
+  {
+    "name": "Klasse 4: Essen",
+    "words": [
+      {
+        "de": "Brot",
+        "en": "bread",
+        "allowImage": false
+      },
+      {
+        "de": "Butter",
+        "en": "butter",
+        "allowImage": false
+      },
+      {
+        "de": "Käse",
+        "en": "cheese",
+        "allowImage": false
+      },
+      {
+        "de": "Milch",
+        "en": "milk",
+        "allowImage": false
+      },
+      {
+        "de": "Ei",
+        "en": "egg",
+        "allowImage": false
+      },
+      {
+        "de": "Apfel",
+        "en": "apple",
+        "allowImage": false
+      },
+      {
+        "de": "Banane",
+        "en": "banana",
+        "allowImage": false
+      },
+      {
+        "de": "Kuchen",
+        "en": "cake",
+        "allowImage": false
+      },
+      {
+        "de": "Schokolade",
+        "en": "chocolate",
+        "allowImage": false
+      },
+      {
+        "de": "Wasser",
+        "en": "water",
+        "allowImage": false
+      },
+      {
+        "de": "Saft",
+        "en": "juice",
+        "allowImage": false
+      },
+      {
+        "de": "Suppe",
+        "en": "soup",
+        "allowImage": false
+      }
+    ],
+    "grade": "4"
+  },
+  {
+    "name": "Klasse 6: Reisen & Verkehr",
+    "words": [
+      {
+        "de": "Flugzeug",
+        "en": "plane",
+        "allowImage": false
+      },
+      {
+        "de": "Zug",
+        "en": "train",
+        "allowImage": false
+      },
+      {
+        "de": "Bus",
+        "en": "bus",
+        "allowImage": false
+      },
+      {
+        "de": "Auto",
+        "en": "car",
+        "allowImage": false
+      },
+      {
+        "de": "Fahrrad",
+        "en": "bicycle",
+        "allowImage": false
+      },
+      {
+        "de": "Schiff",
+        "en": "ship",
+        "allowImage": false
+      },
+      {
+        "de": "Flughafen",
+        "en": "airport",
+        "allowImage": false
+      },
+      {
+        "de": "Bahnhof",
+        "en": "train station",
+        "allowImage": false
+      },
+      {
+        "de": "Fahrkarte",
+        "en": "ticket",
+        "allowImage": false
+      },
+      {
+        "de": "Koffer",
+        "en": "suitcase",
+        "allowImage": false
+      },
+      {
+        "de": "Reise",
+        "en": "journey",
+        "allowImage": false
+      },
+      {
+        "de": "Landkarte",
+        "en": "map",
+        "allowImage": false
+      },
+      {
+        "de": "Urlaub",
+        "en": "holiday",
+        "allowImage": false
+      },
+      {
+        "de": "Hotel",
+        "en": "hotel",
+        "allowImage": false
+      },
+      {
+        "de": "Strand",
+        "en": "beach",
+        "allowImage": false
+      }
+    ],
+    "grade": "6"
+  },
+  {
+    "name": "Klasse 6: Natur & Umwelt",
+    "words": [
+      {
+        "de": "Berg",
+        "en": "mountain",
+        "allowImage": false
+      },
+      {
+        "de": "Fluss",
+        "en": "river",
+        "allowImage": false
+      },
+      {
+        "de": "See",
+        "en": "lake",
+        "allowImage": false
+      },
+      {
+        "de": "Meer",
+        "en": "sea",
+        "allowImage": false
+      },
+      {
+        "de": "Wald",
+        "en": "forest",
+        "allowImage": false
+      },
+      {
+        "de": "Wiese",
+        "en": "meadow",
+        "allowImage": false
+      },
+      {
+        "de": "Insel",
+        "en": "island",
+        "allowImage": false
+      },
+      {
+        "de": "Wüste",
+        "en": "desert",
+        "allowImage": false
+      },
+      {
+        "de": "Regenwild",
+        "en": "rainforest",
+        "allowImage": false
+      },
+      {
+        "de": "Vulkan",
+        "en": "volcano",
+        "allowImage": false
+      },
+      {
+        "de": "Erdbeben",
+        "en": "earthquake",
+        "allowImage": false
+      },
+      {
+        "de": "Umwelt",
+        "en": "environment",
+        "allowImage": false
+      },
+      {
+        "de": "Recycling",
+        "en": "recycling",
+        "allowImage": false
+      },
+      {
+        "de": "Klima",
+        "en": "climate",
+        "allowImage": false
+      }
+    ],
+    "grade": "6"
+  },
+  {
+    "name": "Klasse 6: Schule & Berufe",
+    "words": [
+      {
+        "de": "Lehrer",
+        "en": "teacher",
+        "allowImage": false
+      },
+      {
+        "de": "Schüler",
+        "en": "student",
+        "allowImage": false
+      },
+      {
+        "de": "Hausaufgaben",
+        "en": "homework",
+        "allowImage": false
+      },
+      {
+        "de": "Prüfung",
+        "en": "exam",
+        "allowImage": false
+      },
+      {
+        "de": "Zeugnis",
+        "en": "report card",
+        "allowImage": false
+      },
+      {
+        "de": "Arzt",
+        "en": "doctor",
+        "allowImage": false
+      },
+      {
+        "de": "Polizist",
+        "en": "police officer",
+        "allowImage": false
+      },
+      {
+        "de": "Feuerwehrmann",
+        "en": "firefighter",
+        "allowImage": false
+      },
+      {
+        "de": "Koch",
+        "en": "cook",
+        "allowImage": false
+      },
+      {
+        "de": "Pilot",
+        "en": "pilot",
+        "allowImage": false
+      },
+      {
+        "de": "Ingenieur",
+        "en": "engineer",
+        "allowImage": false
+      },
+      {
+        "de": "Künstler",
+        "en": "artist",
+        "allowImage": false
+      }
+    ],
+    "grade": "6"
+  },
+  {
+    "name": "Kl. 3: Familie",
+    "words": [
+      {"de": "Mutter", "en": "mother", "allowImage": false},
+      {"de": "Vater", "en": "father", "allowImage": false},
+      {"de": "Bruder", "en": "brother", "allowImage": false},
+      {"de": "Schwester", "en": "sister", "allowImage": false},
+      {"de": "Baby", "en": "baby", "allowImage": false},
+      {"de": "Oma", "en": "grandmother", "allowImage": false},
+      {"de": "Opa", "en": "grandfather", "allowImage": false},
+      {"de": "Familie", "en": "family", "allowImage": false},
+      {"de": "Mädchen", "en": "girl", "allowImage": false},
+      {"de": "Junge", "en": "boy", "allowImage": false}
+    ],
+    "grade": "3"
+  },
+  {
+    "name": "Kl. 3: Schule",
+    "words": [
+      {"de": "Schule", "en": "school", "allowImage": false},
+      {"de": "Buch", "en": "book", "allowImage": false},
+      {"de": "Stift", "en": "pen", "allowImage": false},
+      {"de": "Tasche", "en": "bag", "allowImage": false},
+      {"de": "Tisch", "en": "table", "allowImage": false},
+      {"de": "Stuhl", "en": "chair", "allowImage": false},
+      {"de": "Lehrer", "en": "teacher", "allowImage": false},
+      {"de": "Freund", "en": "friend", "allowImage": false},
+      {"de": "Klasse", "en": "class", "allowImage": false},
+      {"de": "Tafel", "en": "board", "allowImage": false}
+    ],
+    "grade": "3"
+  },
+  {
+    "name": "Kl. 3: Körper",
+    "words": [
+      {"de": "Kopf", "en": "head", "allowImage": false},
+      {"de": "Arm", "en": "arm", "allowImage": false},
+      {"de": "Bein", "en": "leg", "allowImage": false},
+      {"de": "Hand", "en": "hand", "allowImage": false},
+      {"de": "Fuß", "en": "foot", "allowImage": false},
+      {"de": "Auge", "en": "eye", "allowImage": false},
+      {"de": "Ohr", "en": "ear", "allowImage": false},
+      {"de": "Nase", "en": "nose", "allowImage": false},
+      {"de": "Mund", "en": "mouth", "allowImage": false},
+      {"de": "Finger", "en": "finger", "allowImage": false}
+    ],
+    "grade": "3"
+  },
+  {
+    "name": "Kl. 4: Kleidung",
+    "words": [
+      {"de": "Hose", "en": "trousers", "allowImage": false},
+      {"de": "Kleid", "en": "dress", "allowImage": false},
+      {"de": "Rock", "en": "skirt", "allowImage": false},
+      {"de": "Schuh", "en": "shoe", "allowImage": false},
+      {"de": "Socke", "en": "sock", "allowImage": false},
+      {"de": "Mütze", "en": "cap", "allowImage": false},
+      {"de": "Jacke", "en": "jacket", "allowImage": false},
+      {"de": "T-Shirt", "en": "T-shirt", "allowImage": false},
+      {"de": "Pullover", "en": "jumper", "allowImage": false},
+      {"de": "Stiefel", "en": "boots", "allowImage": false}
+    ],
+    "grade": "4"
+  },
+  {
+    "name": "Kl. 4: Wetter",
+    "words": [
+      {"de": "Sonne", "en": "sun", "allowImage": false},
+      {"de": "Regen", "en": "rain", "allowImage": false},
+      {"de": "Schnee", "en": "snow", "allowImage": false},
+      {"de": "Wind", "en": "wind", "allowImage": false},
+      {"de": "Wolke", "en": "cloud", "allowImage": false},
+      {"de": "heiß", "en": "hot", "allowImage": false},
+      {"de": "kalt", "en": "cold", "allowImage": false},
+      {"de": "warm", "en": "warm", "allowImage": false},
+      {"de": "Es regnet.", "en": "It's raining.", "allowImage": false},
+      {"de": "Es schneit.", "en": "It's snowing.", "allowImage": false}
+    ],
+    "grade": "4"
+  },
+  {
+    "name": "Kl. 4: Zuhause",
+    "words": [
+      {"de": "Haus", "en": "house", "allowImage": false},
+      {"de": "Zimmer", "en": "room", "allowImage": false},
+      {"de": "Küche", "en": "kitchen", "allowImage": false},
+      {"de": "Bad", "en": "bathroom", "allowImage": false},
+      {"de": "Schlafzimmer", "en": "bedroom", "allowImage": false},
+      {"de": "Wohnzimmer", "en": "living room", "allowImage": false},
+      {"de": "Garten", "en": "garden", "allowImage": false},
+      {"de": "Fenster", "en": "window", "allowImage": false},
+      {"de": "Tür", "en": "door", "allowImage": false},
+      {"de": "Bett", "en": "bed", "allowImage": false}
+    ],
+    "grade": "4"
+  },
+  {
+    "name": "Kl. 4: Hobbys",
+    "words": [
+      {"de": "schwimmen", "en": "swim", "allowImage": false},
+      {"de": "lesen", "en": "read", "allowImage": false},
+      {"de": "singen", "en": "sing", "allowImage": false},
+      {"de": "tanzen", "en": "dance", "allowImage": false},
+      {"de": "malen", "en": "paint", "allowImage": false},
+      {"de": "spielen", "en": "play", "allowImage": false},
+      {"de": "rennen", "en": "run", "allowImage": false},
+      {"de": "klettern", "en": "climb", "allowImage": false},
+      {"de": "kochen", "en": "cook", "allowImage": false},
+      {"de": "Fahrrad fahren", "en": "ride a bike", "allowImage": false}
+    ],
+    "grade": "4"
+  },
+  {
+    "name": "Kl. 5: Zuhause & Familie",
+    "words": [
+      {"de": "Wohnung", "en": "flat", "allowImage": false},
+      {"de": "Nachbar", "en": "neighbour", "allowImage": false},
+      {"de": "Erdgeschoss", "en": "ground floor", "allowImage": false},
+      {"de": "Treppe", "en": "stairs", "allowImage": false},
+      {"de": "Dachboden", "en": "attic", "allowImage": false},
+      {"de": "Keller", "en": "basement", "allowImage": false},
+      {"de": "Garage", "en": "garage", "allowImage": false},
+      {"de": "Teppich", "en": "carpet", "allowImage": false},
+      {"de": "Regal", "en": "shelf", "allowImage": false},
+      {"de": "Sofa", "en": "sofa", "allowImage": false},
+      {"de": "Schrank", "en": "cupboard", "allowImage": false},
+      {"de": "Spiegel", "en": "mirror", "allowImage": false}
+    ],
+    "grade": "5"
+  },
+  {
+    "name": "Kl. 5: Freizeit & Sport",
+    "words": [
+      {"de": "Mannschaft", "en": "team", "allowImage": false},
+      {"de": "Wettkampf", "en": "competition", "allowImage": false},
+      {"de": "gewinnen", "en": "win", "allowImage": false},
+      {"de": "verlieren", "en": "lose", "allowImage": false},
+      {"de": "trainieren, üben", "en": "practise", "allowImage": false},
+      {"de": "Mitglied", "en": "member", "allowImage": false},
+      {"de": "Ergebnis", "en": "result", "allowImage": false},
+      {"de": "Zuschauer", "en": "spectator", "allowImage": false},
+      {"de": "Schwimmbad", "en": "swimming pool", "allowImage": false},
+      {"de": "Sportplatz", "en": "sports ground", "allowImage": false}
+    ],
+    "grade": "5"
+  },
+  {
+    "name": "Kl. 6: Medien & Technik",
+    "words": [
+      {"de": "Bildschirm", "en": "screen", "allowImage": false},
+      {"de": "Tastatur", "en": "keyboard", "allowImage": false},
+      {"de": "Nachricht", "en": "message", "allowImage": false},
+      {"de": "herunterladen", "en": "download", "allowImage": false},
+      {"de": "hochladen", "en": "upload", "allowImage": false},
+      {"de": "Passwort", "en": "password", "allowImage": false},
+      {"de": "Webseite", "en": "website", "allowImage": false},
+      {"de": "Suchmaschine", "en": "search engine", "allowImage": false},
+      {"de": "Gerät", "en": "device", "allowImage": false},
+      {"de": "Netzwerk", "en": "network", "allowImage": false},
+      {"de": "teilen", "en": "share", "allowImage": false},
+      {"de": "Datei", "en": "file", "allowImage": false}
+    ],
+    "grade": "6"
+  },
+  {
+    "name": "Kl. 6: Gefühle & Eigenschaften",
+    "words": [
+      {"de": "aufgeregt", "en": "excited", "allowImage": false},
+      {"de": "ängstlich", "en": "afraid", "allowImage": false},
+      {"de": "wütend", "en": "angry", "allowImage": false},
+      {"de": "überrascht", "en": "surprised", "allowImage": false},
+      {"de": "stolz", "en": "proud", "allowImage": false},
+      {"de": "eifersüchtig", "en": "jealous", "allowImage": false},
+      {"de": "mutig", "en": "brave", "allowImage": false},
+      {"de": "ehrlich", "en": "honest", "allowImage": false},
+      {"de": "geduldig", "en": "patient", "allowImage": false},
+      {"de": "neugierig", "en": "curious", "allowImage": false},
+      {"de": "schüchtern", "en": "shy", "allowImage": false},
+      {"de": "höflich", "en": "polite", "allowImage": false}
+    ],
+    "grade": "6"
+  },
+  {
+    "name": "Kl. 6: Gesundheit & Körper",
+    "words": [
+      {"de": "Kopfschmerzen", "en": "headache", "allowImage": false},
+      {"de": "Bauchschmerzen", "en": "stomach ache", "allowImage": false},
+      {"de": "Erkältung", "en": "cold", "allowImage": false},
+      {"de": "Fieber", "en": "fever", "allowImage": false},
+      {"de": "Husten", "en": "cough", "allowImage": false},
+      {"de": "Arzt", "en": "doctor", "allowImage": false},
+      {"de": "Medizin", "en": "medicine", "allowImage": false},
+      {"de": "Krankenhaus", "en": "hospital", "allowImage": false},
+      {"de": "gesund", "en": "healthy", "allowImage": false},
+      {"de": "krank", "en": "ill", "allowImage": false},
+      {"de": "sich ausruhen", "en": "rest", "allowImage": false},
+      {"de": "Pflaster", "en": "plaster", "allowImage": false}
+    ],
+    "grade": "6"
   }
 ]
