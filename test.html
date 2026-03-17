@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Lerntrainer TEST</title>
+    <style>
+        html, body { margin: 0; padding: 0; min-height: 100%; background: #f0f4f8; font-family: "Segoe UI", sans-serif; }
+        * { -webkit-user-select: none; user-select: none; }
+        #errors { position: fixed; top: 0; left: 0; right: 0; background: #c00; color: white; padding: 0.8rem; font-size: 0.75rem; word-break: break-all; z-index: 99999; max-height: 50vh; overflow-y: auto; display: none; }
+        #status { position: fixed; bottom: 0; left: 0; right: 0; background: #222; color: #4ade80; padding: 0.5rem; font-size: 0.75rem; z-index: 99998; }
+    </style>
+</head>
+<body>
+<div id="errors"></div>
+<div id="status">Starte...</div>
+<app-shell></app-shell>
+
+<audio src="assets/audio/ding.mp3" preload="auto"></audio>
+<audio src="assets/audio/buzz.mp3" preload="auto"></audio>
+
+<script>
+    var errBox = document.getElementById("errors");
+    var status = document.getElementById("status");
+
+    function log(msg) { status.textContent = msg; }
+    function err(msg) { errBox.style.display = "block"; errBox.innerHTML += "<p>" + msg + "</p>"; }
+
+    window.onerror = function(m, u, l) { err("onerror: " + m + " @ " + u + ":" + l); };
+    window.addEventListener("unhandledrejection", function(e) { err("rejection: " + (e.reason?.message || e.reason)); });
+
+    log("Lade app-shell.js...");
+
+    var s = document.createElement("script");
+    s.type = "module";
+    s.src = "./core/app-shell.js?v=" + Date.now();
+    s.onload = function() { log("app-shell.js geladen! App sollte sichtbar sein."); };
+    s.onerror = function(e) { err("Script FAILED to load: " + s.src); };
+    document.body.appendChild(s);
+</script>
+</body>
+</html>
