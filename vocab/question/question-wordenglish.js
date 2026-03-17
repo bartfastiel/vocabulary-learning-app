@@ -32,7 +32,7 @@ class VocabQuestionWordEnglish extends HTMLElement {
 
         // For English vocab: “Wie heißt X auf Deutsch?”
         // For other subjects: show the answer as a question to match back
-        const isQuiz = this.vocab.de && this.vocab.de.includes(“?”);
+        const isQuiz = this.vocab.de && this.vocab.de.includes("?");
         if (isQuiz) {
             q.textContent = `Was passt zu: \u201e${this.vocab.en}\u201c?`;
         } else {

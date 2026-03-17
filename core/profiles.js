@@ -29,7 +29,7 @@ const RANDOM_BGS = [
 
 export function createProfile(name) {
     const list = getProfiles();
-    const id = "p" + Date.now();
+    const id = "p" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
     const bg = RANDOM_BGS[Math.floor(Math.random() * RANDOM_BGS.length)];
     list.push({ id, name, role: null, points: 0, streakRecord: 0,
                 avatarSelection: null, avatarUnlocked: [], avatarSvg: "", appBg: bg,

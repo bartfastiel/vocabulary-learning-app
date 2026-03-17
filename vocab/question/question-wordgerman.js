@@ -28,7 +28,7 @@ class VocabQuestionWordGerman extends HTMLElement {
 
         // For English vocab: “Wie heißt X auf Englisch?”
         // For other subjects (bio, geo): just show the question directly
-        const isQuiz = this.vocab.de && this.vocab.de.includes(“?”);
+        const isQuiz = this.vocab.de && this.vocab.de.includes("?");
         if (isQuiz) {
             q.textContent = this.vocab.de;
         } else {
