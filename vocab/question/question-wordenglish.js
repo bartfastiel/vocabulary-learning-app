@@ -30,14 +30,9 @@ class VocabQuestionWordEnglish extends HTMLElement {
 
         const q = this.shadowRoot.querySelector(".question");
 
-        // For English vocab: “Wie heißt X auf Deutsch?”
-        // For other subjects: show the answer as a question to match back
-        const isQuiz = this.vocab.de && this.vocab.de.includes(“?”);
-        if (isQuiz) {
-            q.textContent = `Was passt zu: \u201e${this.vocab.en}\u201c?`;
-        } else {
-            q.textContent = `Wie hei\u00dft \u201e${this.vocab.en}\u201c auf Deutsch?`;
-        }
+        // Mirror phrasing from the German→English question,
+        // now asking for the German translation.
+        q.textContent = `Wie heißt „${this.vocab.en}” auf Deutsch?`;
     }
 }
 

@@ -2,26 +2,18 @@
 // Mathe-Trainer für die 5. Klasse.
 // Aufgabentypen: Grundrechenarten, Reihenfolge, Brüche, Geometrie, Dezimalzahlen
 
-const _grade = () => parseInt(localStorage.getItem("userGrade") || "5");
-
-const ALL_MATH_CATEGORIES = [
-    { id: "addition",       name: "\u2795 Addition",         generate: genAddition, grades: [3,4,5,6] },
-    { id: "subtraktion",    name: "\u2796 Subtraktion",      generate: genSubtraktion, grades: [3,4,5,6] },
-    { id: "multiplikation", name: "\u2716\uFE0F Multiplikation",   generate: genMultiplikation, grades: [3,4,5,6] },
-    { id: "division",       name: "\u2797 Division",          generate: genDivision, grades: [3,4,5,6] },
-    { id: "einmaleins",     name: "\uD83D\uDD22 1x1 Training", generate: genEinmaleins, grades: [3,4] },
-    { id: "reihenfolge",    name: "\uD83D\uDD22 Punkt vor Strich", generate: genReihenfolge, grades: [4,5,6] },
-    { id: "brueche",        name: "\uD83C\uDF55 Br\u00fcche",           generate: genBrueche, grades: [5,6] },
-    { id: "dezimal",        name: "\uD83D\uDD1F Dezimalzahlen",    generate: genDezimal, grades: [5,6] },
-    { id: "geometrie",      name: "\uD83D\uDCD0 Geometrie",        generate: genGeometrie, grades: [5,6] },
-    { id: "groessen",       name: "\uD83D\uDCCF Gr\u00f6\u00dfen umrechnen", generate: genGroessen, grades: [4,5,6] },
-    { id: "textaufgaben",   name: "\uD83D\uDCDD Textaufgaben",     generate: genTextaufgaben, grades: [3,4,5,6] },
-    { id: "prozent",        name: "% Prozentrechnung",  generate: genProzent, grades: [6] },
-    { id: "negative",       name: "\u2796 Negative Zahlen",  generate: genNegative, grades: [6] },
+const MATH_CATEGORIES = [
+    { id: "addition",       name: "➕ Addition",         generate: genAddition },
+    { id: "subtraktion",    name: "➖ Subtraktion",      generate: genSubtraktion },
+    { id: "multiplikation", name: "✖️ Multiplikation",   generate: genMultiplikation },
+    { id: "division",       name: "➗ Division",          generate: genDivision },
+    { id: "reihenfolge",    name: "🔢 Punkt vor Strich", generate: genReihenfolge },
+    { id: "brueche",        name: "🍕 Brüche",           generate: genBrueche },
+    { id: "dezimal",        name: "🔟 Dezimalzahlen",    generate: genDezimal },
+    { id: "geometrie",      name: "📐 Geometrie",        generate: genGeometrie },
+    { id: "groessen",       name: "📏 Größen umrechnen", generate: genGroessen },
+    { id: "textaufgaben",   name: "📝 Textaufgaben",     generate: genTextaufgaben },
 ];
-
-// Filter by user's grade
-const MATH_CATEGORIES = ALL_MATH_CATEGORIES.filter(c => c.grades.includes(_grade()));
 
 // ── Generators ─────────────────────────────────────────────────────────────────
 // Each returns { question: string, answer: number|string, choices: string[] }
@@ -55,45 +47,18 @@ function shuffle(arr) {
 }
 
 function genAddition() {
-    const g = _grade();
-    const max = g <= 3 ? 100 : g <= 4 ? 1000 : 9999;
-    const a = randInt(g <= 3 ? 1 : 100, max), b = randInt(1, max);
+    const a = randInt(100, 9999), b = randInt(100, 9999);
     return { question: `${a} + ${b} = ?`, answer: String(a + b), choices: makeChoices(a + b) };
 }
 
 function genSubtraktion() {
-    const g = _grade();
-    const max = g <= 3 ? 100 : g <= 4 ? 1000 : 9999;
-    let a = randInt(g <= 3 ? 10 : 200, max), b = randInt(1, a);
-    return { question: `${a} \u2212 ${b} = ?`, answer: String(a - b), choices: makeChoices(a - b) };
+    let a = randInt(200, 9999), b = randInt(100, a);
+    return { question: `${a} − ${b} = ?`, answer: String(a - b), choices: makeChoices(a - b) };
 }
 
 function genMultiplikation() {
-    const g = _grade();
-    const maxA = g <= 3 ? 10 : g <= 4 ? 12 : 25;
-    const maxB = g <= 3 ? 10 : g <= 4 ? 12 : 25;
-    const a = randInt(2, maxA), b = randInt(2, maxB);
-    return { question: `${a} \u00d7 ${b} = ?`, answer: String(a * b), choices: makeChoices(a * b) };
-}
-
-function genEinmaleins() {
-    const a = randInt(2, 10), b = randInt(2, 10);
-    return { question: `${a} \u00d7 ${b} = ?`, answer: String(a * b), choices: makeChoices(a * b) };
-}
-
-function genProzent() {
-    const pcts = [10, 20, 25, 50, 75];
-    const p = pcts[randInt(0, pcts.length - 1)];
-    const base = randInt(2, 20) * 10;
-    const ans = base * p / 100;
-    return { question: `${p}% von ${base} = ?`, answer: String(ans), choices: makeChoices(ans) };
-}
-
-function genNegative() {
-    const a = randInt(-20, 20), b = randInt(-20, 20);
-    const op = Math.random() < 0.5;
-    if (op) return { question: `(${a}) + (${b}) = ?`, answer: String(a + b), choices: makeChoices(a + b) };
-    return { question: `(${a}) \u2212 (${b}) = ?`, answer: String(a - b), choices: makeChoices(a - b) };
+    const a = randInt(2, 25), b = randInt(2, 25);
+    return { question: `${a} × ${b} = ?`, answer: String(a * b), choices: makeChoices(a * b) };
 }
 
 function genDivision() {
