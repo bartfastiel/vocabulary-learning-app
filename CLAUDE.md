@@ -4,19 +4,84 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Running the App
 
-There is no build system, package manager, or test suite. The app is plain HTML/JS served directly from the filesystem or a static file server.
-
-To run locally, serve from the project root (required for ES module imports and `fetch` calls):
+The app is plain HTML/JS served from a static file server. A `package.json` exists for dev tooling (testing).
 
 ```sh
-# Example using Python
-python -m http.server 8080
-
-# Example using Node
-npx serve .
+npm install          # install dev dependencies (first time)
+npx serve . -l 8080  # serve the app
 ```
 
 Then open `http://localhost:8080` in a browser.
+
+## Testing (MANDATORY)
+
+**Quality gate: All tests MUST pass before any push.** A pre-push hook enforces this automatically.
+
+### Test Stack
+
+- **Vitest** — unit tests (jsdom environment) for isolated modules
+- **Playwright** — E2E tests (Chromium) for all user flows
+- **v8** — coverage provider
+
+### Running Tests
+
+```sh
+npm test                    # run ALL tests (unit + E2E) — this is what the pre-push hook runs
+npm run test:unit           # unit tests only
+npm run test:e2e            # E2E tests only
+npm run test:e2e:headed     # E2E with visible browser (debugging)
+npm run test:unit:watch     # unit tests in watch mode
+npm run test:coverage       # unit tests with coverage report
+```
+
+### Test Structure
+
+```
+tests/
+  unit/               # Vitest unit tests
+    points.test.js    # PointsManager: points, streaks, treasure, dev mode
+    profiles.test.js  # Profile CRUD, activation, snapshots, avatar
+    audio.test.js     # playSound, playVoice, normalization
+  e2e/                # Playwright E2E tests
+    helpers.js        # Shared helpers (freshStart, waitForAppShell, etc.)
+    app-loads.spec.js # App loads without errors, shadow DOM present
+    dashboard.spec.js # Topbar, subject cards, stats, action buttons
+    navigation.spec.js# Subject navigation, back button
+    vocab-trainer.spec.js  # Full vocab training flow
+    vocab-data.spec.js     # vocab.json integrity (structure, duplicates)
+    math-trainer.spec.js   # Math trainer renders and has interactive elements
+    deutsch-trainer.spec.js# Deutsch trainer renders
+    game-lobby.spec.js     # Game lobby opens, shows games
+    avatar-builder.spec.js # Avatar builder opens, has controls
+    profiles.spec.js       # Profile persistence in browser
+    localStorage.spec.js   # All localStorage integrations
+```
+
+### Pre-push Hook
+
+`.githooks/pre-push` runs automatically before every `git push`:
+1. Unit tests (Vitest)
+2. E2E tests (Playwright)
+3. Static checks (vocab.json validity)
+
+Git is configured to use `.githooks/` via `core.hooksPath`.
+
+### Writing New Tests
+
+When adding a new feature:
+1. Write E2E test first (in `tests/e2e/`) covering the user flow
+2. Add unit tests (in `tests/unit/`) for any new isolated logic
+3. Run `npm test` to verify everything passes
+4. Only then commit
+
+### Coverage
+
+Unit test coverage for core modules:
+- `audio.js` — 100%
+- `points.js` — 100%
+- `profiles.js` — 84%
+
+E2E tests cover all remaining UI components and user flows (42 tests across 11 spec files). Web Components with Shadow DOM are not measurable via v8 coverage in jsdom, so E2E tests are the primary safety net for UI components.
 
 ## Architecture
 
