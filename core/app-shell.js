@@ -978,6 +978,7 @@ class AppShell extends HTMLElement {
             const name = nameInput.value.trim();
             if (!name) { nameInput.focus(); return; }
             const id = createProfile(name);
+            assignRandomAvatarIfNeeded(generateRandomAvatar);
             // Save grade to profile and localStorage
             const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
             const p = list.find(p => p.id === id);
