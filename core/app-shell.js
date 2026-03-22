@@ -641,6 +641,15 @@ class AppShell extends HTMLElement {
               <button class="age-btn" data-age="11" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">11</button>
               <button class="age-btn" data-age="12" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">12+</button>
             </div>
+            <p style="font-size:0.85rem;color:#718096;margin:0.5rem 0 0.2rem;font-weight:600">Welche Klasse bist du?</p>
+            <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="grade-select">
+              <button class="grade-btn" data-grade="1" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">1</button>
+              <button class="grade-btn" data-grade="2" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">2</button>
+              <button class="grade-btn" data-grade="3" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">3</button>
+              <button class="grade-btn" data-grade="4" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">4</button>
+              <button class="grade-btn" data-grade="5" style="padding:0.5rem 1rem;border:2px solid #4299e1;border-radius:10px;background:#ebf8ff;font-size:1rem;font-weight:700;cursor:pointer;color:#2b6cb0">5</button>
+              <button class="grade-btn" data-grade="6" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">6</button>
+            </div>
             <div class="profile-form-btns">
               <button id="btn-profile-cancel">Zur\u00fcck</button>
               <button id="btn-profile-create">Erstellen</button>
@@ -784,10 +793,48 @@ class AppShell extends HTMLElement {
           <button class="settings-item" id="home-vocab-edit">\u270F\uFE0F Vokabeln bearbeiten</button>
           <button class="settings-item" id="home-teacher">\uD83C\uDF93 Lehrer-Bereich</button>
           <button class="settings-item" id="home-groups">\uD83D\uDC65 Gruppen</button>
+          <button class="settings-item" id="home-age-grade">\uD83C\uDF82 Alter &amp; Klasse</button>
           <button class="settings-item" id="home-profile">\uD83D\uDD04 Profil wechseln</button>
           <button class="settings-item" id="home-design">\uD83D\uDE80 Klassisches Design</button>
         </div>
 
+      </div>
+
+      <!-- Age & Grade settings overlay -->
+      <div class="bg-overlay" id="age-grade-overlay">
+        <div class="bg-panel" style="max-width:400px">
+          <div class="bg-header">
+            <span class="bg-header-title">\uD83C\uDF82 Alter &amp; Klasse</span>
+            <button class="bg-close" id="age-grade-close">\u2715</button>
+          </div>
+          <div style="padding:1rem;display:flex;flex-direction:column;gap:1rem">
+            <div>
+              <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Wie alt bist du?</p>
+              <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="settings-age-select">
+                <button class="settings-age-btn" data-age="5" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">5</button>
+                <button class="settings-age-btn" data-age="6" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">6</button>
+                <button class="settings-age-btn" data-age="7" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">7</button>
+                <button class="settings-age-btn" data-age="8" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">8</button>
+                <button class="settings-age-btn" data-age="9" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">9</button>
+                <button class="settings-age-btn" data-age="10" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">10</button>
+                <button class="settings-age-btn" data-age="11" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">11</button>
+                <button class="settings-age-btn" data-age="12" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">12+</button>
+              </div>
+            </div>
+            <div>
+              <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Welche Klasse bist du?</p>
+              <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="settings-grade-select">
+                <button class="settings-grade-btn" data-grade="1" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">1</button>
+                <button class="settings-grade-btn" data-grade="2" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">2</button>
+                <button class="settings-grade-btn" data-grade="3" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">3</button>
+                <button class="settings-grade-btn" data-grade="4" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">4</button>
+                <button class="settings-grade-btn" data-grade="5" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">5</button>
+                <button class="settings-grade-btn" data-grade="6" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">6</button>
+              </div>
+            </div>
+            <button id="age-grade-save" style="padding:0.7rem;border:none;border-radius:10px;background:#4299e1;color:white;font-size:1rem;font-weight:bold;cursor:pointer;margin-top:0.3rem">Speichern</button>
+          </div>
+        </div>
       </div>
 
       <!-- Background settings overlay -->
@@ -995,16 +1042,29 @@ class AppShell extends HTMLElement {
             };
         }
 
+        // Grade selection
+        let selectedGrade = "5";
+        for (const btn of this.shadowRoot.querySelectorAll(".grade-btn")) {
+            btn.onclick = () => {
+                this.shadowRoot.querySelectorAll(".grade-btn").forEach(b => {
+                    b.style.borderColor = "#e2e8f0"; b.style.background = "white"; b.style.color = "#2d3748";
+                });
+                btn.style.borderColor = "#4299e1"; btn.style.background = "#ebf8ff"; btn.style.color = "#2b6cb0";
+                selectedGrade = btn.dataset.grade;
+            };
+        }
+
         const doCreate = () => {
             const name = nameInput.value.trim();
             if (!name) { nameInput.focus(); return; }
             const id = createProfile(name);
             assignRandomAvatarIfNeeded(generateRandomAvatar);
-            // Save age to profile and localStorage
+            // Save age and grade to profile and localStorage
             const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
             const p = list.find(p => p.id === id);
-            if (p) { p.age = selectedAge; localStorage.setItem("allProfiles", JSON.stringify(list)); }
+            if (p) { p.age = selectedAge; p.grade = selectedGrade; localStorage.setItem("allProfiles", JSON.stringify(list)); }
             localStorage.setItem("userAge", selectedAge);
+            localStorage.setItem("userGrade", selectedGrade);
             _applyAgeSettings(this, selectedAge);
             finish(id);
         };
@@ -1159,6 +1219,60 @@ class AppShell extends HTMLElement {
             localStorage.setItem("appDesign", "classic");
             location.reload();
         };
+        // Age & Grade settings overlay
+        const ageGradeOverlay = this.shadowRoot.getElementById("age-grade-overlay");
+        this.shadowRoot.getElementById("home-age-grade").onclick = () => {
+            settingsMenu.classList.remove("open");
+            // Highlight current values
+            const curAge = localStorage.getItem("userAge") || "";
+            const curGrade = localStorage.getItem("userGrade") || "";
+            this.shadowRoot.querySelectorAll(".settings-age-btn").forEach(b => {
+                const match = b.dataset.age === curAge;
+                b.style.borderColor = match ? "#4299e1" : "#e2e8f0";
+                b.style.background = match ? "#ebf8ff" : "white";
+                b.style.color = match ? "#2b6cb0" : "#2d3748";
+            });
+            this.shadowRoot.querySelectorAll(".settings-grade-btn").forEach(b => {
+                const match = b.dataset.grade === curGrade;
+                b.style.borderColor = match ? "#4299e1" : "#e2e8f0";
+                b.style.background = match ? "#ebf8ff" : "white";
+                b.style.color = match ? "#2b6cb0" : "#2d3748";
+            });
+            ageGradeOverlay._selAge = curAge;
+            ageGradeOverlay._selGrade = curGrade;
+            ageGradeOverlay.classList.add("active");
+        };
+        for (const btn of this.shadowRoot.querySelectorAll(".settings-age-btn")) {
+            btn.onclick = () => {
+                this.shadowRoot.querySelectorAll(".settings-age-btn").forEach(b => {
+                    b.style.borderColor = "#e2e8f0"; b.style.background = "white"; b.style.color = "#2d3748";
+                });
+                btn.style.borderColor = "#4299e1"; btn.style.background = "#ebf8ff"; btn.style.color = "#2b6cb0";
+                ageGradeOverlay._selAge = btn.dataset.age;
+            };
+        }
+        for (const btn of this.shadowRoot.querySelectorAll(".settings-grade-btn")) {
+            btn.onclick = () => {
+                this.shadowRoot.querySelectorAll(".settings-grade-btn").forEach(b => {
+                    b.style.borderColor = "#e2e8f0"; b.style.background = "white"; b.style.color = "#2d3748";
+                });
+                btn.style.borderColor = "#4299e1"; btn.style.background = "#ebf8ff"; btn.style.color = "#2b6cb0";
+                ageGradeOverlay._selGrade = btn.dataset.grade;
+            };
+        }
+        this.shadowRoot.getElementById("age-grade-save").onclick = () => {
+            if (ageGradeOverlay._selAge) {
+                localStorage.setItem("userAge", ageGradeOverlay._selAge);
+                _applyAgeSettings(this, ageGradeOverlay._selAge);
+            }
+            if (ageGradeOverlay._selGrade) {
+                localStorage.setItem("userGrade", ageGradeOverlay._selGrade);
+            }
+            saveSnapshot();
+            ageGradeOverlay.classList.remove("active");
+        };
+        this.shadowRoot.getElementById("age-grade-close").onclick = () => ageGradeOverlay.classList.remove("active");
+
         // Background settings overlay
         const bgOverlay = this.shadowRoot.getElementById("bg-overlay");
         this.shadowRoot.getElementById("home-bg").onclick = () => { settingsMenu.classList.remove("open"); bgOverlay.classList.add("active"); };
