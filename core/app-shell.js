@@ -19,15 +19,21 @@ import { getProfiles, getActiveId, getActiveProfile, createProfile, deleteProfil
 
 function _applyAgeSettings(host, age) {
     const a = parseInt(age) || 10;
-    // Younger kids get larger base font → all rem values scale up
+    // Scale font size based on age — younger = bigger, older = can handle smaller
     let size;
-    if (a <= 6)       size = "120%";
-    else if (a <= 8)  size = "110%";
-    else if (a <= 10) size = "100%";
-    else              size = "95%";
+    if (a <= 5)       size = "150%";
+    else if (a <= 6)  size = "140%";
+    else if (a <= 7)  size = "130%";
+    else if (a <= 8)  size = "120%";
+    else if (a <= 9)  size = "110%";
+    else if (a <= 11) size = "100%";
+    else if (a <= 14) size = "95%";
+    else if (a >= 60) size = "130%";
+    else if (a >= 50) size = "115%";
+    else              size = "100%";
     document.documentElement.style.fontSize = size;
-    if (a <= 8) host.setAttribute("data-age", "young");
-    else        host.removeAttribute("data-age");
+    if (a <= 8 || a >= 60) host.setAttribute("data-age", "young");
+    else                   host.removeAttribute("data-age");
 }
 
 class AppShell extends HTMLElement {
@@ -635,16 +641,7 @@ class AppShell extends HTMLElement {
             <input id="input-profile-name" type="text" placeholder="Dein Name..."
                    autocomplete="off" autocorrect="off" spellcheck="false"/>
             <p style="font-size:0.85rem;color:#718096;margin:0.3rem 0 0.2rem;font-weight:600">Wie alt bist du?</p>
-            <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="age-select">
-              <button class="age-btn" data-age="5" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">5</button>
-              <button class="age-btn" data-age="6" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">6</button>
-              <button class="age-btn" data-age="7" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">7</button>
-              <button class="age-btn" data-age="8" style="padding:0.5rem 1rem;border:2px solid #4299e1;border-radius:10px;background:#ebf8ff;font-size:1rem;font-weight:700;cursor:pointer;color:#2b6cb0">8</button>
-              <button class="age-btn" data-age="9" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">9</button>
-              <button class="age-btn" data-age="10" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">10</button>
-              <button class="age-btn" data-age="11" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">11</button>
-              <button class="age-btn" data-age="12" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">12+</button>
-            </div>
+            <input id="input-profile-age" type="number" min="1" max="90" value="8" style="width:5rem;padding:0.5rem;border:2px solid #e2e8f0;border-radius:10px;font-size:1.2rem;font-weight:700;text-align:center;outline:none" /><span style="font-size:0.85rem;color:#718096;margin-left:0.4rem">Jahre</span>
             <p style="font-size:0.85rem;color:#718096;margin:0.5rem 0 0.2rem;font-weight:600">Welche Klasse bist du?</p>
             <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="grade-select">
               <button class="grade-btn" data-grade="1" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">1</button>
@@ -814,16 +811,7 @@ class AppShell extends HTMLElement {
           <div style="padding:1rem;display:flex;flex-direction:column;gap:1rem">
             <div>
               <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Wie alt bist du?</p>
-              <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="settings-age-select">
-                <button class="settings-age-btn" data-age="5" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">5</button>
-                <button class="settings-age-btn" data-age="6" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">6</button>
-                <button class="settings-age-btn" data-age="7" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">7</button>
-                <button class="settings-age-btn" data-age="8" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">8</button>
-                <button class="settings-age-btn" data-age="9" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">9</button>
-                <button class="settings-age-btn" data-age="10" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">10</button>
-                <button class="settings-age-btn" data-age="11" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">11</button>
-                <button class="settings-age-btn" data-age="12" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">12+</button>
-              </div>
+              <input id="settings-age-input" type="number" min="1" max="90" style="width:5rem;padding:0.5rem;border:2px solid #e2e8f0;border-radius:10px;font-size:1.2rem;font-weight:700;text-align:center;outline:none" /><span style="font-size:0.85rem;color:#718096;margin-left:0.4rem">Jahre</span>
             </div>
             <div>
               <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Welche Klasse bist du?</p>
@@ -1034,17 +1022,8 @@ class AppShell extends HTMLElement {
         this.shadowRoot.getElementById("btn-new-profile").onclick = () => showNew();
         this.shadowRoot.getElementById("btn-profile-cancel").onclick = () => showPick();
 
-        // Age selection
-        let selectedAge = "8";
-        for (const btn of this.shadowRoot.querySelectorAll(".age-btn")) {
-            btn.onclick = () => {
-                this.shadowRoot.querySelectorAll(".age-btn").forEach(b => {
-                    b.style.borderColor = "#e2e8f0"; b.style.background = "white"; b.style.color = "#2d3748";
-                });
-                btn.style.borderColor = "#4299e1"; btn.style.background = "#ebf8ff"; btn.style.color = "#2b6cb0";
-                selectedAge = btn.dataset.age;
-            };
-        }
+        // Age input
+        const ageInput = this.shadowRoot.getElementById("input-profile-age");
 
         // Grade selection
         let selectedGrade = "5";
@@ -1066,10 +1045,11 @@ class AppShell extends HTMLElement {
             // Save age and grade to profile and localStorage
             const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
             const p = list.find(p => p.id === id);
-            if (p) { p.age = selectedAge; p.grade = selectedGrade; localStorage.setItem("allProfiles", JSON.stringify(list)); }
-            localStorage.setItem("userAge", selectedAge);
+            const age = String(Math.min(90, Math.max(1, parseInt(ageInput.value) || 8)));
+            if (p) { p.age = age; p.grade = selectedGrade; localStorage.setItem("allProfiles", JSON.stringify(list)); }
+            localStorage.setItem("userAge", age);
             localStorage.setItem("userGrade", selectedGrade);
-            _applyAgeSettings(this, selectedAge);
+            _applyAgeSettings(this, age);
             finish(id);
         };
         this.shadowRoot.getElementById("btn-profile-create").onclick = doCreate;
@@ -1225,36 +1205,20 @@ class AppShell extends HTMLElement {
         };
         // Age & Grade settings overlay
         const ageGradeOverlay = this.shadowRoot.getElementById("age-grade-overlay");
+        const settingsAgeInput = this.shadowRoot.getElementById("settings-age-input");
         this.shadowRoot.getElementById("home-age-grade").onclick = () => {
             settingsMenu.classList.remove("open");
-            // Highlight current values
-            const curAge = localStorage.getItem("userAge") || "";
+            settingsAgeInput.value = localStorage.getItem("userAge") || "8";
             const curGrade = localStorage.getItem("userGrade") || "";
-            this.shadowRoot.querySelectorAll(".settings-age-btn").forEach(b => {
-                const match = b.dataset.age === curAge;
-                b.style.borderColor = match ? "#4299e1" : "#e2e8f0";
-                b.style.background = match ? "#ebf8ff" : "white";
-                b.style.color = match ? "#2b6cb0" : "#2d3748";
-            });
             this.shadowRoot.querySelectorAll(".settings-grade-btn").forEach(b => {
                 const match = b.dataset.grade === curGrade;
                 b.style.borderColor = match ? "#4299e1" : "#e2e8f0";
                 b.style.background = match ? "#ebf8ff" : "white";
                 b.style.color = match ? "#2b6cb0" : "#2d3748";
             });
-            ageGradeOverlay._selAge = curAge;
             ageGradeOverlay._selGrade = curGrade;
             ageGradeOverlay.classList.add("active");
         };
-        for (const btn of this.shadowRoot.querySelectorAll(".settings-age-btn")) {
-            btn.onclick = () => {
-                this.shadowRoot.querySelectorAll(".settings-age-btn").forEach(b => {
-                    b.style.borderColor = "#e2e8f0"; b.style.background = "white"; b.style.color = "#2d3748";
-                });
-                btn.style.borderColor = "#4299e1"; btn.style.background = "#ebf8ff"; btn.style.color = "#2b6cb0";
-                ageGradeOverlay._selAge = btn.dataset.age;
-            };
-        }
         for (const btn of this.shadowRoot.querySelectorAll(".settings-grade-btn")) {
             btn.onclick = () => {
                 this.shadowRoot.querySelectorAll(".settings-grade-btn").forEach(b => {
@@ -1265,10 +1229,9 @@ class AppShell extends HTMLElement {
             };
         }
         this.shadowRoot.getElementById("age-grade-save").onclick = () => {
-            if (ageGradeOverlay._selAge) {
-                localStorage.setItem("userAge", ageGradeOverlay._selAge);
-                _applyAgeSettings(this, ageGradeOverlay._selAge);
-            }
+            const age = String(Math.min(90, Math.max(1, parseInt(settingsAgeInput.value) || 8)));
+            localStorage.setItem("userAge", age);
+            _applyAgeSettings(this, age);
             if (ageGradeOverlay._selGrade) {
                 localStorage.setItem("userGrade", ageGradeOverlay._selGrade);
             }
