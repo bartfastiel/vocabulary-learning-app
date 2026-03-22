@@ -19,11 +19,15 @@ import { getProfiles, getActiveId, getActiveProfile, createProfile, deleteProfil
 
 function _applyAgeSettings(host, age) {
     const a = parseInt(age) || 10;
-    // Younger kids get larger text and higher contrast
-    if (a <= 6)       { host.style.fontSize = "1.25rem"; host.setAttribute("data-age", "young"); }
-    else if (a <= 8)  { host.style.fontSize = "1.1rem";  host.setAttribute("data-age", "young"); }
-    else if (a <= 10) { host.style.fontSize = "1rem";    host.removeAttribute("data-age"); }
-    else              { host.style.fontSize = "0.95rem"; host.removeAttribute("data-age"); }
+    // Younger kids get larger base font → all rem values scale up
+    let size;
+    if (a <= 6)       size = "120%";
+    else if (a <= 8)  size = "110%";
+    else if (a <= 10) size = "100%";
+    else              size = "95%";
+    document.documentElement.style.fontSize = size;
+    if (a <= 8) host.setAttribute("data-age", "young");
+    else        host.removeAttribute("data-age");
 }
 
 class AppShell extends HTMLElement {
