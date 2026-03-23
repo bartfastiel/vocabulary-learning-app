@@ -812,6 +812,17 @@ class AppShell extends HTMLElement {
               </div>
             </div>
             <div>
+              <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Textfarbe</p>
+              <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap" id="settings-textcolor-select">
+                <button class="settings-color-btn" data-color="#ffffff" style="width:2.2rem;height:2.2rem;border-radius:50%;border:2px solid #e2e8f0;background:#ffffff;cursor:pointer" title="Wei\u00df"></button>
+                <button class="settings-color-btn" data-color="#333333" style="width:2.2rem;height:2.2rem;border-radius:50%;border:2px solid #e2e8f0;background:#333333;cursor:pointer" title="Schwarz"></button>
+                <button class="settings-color-btn" data-color="#fbbf24" style="width:2.2rem;height:2.2rem;border-radius:50%;border:2px solid #e2e8f0;background:#fbbf24;cursor:pointer" title="Gelb"></button>
+                <button class="settings-color-btn" data-color="#38bdf8" style="width:2.2rem;height:2.2rem;border-radius:50%;border:2px solid #e2e8f0;background:#38bdf8;cursor:pointer" title="Blau"></button>
+                <button class="settings-color-btn" data-color="#4ade80" style="width:2.2rem;height:2.2rem;border-radius:50%;border:2px solid #e2e8f0;background:#4ade80;cursor:pointer" title="Gr\u00fcn"></button>
+                <button class="settings-color-btn" data-color="#f472b6" style="width:2.2rem;height:2.2rem;border-radius:50%;border:2px solid #e2e8f0;background:#f472b6;cursor:pointer" title="Rosa"></button>
+              </div>
+            </div>
+            <div>
               <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Welche Klasse bist du?</p>
               <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="settings-grade-select">
                 <button class="settings-grade-btn" data-grade="1" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">1</button>
@@ -1211,11 +1222,30 @@ class AppShell extends HTMLElement {
             settingsFontLabel.textContent = settingsFontInput.value + "%";
             _applyFontSize(this, settingsFontInput.value);
         };
+        // Text color buttons
+        const colorBtns = this.shadowRoot.querySelectorAll(".settings-color-btn");
+        ageGradeOverlay._selColor = localStorage.getItem("textColor") || "#ffffff";
+        const highlightColorBtn = (color) => {
+            colorBtns.forEach(b => {
+                const match = b.dataset.color === color;
+                b.style.borderColor = match ? "#4299e1" : "#e2e8f0";
+                b.style.transform = match ? "scale(1.2)" : "scale(1)";
+            });
+        };
+        for (const cb of colorBtns) {
+            cb.onclick = () => {
+                ageGradeOverlay._selColor = cb.dataset.color;
+                highlightColorBtn(cb.dataset.color);
+            };
+        }
+
         this.shadowRoot.getElementById("home-age-grade").onclick = () => {
             settingsMenu.classList.remove("open");
             const cur = localStorage.getItem("fontSize") || "100";
             settingsFontInput.value = cur;
             settingsFontLabel.textContent = cur + "%";
+            ageGradeOverlay._selColor = localStorage.getItem("textColor") || "#ffffff";
+            highlightColorBtn(ageGradeOverlay._selColor);
             const curGrade = localStorage.getItem("userGrade") || "";
             this.shadowRoot.querySelectorAll(".settings-grade-btn").forEach(b => {
                 const match = b.dataset.grade === curGrade;
@@ -1239,6 +1269,9 @@ class AppShell extends HTMLElement {
             const fs = String(Math.min(150, Math.max(80, parseInt(settingsFontInput.value) || 100)));
             localStorage.setItem("fontSize", fs);
             _applyFontSize(this, fs);
+            if (ageGradeOverlay._selColor) {
+                localStorage.setItem("textColor", ageGradeOverlay._selColor);
+            }
             if (ageGradeOverlay._selGrade) {
                 localStorage.setItem("userGrade", ageGradeOverlay._selGrade);
             }

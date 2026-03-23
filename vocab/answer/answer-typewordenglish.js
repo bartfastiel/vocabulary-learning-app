@@ -92,33 +92,39 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
             if (e.key === "Enter" && !button.disabled) button.click();
         });
 
+        const textColor = localStorage.getItem("textColor") || "#ffffff";
+        input.style.color = textColor;
+
         let answered = false;
-        let wasCorrect = false;
         button.onclick = () => {
-            if (!answered) {
-                answered = true;
-                const user = input.value.trim().toLowerCase();
-                const isCorrect = user === correct;
-                wasCorrect = isCorrect;
-                input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
-                (isCorrect ? this.soundCorrect : this.soundWrong).play();
-                playVoice(this.word.en);
-                this.updatePoints(isCorrect ? +1 : -1);
-                this.updateStreak(isCorrect);
-                input.disabled = true;
+            if (answered) return;
+            answered = true;
+            const user = input.value.trim().toLowerCase();
+            const isCorrect = user === correct;
+            input.style.backgroundColor = isCorrect ? "#81c784" : "#e57373";
+            (isCorrect ? this.soundCorrect : this.soundWrong).play();
+            playVoice(this.word.en);
+            this.updatePoints(isCorrect ? +1 : -1);
+            this.updateStreak(isCorrect);
+            input.disabled = true;
+            button.disabled = true;
 
-                // show correct answer if user was wrong
-                if (!isCorrect) {
-                    feedback.innerHTML = `<div class="correct-answer">Richtig wäre: <b>${this.word.en}</b></div>`;
-                }
+            if (!isCorrect) {
+                feedback.innerHTML = `<div class="correct-answer">Richtig wäre: <b>${this.word.en}</b></div>`;
+            }
 
-                button.innerHTML = "Nächste Frage";
-            } else {
+            this.dispatchEvent(new CustomEvent("checked", {
+                bubbles: true,
+                detail: { correct: isCorrect }
+            }));
+
+            const delay = isCorrect ? 2000 : 3500;
+            setTimeout(() => {
                 this.dispatchEvent(new CustomEvent("answered", {
                     bubbles: true,
-                    detail: { correct: wasCorrect }
+                    detail: { correct: isCorrect }
                 }));
-            }
+            }, delay);
         };
     }
 }

@@ -79,13 +79,6 @@ class VocabAnswerChooseImage extends HTMLElement {
         const nextBtn = this.shadowRoot.querySelector("next-button");
         let wasCorrect = false;
 
-        nextBtn.addEventListener("next", () => {
-            this.dispatchEvent(new CustomEvent("answered", {
-                bubbles: true,
-                detail: { correct: wasCorrect }
-            }));
-        });
-
         let correctElement = null;
 
         options.forEach(opt => {
@@ -96,7 +89,7 @@ class VocabAnswerChooseImage extends HTMLElement {
                 .toLowerCase()
                 .replaceAll(/[^a-z0-9]/g, "_");
             img.src = `assets/img/${fileSafe}.png`
-            img.alt = ""; // no visible text, per your rule
+            img.alt = "";
             btn.appendChild(img);
 
             btn.onclick = () => {
@@ -108,17 +101,26 @@ class VocabAnswerChooseImage extends HTMLElement {
                 this.updatePoints(isCorrect ? +1 : -1);
                 this.updateStreak(isCorrect);
 
-                // Disable all buttons
                 Array.from(optionsDiv.querySelectorAll("button")).forEach(b => (b.disabled = true));
 
-                // Highlight the correct one if wrong
                 if (!isCorrect) {
                     if (correctElement) {
                         correctElement.classList.add("would-have-been-correct");
                     }
                 }
 
-                nextBtn.show();
+                this.dispatchEvent(new CustomEvent("checked", {
+                    bubbles: true,
+                    detail: { correct: isCorrect }
+                }));
+
+                const delay = isCorrect ? 2000 : 3500;
+                setTimeout(() => {
+                    this.dispatchEvent(new CustomEvent("answered", {
+                        bubbles: true,
+                        detail: { correct: isCorrect }
+                    }));
+                }, delay);
             };
 
             optionsDiv.appendChild(btn);
