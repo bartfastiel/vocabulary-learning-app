@@ -54,10 +54,9 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
         button:hover { background-color: #ffcc80; }
         .correct-answer {
           margin-top: 0.6rem;
-          color: #333;
+          color: #fff;
           font-style: italic;
           font-size: 1rem;
-          opacity: 0.8;
         }
       </style>
 
