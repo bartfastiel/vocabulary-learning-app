@@ -69,15 +69,25 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
         const nextBtn = this.shadowRoot.querySelector("next-button");
         let wasCorrect = false;
 
+        let timer = null;
+        const advance = (correct) => {
+            if (timer) { clearTimeout(timer); timer = null; }
+            this.dispatchEvent(new CustomEvent("answered", {
+                bubbles: true, detail: { correct }
+            }));
+        };
+
+        nextBtn.addEventListener("next", () => advance(wasCorrect));
+
         options.forEach(opt => {
             const listenBtn = document.createElement("button");
             listenBtn.className = "listen-btn";
-            listenBtn.textContent = "🔈 Anhören";
+            listenBtn.textContent = "\uD83D\uDD08 Anh\u00f6ren";
             listenBtn.onclick = () => playVoice(opt);
 
             const chooseBtn = document.createElement("button");
             chooseBtn.className = "choose-btn";
-            chooseBtn.textContent = "Antwort wählen";
+            chooseBtn.textContent = "Antwort w\u00e4hlen";
 
             chooseBtn.onclick = () => {
                 const isCorrect = opt === correct;
@@ -102,17 +112,11 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
                 }
 
                 this.dispatchEvent(new CustomEvent("checked", {
-                    bubbles: true,
-                    detail: { correct: isCorrect }
+                    bubbles: true, detail: { correct: isCorrect }
                 }));
 
-                const delay = isCorrect ? 2000 : 3500;
-                setTimeout(() => {
-                    this.dispatchEvent(new CustomEvent("answered", {
-                        bubbles: true,
-                        detail: { correct: isCorrect }
-                    }));
-                }, delay);
+                nextBtn.show();
+                timer = setTimeout(() => advance(isCorrect), isCorrect ? 2000 : 3500);
             };
 
             optionsDiv.appendChild(listenBtn);
