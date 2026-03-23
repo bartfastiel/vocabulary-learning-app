@@ -1,13 +1,3 @@
-// game/game-lobby.js
-//
-// Central hub for all fun-games.
-// Usage (from app-shell):
-//   gameLobby.pointsManager = pointsManager;
-//   gameLobby.open();
-//
-// Internally manages three screens: list → playing → result.
-// Deducts cost on game start, awards pointsEarned on game end.
-// All events from child game components are caught on this.shadowRoot.
 
 import "./rocket-game.js";
 import "./flappy-game.js";
@@ -32,7 +22,6 @@ import "./doodlejump-game.js";
 import "./2048-game.js";
 import "./minesweeper-game.js";
 import "./asteroids-game.js";
-// racing-game removed
 import "./quiz-game.js";
 import "./craft-game.js";
 
@@ -225,7 +214,6 @@ function saveHighscore(id, score) {
     return false;
 }
 
-// ─── teacher restrictions (cached, loaded in background) ─────────────────────
 let _cachedPlayAllowed = { allowed: true };
 let _cachedBlockedGames = {};
 setTimeout(() => {
@@ -241,8 +229,6 @@ setTimeout(() => {
     setInterval(refresh, 30000);
 }, 3000);
 
-// ─── component ────────────────────────────────────────────────────────────────
-
 class GameLobby extends HTMLElement {
     constructor() {
         super();
@@ -256,8 +242,6 @@ class GameLobby extends HTMLElement {
         this._setupGlobalListeners();
     }
 
-    // ── public API ────────────────────────────────────────────────────────────
-
     open() {
         this.shadowRoot.querySelector(".overlay").classList.add("active");
         this._showList();
@@ -267,8 +251,6 @@ class GameLobby extends HTMLElement {
         this._clearSlot();
         this.shadowRoot.querySelector(".overlay").classList.remove("active");
     }
-
-    // ── shell ─────────────────────────────────────────────────────────────────
 
     _renderShell() {
         this.shadowRoot.innerHTML = `
@@ -281,7 +263,6 @@ class GameLobby extends HTMLElement {
         }
         .overlay.active { display: flex; }
 
-        /* ── list screen ── */
         .list-screen {
           display: flex; flex-direction: column;
           height: 100%; overflow: hidden;
@@ -352,7 +333,6 @@ class GameLobby extends HTMLElement {
           border-radius: 6px; padding: 0.1rem 0.4rem;
         }
 
-        /* ── play screen ── */
         .play-screen {
           position: relative; width: 100%; height: 100%;
           display: flex; align-items: center; justify-content: center;
@@ -369,7 +349,6 @@ class GameLobby extends HTMLElement {
         }
         .quit-btn:hover { background: rgba(255,80,80,0.5); }
 
-        /* ── result screen ── */
         .result-screen {
           display: flex; align-items: center; justify-content: center;
           width: 100%; height: 100%;
@@ -401,7 +380,6 @@ class GameLobby extends HTMLElement {
         .btn-again:hover, .btn-back:hover { filter: brightness(0.92); }
         .btn-again:disabled { opacity: 0.4; cursor: default; filter: none; }
 
-        /* screen visibility */
         [hidden] { display: none !important; }
       </style>
 
@@ -440,20 +418,15 @@ class GameLobby extends HTMLElement {
 
       </div>`;
 
-        // static button wiring
         this.shadowRoot.querySelector(".close-lobby-btn").onclick = () => this.close();
         this.shadowRoot.getElementById("btn-back").onclick  = () => this._showList();
         this.shadowRoot.getElementById("quit-btn").onclick  = () => this._handleQuit();
     }
 
-    // ── listeners for game events ─────────────────────────────────────────────
-
     _setupGlobalListeners() {
         this.shadowRoot.addEventListener("game-over",   e => this._handleGameOver(e));
         this.shadowRoot.addEventListener("close-game",  ()  => this._handleCloseGame());
     }
-
-    // ── screens ───────────────────────────────────────────────────────────────
 
     _showList() {
         this._clearSlot();
@@ -469,7 +442,6 @@ class GameLobby extends HTMLElement {
         this.shadowRoot.getElementById("play-screen").hidden   = false;
         this.shadowRoot.getElementById("result-screen").hidden = true;
 
-        // hide the lobby quit button for rocket-game (has its own)
         this.shadowRoot.getElementById("quit-btn").hidden = (game.id === "rocket");
 
         const el = document.createElement(game.component);
@@ -500,15 +472,12 @@ class GameLobby extends HTMLElement {
         this.shadowRoot.getElementById("r-hs").textContent =
             isNewHS ? "🎉 Neuer Highscore!" : "";
 
-        // "Play again" — check if still affordable
         const canAfford = this._pm()?.points >= game.cost;
         const btnAgain  = this.shadowRoot.getElementById("btn-again");
         btnAgain.disabled = !canAfford;
         btnAgain.title    = canAfford ? "" : `Zu wenig Punkte (${game.cost} benötigt)`;
         btnAgain.onclick  = () => this._startGame(game.id);
     }
-
-    // ── game lifecycle ────────────────────────────────────────────────────────
 
     _renderCards() {
         const pm = this._pm();
@@ -519,7 +488,6 @@ class GameLobby extends HTMLElement {
         this.shadowRoot.getElementById("lobby-points").textContent =
             `${pts} Punkt${pts !== 1 ? "e" : ""}`;
 
-        // Use cached teacher restrictions (refreshed in background)
         const playCheck = _cachedPlayAllowed;
 
         grid.innerHTML = GAMES.map(g => {
@@ -576,7 +544,6 @@ class GameLobby extends HTMLElement {
 
     _handleCloseGame() {
         if (!this._activeGame) return;
-        // rocket-game: no score, no points earned; just show a minimal result
         this._showResult(null, 0, false);
     }
 
@@ -584,8 +551,6 @@ class GameLobby extends HTMLElement {
         this._clearSlot();
         this._showList();
     }
-
-    // ── helpers ───────────────────────────────────────────────────────────────
 
     _pm() { return this.pointsManager ?? null; }
 }

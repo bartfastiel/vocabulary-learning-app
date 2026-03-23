@@ -1,8 +1,3 @@
-// game/rocket-game.js
-//
-// A direct modularization of the original rocket mini-game.
-// Functionality, visuals, and algorithms are IDENTICAL to the inline version.
-//
 
 class RocketGame extends HTMLElement {
     constructor() {
@@ -108,7 +103,6 @@ class RocketGame extends HTMLElement {
     }
 
     disconnectedCallback() {
-        // clean up document-level listeners and animation loop
         if (this._cleanupFn) this._cleanupFn();
     }
 
@@ -198,7 +192,7 @@ class RocketGame extends HTMLElement {
 
         canvas.addEventListener("touchend", () => {
             touchX = null;
-            hasShotThisTouch = false; // wieder erlauben bei neuem Touch
+            hasShotThisTouch = false;
             e.preventDefault();
         }, {passive: true});
 

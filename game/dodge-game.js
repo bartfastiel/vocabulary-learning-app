@@ -1,6 +1,3 @@
-// game/dodge-game.js
-// Ausweichen: move your character left/right to dodge falling obstacles. Survive as long as possible.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 class DodgeGame extends HTMLElement {
     constructor() {
@@ -60,7 +57,6 @@ class DodgeGame extends HTMLElement {
             if (e.key === "ArrowRight" || e.key === "d") this._moveRight = false;
         }, sig);
 
-        // touch: move toward touch X
         this._touchX = null;
         this._cv.addEventListener("touchstart", e => {
             const r = this._cv.getBoundingClientRect();
@@ -94,11 +90,9 @@ class DodgeGame extends HTMLElement {
         }
         this._px = Math.max(this._pw / 2, Math.min(this._W - this._pw / 2, this._px));
 
-        // score
         this._score += dt;
         this._difficulty = 1 + this._score / 15;
 
-        // spawn
         this._spawnTimer -= dt;
         if (this._spawnTimer <= 0) {
             this._spawnTimer = Math.max(0.2, 0.7 / this._difficulty);
@@ -113,13 +107,11 @@ class DodgeGame extends HTMLElement {
             });
         }
 
-        // move obstacles
         for (let i = this._obstacles.length - 1; i >= 0; i--) {
             const o = this._obstacles[i];
             o.y += o.speed * dt;
             if (o.y > this._H + 20) { this._obstacles.splice(i, 1); continue; }
 
-            // collision
             const playerY = this._H - 40;
             if (o.y + o.h > playerY && o.y < playerY + 24 &&
                 o.x + o.w > this._px - this._pw / 2 && o.x < this._px + this._pw / 2) {
@@ -131,11 +123,9 @@ class DodgeGame extends HTMLElement {
 
     _draw() {
         const ctx = this._ctx;
-        // background
         ctx.fillStyle = "#0a1628";
         ctx.fillRect(0, 0, this._W, this._H);
 
-        // stars
         ctx.fillStyle = "rgba(255,255,255,0.15)";
         for (let i = 0; i < 30; i++) {
             const sx = (i * 97 + 13) % this._W;
@@ -143,7 +133,6 @@ class DodgeGame extends HTMLElement {
             ctx.fillRect(sx, sy, 2, 2);
         }
 
-        // obstacles
         ctx.font = "20px sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -151,7 +140,6 @@ class DodgeGame extends HTMLElement {
             ctx.fillText(o.emoji, o.x + o.w / 2, o.y + o.h / 2);
         }
 
-        // player
         const py = this._H - 40;
         ctx.fillStyle = "#4dd0e1";
         ctx.beginPath();
@@ -160,7 +148,6 @@ class DodgeGame extends HTMLElement {
         ctx.font = "18px sans-serif";
         ctx.fillText("🛡️", this._px, py + 12);
 
-        // HUD
         ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.beginPath(); ctx.roundRect(4, 4, 130, 28, 6); ctx.fill();
         ctx.fillStyle = "white"; ctx.font = "bold 14px 'Segoe UI',sans-serif";

@@ -1,6 +1,3 @@
-// game/doodlejump-game.js
-// Hoch Springer: Doodle Jump style - bounce upwards on platforms, go as high as possible.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 const DJ_W = 300, DJ_H = 450;
 
@@ -51,7 +48,6 @@ class DoodleJumpGame extends HTMLElement {
         this._alive = true;
         this._facingRight = true;
 
-        // generate initial platforms
         this._platforms = [];
         for (let i = 0; i < 8; i++) {
             this._platforms.push({
@@ -60,7 +56,6 @@ class DoodleJumpGame extends HTMLElement {
                 w: 60, type: "normal",
             });
         }
-        // ensure a platform under player
         this._platforms[0].x = this._px - 15;
         this._platforms[0].y = this._py + this._ph + 5;
 
@@ -79,7 +74,6 @@ class DoodleJumpGame extends HTMLElement {
             if ((e.key === "ArrowRight" || e.key === "d") && this._pvx > 0) this._pvx = 0;
         }, sig);
 
-        // tilt / touch
         this._touchX = null;
         this._cv.addEventListener("touchstart", e => {
             const r = this._cv.getBoundingClientRect();
@@ -103,7 +97,6 @@ class DoodleJumpGame extends HTMLElement {
     }
 
     _update(dt) {
-        // touch input
         if (this._touchX !== null) {
             const center = this._px + this._pw / 2;
             if (this._touchX < center - 15) { this._pvx = -200; this._facingRight = false; }
@@ -111,16 +104,13 @@ class DoodleJumpGame extends HTMLElement {
             else this._pvx = 0;
         }
 
-        // gravity
         this._pvy += 800 * dt;
         this._px += this._pvx * dt;
         this._py += this._pvy * dt;
 
-        // wrap horizontally
         if (this._px + this._pw < 0) this._px = DJ_W;
         if (this._px > DJ_W) this._px = -this._pw;
 
-        // platform collision (only when falling)
         if (this._pvy > 0) {
             for (const p of this._platforms) {
                 const relY = p.y - this._camY;
@@ -137,7 +127,6 @@ class DoodleJumpGame extends HTMLElement {
             }
         }
 
-        // scroll camera up
         const screenY = this._py;
         if (screenY < DJ_H * 0.35) {
             const shift = DJ_H * 0.35 - screenY;
@@ -148,7 +137,6 @@ class DoodleJumpGame extends HTMLElement {
             if (heightGained > this._score) this._score = heightGained;
         }
 
-        // generate new platforms above
         const topWorld = this._camY;
         const highestPlatY = Math.min(...this._platforms.map(p => p.y));
         if (highestPlatY > topWorld - 100) {
@@ -162,10 +150,8 @@ class DoodleJumpGame extends HTMLElement {
             });
         }
 
-        // remove platforms far below
         this._platforms = this._platforms.filter(p => p.y - this._camY < DJ_H + 50 && !p.broken);
 
-        // fell off bottom
         if (this._py > DJ_H + 50) {
             this._alive = false;
             this._end();
@@ -175,21 +161,18 @@ class DoodleJumpGame extends HTMLElement {
     _draw() {
         const ctx = this._ctx;
 
-        // background
         const bg = ctx.createLinearGradient(0, 0, 0, DJ_H);
         bg.addColorStop(0, "#e8f5e9");
         bg.addColorStop(1, "#c8e6c9");
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, DJ_W, DJ_H);
 
-        // grid lines
         ctx.strokeStyle = "rgba(0,0,0,0.04)";
         ctx.lineWidth = 1;
         for (let y = 0; y < DJ_H; y += 30) {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(DJ_W, y); ctx.stroke();
         }
 
-        // platforms
         for (const p of this._platforms) {
             const py = p.y - this._camY;
             if (py < -20 || py > DJ_H + 20) continue;
@@ -212,37 +195,29 @@ class DoodleJumpGame extends HTMLElement {
             }
         }
 
-        // player (doodle character)
         const px = this._px, ppY = this._py;
-        // body
         ctx.fillStyle = "#FFE082";
         ctx.beginPath();
         ctx.roundRect(px + 4, ppY + 6, this._pw - 8, this._ph - 10, 6);
         ctx.fill();
-        // head
         ctx.fillStyle = "#FFE082";
         ctx.beginPath();
         ctx.arc(px + this._pw / 2, ppY + 4, 10, 0, Math.PI * 2);
         ctx.fill();
-        // eyes
         ctx.fillStyle = "#333";
         const eo = this._facingRight ? 3 : -3;
         ctx.beginPath(); ctx.arc(px + this._pw / 2 + eo, ppY + 2, 2.5, 0, Math.PI * 2); ctx.fill();
-        // nose
         ctx.fillStyle = "#FF8A65";
         ctx.beginPath();
         ctx.arc(px + this._pw / 2 + (this._facingRight ? 6 : -6), ppY + 6, 2, 0, Math.PI * 2);
         ctx.fill();
-        // legs
         ctx.fillStyle = "#FFE082";
         ctx.fillRect(px + 6, ppY + this._ph - 6, 6, 8);
         ctx.fillRect(px + this._pw - 12, ppY + this._ph - 6, 6, 8);
-        // feet
         ctx.fillStyle = "#8D6E63";
         ctx.fillRect(px + 4, ppY + this._ph + 1, 9, 4);
         ctx.fillRect(px + this._pw - 13, ppY + this._ph + 1, 9, 4);
 
-        // HUD
         ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.beginPath(); ctx.roundRect(4, 4, 100, 26, 6); ctx.fill();
         ctx.fillStyle = "white"; ctx.font = "bold 14px 'Segoe UI',sans-serif";
@@ -252,7 +227,6 @@ class DoodleJumpGame extends HTMLElement {
 
     _end() {
         cancelAnimationFrame(this._raf);
-        // death overlay
         const ctx = this._ctx;
         ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.fillRect(0, 0, DJ_W, DJ_H);

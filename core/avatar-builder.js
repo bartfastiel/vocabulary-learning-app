@@ -1,18 +1,7 @@
-// core/avatar-builder.js
-//
-// Avatar builder as a native Web Component.
-// All artwork is inline SVG — no external asset files required.
-// Options with cost:1 are premium and must be unlocked with 1 Taler.
-// Unlocked items are stored in localStorage["avatarUnlocked"].
-// Exposes open() / close() methods and fires "avatar-saved" on save.
-// Also exports getAvatarSVG() for use in other components.
-// Set avatarBuilder.pointsManager = pointsManager to enable unlocking.
-
 const LS_KEY   = "avatarSelection";
 const LS_UNLOCK = "avatarUnlocked";
 const LS_BG    = "appBg";
 
-// ─── App background themes ────────────────────────────────────────────────────
 const APP_BG_THEMES = [
     { key: "dark",   label: "Nacht",    color: "#050d1a", accent: "#0ea5e9" },
     { key: "ocean",  label: "Ozean",    color: "#021a22", accent: "#06b6d4" },
@@ -24,9 +13,6 @@ const APP_BG_THEMES = [
     { key: "ice",    label: "Eis",      color: "#f0f8ff", accent: "#93c5fd" },
 ];
 
-// ─── artwork ──────────────────────────────────────────────────────────────────
-// Canvas: 200×200.  Face oval: cx=100 cy=120 rx=54 ry=60 (top≈60, bottom≈180).
-// Layer order (bottom→top): background, face, hair, eyebrows, eyes, mouth, glasses, accessory.
 
 const LAYERS = {
     background: [
@@ -159,7 +145,7 @@ const LAYERS = {
           <rect x="50"  y="50"  width="25" height="25" fill="#E3F2FD"/>
           <rect x="100" y="50"  width="25" height="25" fill="#E3F2FD"/>
           <rect x="150" y="50"  width="25" height="25" fill="#E3F2FD"/>` },
-        // ── PREMIUM ──
+
         { label: "⭐ Feuerwerk", cost: 1, svg: `<rect width="200" height="200" fill="#07001A"/>
           <line x1="60" y1="80" x2="60" y2="50" stroke="#FFD700" stroke-width="2"/>
           <line x1="60" y1="80" x2="42" y2="66" stroke="#FFD700" stroke-width="2"/>
@@ -258,7 +244,7 @@ const LAYERS = {
         { label: "Olive",       svg: `<ellipse cx="100" cy="120" rx="54" ry="60" fill="#C68642"/>` },
         { label: "Dunkel",      svg: `<ellipse cx="100" cy="120" rx="54" ry="60" fill="#8D5524"/>` },
         { label: "Sehr dunkel", svg: `<ellipse cx="100" cy="120" rx="54" ry="60" fill="#4A2912"/>` },
-        // ── TIERE (5 Taler) ──
+
         { label: "🐱 Katze",  cost: 5, svg: `
           <ellipse cx="100" cy="118" rx="54" ry="58" fill="#E8C49A"/>
           <polygon points="60,72 44,36 88,68" fill="#E8C49A"/>
@@ -408,7 +394,7 @@ const LAYERS = {
           <ellipse cx="100" cy="52" rx="16" ry="14" fill="#8B5E3C"/>
           <line x1="88" y1="62" x2="84" y2="70" stroke="#6B4226" stroke-width="3"/>
           <line x1="112" y1="62" x2="116" y2="70" stroke="#6B4226" stroke-width="3"/>` },
-        // ── PREMIUM ──
+
         { label: "⭐ Gold",       cost: 1, svg: `<ellipse cx="100" cy="66" rx="58" ry="36" fill="#FFD700"/>
           <rect x="42" y="82" width="17" height="85" rx="8" fill="#FFD700"/>
           <rect x="141" y="82" width="17" height="85" rx="8" fill="#FFD700"/>
@@ -483,7 +469,7 @@ const LAYERS = {
         { label: "Gebogen",   svg: `
           <path d="M65,95 Q72,84 93,90" stroke="#4A3728" stroke-width="3.5" fill="none" stroke-linecap="round"/>
           <path d="M107,90 Q128,84 135,95" stroke="#4A3728" stroke-width="3.5" fill="none" stroke-linecap="round"/>` },
-        // ── PREMIUM ──
+
         { label: "⭐ Gold",   cost: 1, svg: `
           <path d="M63,93 Q78,88 93,93" stroke="#FFD700" stroke-width="5" fill="none" stroke-linecap="round"/>
           <path d="M107,93 Q122,88 137,93" stroke="#FFD700" stroke-width="5" fill="none" stroke-linecap="round"/>
@@ -603,7 +589,7 @@ const LAYERS = {
           <circle cx="78"  cy="107" r="6"  fill="#3D2B1F"/>
           <circle cx="80"  cy="105" r="2"  fill="white"/>
           <path d="M110,107 Q122,115 134,107" stroke="#3D2B1F" stroke-width="3.5" fill="none" stroke-linecap="round"/>` },
-        // ── PREMIUM ──
+
         { label: "⭐ Regenbogen", cost: 1, svg: `
           <circle cx="78" cy="107" r="11" fill="white"/>
           <circle cx="78" cy="107" r="8" fill="#FF6B6B"/>
@@ -701,7 +687,7 @@ const LAYERS = {
         { label: "Schmunzeln",  svg: `<path d="M84,138 Q92,147 100,144 Q108,141 116,144" stroke="#C0836A" stroke-width="3" fill="none" stroke-linecap="round"/>` },
         { label: "Lippenstift", svg: `<path d="M82,136 Q100,150 118,136" stroke="#CC0044" stroke-width="2" fill="#FF3366"/>
           <path d="M82,136 Q91,130 100,133 Q109,130 118,136" fill="#FF3366" stroke="none"/>` },
-        // ── PREMIUM ──
+
         { label: "⭐ Gold",     cost: 1, svg: `
           <path d="M80,134 Q100,150 120,134" stroke="#FFD700" stroke-width="4.5" fill="none" stroke-linecap="round"/>
           <circle cx="82" cy="136" r="3" fill="#FFD700"/>
@@ -790,7 +776,7 @@ const LAYERS = {
           <line x1="90" y1="112" x2="110" y2="112" stroke="#555" stroke-width="2"/>
           <line x1="66" y1="112" x2="58" y2="108" stroke="#555" stroke-width="2"/>
           <line x1="134" y1="112" x2="142" y2="108" stroke="#555" stroke-width="2"/>` },
-        // ── PREMIUM ──
+
         { label: "⭐ Gold",      cost: 1, svg: `
           <circle cx="78" cy="107" r="15" fill="none" stroke="#FFD700" stroke-width="3.5"/>
           <circle cx="122" cy="107" r="15" fill="none" stroke="#FFD700" stroke-width="3.5"/>
@@ -930,7 +916,7 @@ const LAYERS = {
           <line x1="100" y1="158" x2="100" y2="175" stroke="#CC0000" stroke-width="1.5"/>
           <line x1="125" y1="160" x2="125" y2="177" stroke="#CC0000" stroke-width="1.5"/>
           <line x1="145" y1="165" x2="145" y2="182" stroke="#CC0000" stroke-width="1.5"/>` },
-        // ── PREMIUM ──
+
         { label: "⭐ Diamant Krone", cost: 1, svg: `
           <polygon points="54,82 54,48 70,64 100,42 130,64 146,48 146,82" fill="#B9F2FF" stroke="#74D7FF" stroke-width="2"/>
           <polygon points="60,82 60,54 72,66 100,48 128,66 140,54 140,82" fill="#E8FBFF" opacity="0.5"/>
@@ -993,7 +979,6 @@ const CATEGORIES = [
 
 const DEFAULT_SEL = { background: 0, face: 0, hair: 0, eyebrows: 0, eyes: 0, mouth: 0, glasses: 0, accessory: 0 };
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
 
 function composeSVG(sel) {
     const parts = CATEGORIES.map(cat => LAYERS[cat.id][sel[cat.id] ?? 0]?.svg ?? "");
@@ -1009,7 +994,6 @@ export function getAvatarSVG() {
     }
 }
 
-/** Generate a random avatar selection (only free items, no cost items) */
 export function randomAvatarSelection() {
     const freeIndices = (arr) => arr.map((item, i) => item.cost ? -1 : i).filter(i => i >= 0);
     const rndFree = (arr) => { const free = freeIndices(arr); return free.length ? free[Math.floor(Math.random() * free.length)] : 0; };
@@ -1025,13 +1009,11 @@ export function randomAvatarSelection() {
     };
 }
 
-/** Generate random avatar and return both selection + SVG */
 export function generateRandomAvatar() {
     const sel = randomAvatarSelection();
     return { selection: sel, svg: composeSVG(sel) };
 }
 
-// ─── component ────────────────────────────────────────────────────────────────
 
 class AvatarBuilder extends HTMLElement {
     constructor() {

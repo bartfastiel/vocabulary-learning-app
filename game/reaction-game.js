@@ -1,6 +1,3 @@
-// game/reaction-game.js
-// Tap/click colored targets before they vanish. 30 seconds, score = hits.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 class ReactionGame extends HTMLElement {
     constructor() {

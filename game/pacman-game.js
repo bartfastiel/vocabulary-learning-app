@@ -1,6 +1,3 @@
-// game/pacman-game.js
-// Punktefresser: Pac-Man style maze game. Eat all dots, avoid ghosts.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 const PM_CELL = 20;
 const PM_MAP = [
@@ -85,7 +82,6 @@ class PacmanGame extends HTMLElement {
             }
         }
 
-        // ghosts — start in the middle, player starts in corner
         const ghostStarts = [
             { x: 9, y: 7 }, { x: 11, y: 7 }, { x: 9, y: 5 }, { x: 11, y: 5 }
         ];
@@ -93,7 +89,7 @@ class PacmanGame extends HTMLElement {
             x: ghostStarts[i].x, y: ghostStarts[i].y,
             color, dir: { x: 0, y: 0 },
             moveTimer: 0,
-            frozen: 3 + i * 1.5, // each ghost unfreezes later (3s, 4.5s, 6s, 7.5s)
+            frozen: 3 + i * 1.5,
         }));
 
         this._moveTimer = 0;
@@ -139,16 +135,13 @@ class PacmanGame extends HTMLElement {
     }
 
     _update(dt) {
-        // mouth animation
         this._mouthAngle += this._mouthDir * dt * 8;
         if (this._mouthAngle > 0.8) this._mouthDir = -1;
         if (this._mouthAngle < 0.05) this._mouthDir = 1;
 
-        // player movement (grid-based)
         this._moveTimer += dt;
         if (this._moveTimer >= 0.15) {
             this._moveTimer = 0;
-            // try next direction first
             const nx = this._px + this._nextDir.x;
             const ny = this._py + this._nextDir.y;
             if (!this._isWall(nx, ny)) {
@@ -161,20 +154,16 @@ class PacmanGame extends HTMLElement {
                 this._py = my;
             }
 
-            // eat dot
             const dot = this._dots.find(d => d.x === this._px && d.y === this._py && !d.eaten);
             if (dot) { dot.eaten = true; this._score++; }
 
-            // win check
             if (this._score >= this._totalDots) {
                 this._end();
                 return;
             }
         }
 
-        // ghost movement
         for (const g of this._ghosts) {
-            // Frozen ghosts don't move or kill
             if (g.frozen > 0) { g.frozen -= dt; continue; }
             g.moveTimer += dt;
             if (g.moveTimer >= this._ghostSpeed) {
@@ -190,7 +179,6 @@ class PacmanGame extends HTMLElement {
     }
 
     _moveGhost(g) {
-        // simple chase AI: prefer direction toward player, random otherwise
         const possibleDirs = [
             { x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 },
         ].filter(d => {
@@ -199,7 +187,6 @@ class PacmanGame extends HTMLElement {
         });
 
         if (possibleDirs.length === 0) {
-            // reverse if stuck
             if (!this._isWall(g.x - g.dir.x, g.y - g.dir.y)) {
                 g.dir = { x: -g.dir.x, y: -g.dir.y };
                 g.x += g.dir.x; g.y += g.dir.y;
@@ -207,7 +194,6 @@ class PacmanGame extends HTMLElement {
             return;
         }
 
-        // 60% chance to chase, 40% random
         if (Math.random() < 0.6) {
             possibleDirs.sort((a, b) => {
                 const da = Math.abs(g.x + a.x - this._px) + Math.abs(g.y + a.y - this._py);
@@ -231,7 +217,6 @@ class PacmanGame extends HTMLElement {
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, PM_W, PM_H);
 
-        // walls
         ctx.fillStyle = "#1a237e";
         ctx.strokeStyle = "#304FFE";
         ctx.lineWidth = 2;
@@ -240,7 +225,6 @@ class PacmanGame extends HTMLElement {
             ctx.strokeRect(w.x * c + 1, w.y * c + 1, c - 2, c - 2);
         }
 
-        // dots
         for (const d of this._dots) {
             if (d.eaten) continue;
             ctx.fillStyle = "#FFEB3B";
@@ -249,7 +233,6 @@ class PacmanGame extends HTMLElement {
             ctx.fill();
         }
 
-        // player (pac-man)
         const angle = this._mouthAngle;
         let startAngle = angle;
         if (this._dir.x === -1) startAngle = Math.PI + angle;
@@ -263,21 +246,18 @@ class PacmanGame extends HTMLElement {
         ctx.lineTo(this._px * c + c / 2, this._py * c + c / 2);
         ctx.fill();
 
-        // ghosts
         for (const g of this._ghosts) {
             const gx = g.x * c + c / 2, gy = g.y * c + c / 2;
             ctx.fillStyle = g.color;
             ctx.beginPath();
             ctx.arc(gx, gy - 2, c / 2 - 2, Math.PI, 0);
             ctx.lineTo(gx + c / 2 - 2, gy + c / 2 - 2);
-            // wavy bottom
             for (let i = 0; i < 3; i++) {
                 const wx = gx + c / 2 - 2 - (i + 1) * ((c - 4) / 3);
                 ctx.lineTo(wx + (c - 4) / 6, gy + c / 2 - 6);
                 ctx.lineTo(wx, gy + c / 2 - 2);
             }
             ctx.fill();
-            // eyes
             ctx.fillStyle = "white";
             ctx.beginPath(); ctx.arc(gx - 3, gy - 3, 3, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(gx + 3, gy - 3, 3, 0, Math.PI * 2); ctx.fill();
@@ -286,7 +266,6 @@ class PacmanGame extends HTMLElement {
             ctx.beginPath(); ctx.arc(gx + 4, gy - 3, 1.5, 0, Math.PI * 2); ctx.fill();
         }
 
-        // HUD
         ctx.fillStyle = "rgba(0,0,0,0.6)";
         ctx.beginPath(); ctx.roundRect(4, 4, 120, 22, 5); ctx.fill();
         ctx.fillStyle = "white"; ctx.font = "bold 12px 'Segoe UI',sans-serif";
@@ -306,7 +285,6 @@ class PacmanGame extends HTMLElement {
 
     _endDeath() {
         cancelAnimationFrame(this._raf);
-        // flash red
         this._ctx.fillStyle = "rgba(255,0,0,0.4)";
         this._ctx.fillRect(0, 0, PM_W, PM_H);
         setTimeout(() => {

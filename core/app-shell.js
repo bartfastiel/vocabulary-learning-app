@@ -1,6 +1,3 @@
-// core/app-shell.js
-// Clean ANTON-style dashboard with subject cards and trainer views.
-
 import "./help-overlay.js";
 import "./group-board.js";
 import "./invite-qr.js";
@@ -19,7 +16,6 @@ import { getProfiles, getActiveId, getActiveProfile, createProfile, deleteProfil
 
 function _applyAgeSettings(host, age) {
     const a = parseInt(age) || 10;
-    // Younger kids get larger base font → all rem values scale up
     let size;
     if (a <= 6)       size = "120%";
     else if (a <= 8)  size = "110%";
@@ -48,7 +44,7 @@ class AppShell extends HTMLElement {
           color: #2d3748;
         }
 
-        /* ── Age-based adjustments for young children ── */
+
         :host([data-age="young"]) { font-weight: 500; }
         :host([data-age="young"]) .card-title { color: #000; }
         :host([data-age="young"]) .card-desc { color: #4a5568; }
@@ -56,7 +52,7 @@ class AppShell extends HTMLElement {
         :host([data-age="young"]) .stat-label { color: #4a5568; }
         :host([data-age="young"]) .action-label { color: #000; }
 
-        /* ── Top bar ── */
+
         .topbar {
           display: flex; align-items: center; justify-content: space-between;
           padding: 0.7rem 1.2rem;
@@ -96,7 +92,7 @@ class AppShell extends HTMLElement {
         }
         .topbar-btn:hover { background: #edf2f7; }
 
-        /* ── Dashboard / Home ── */
+
         #home-screen {
           max-width: 600px; margin: 0 auto;
           padding: 1.5rem 1rem 2rem;
@@ -116,7 +112,7 @@ class AppShell extends HTMLElement {
           margin: 0 0 1.5rem;
         }
 
-        /* ── Subject cards ── */
+
         .subject-cards {
           display: flex; flex-direction: column; gap: 0.9rem;
           margin-bottom: 1.5rem;
@@ -151,7 +147,7 @@ class AppShell extends HTMLElement {
         .card-desc { font-size: 0.82rem; color: #a0aec0; margin: 0.15rem 0 0; }
         .card-arrow { font-size: 1.3rem; color: #cbd5e0; }
 
-        /* ── Action buttons on home ── */
+
         .home-actions {
           display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.5rem;
           margin-bottom: 1rem;
@@ -190,7 +186,7 @@ class AppShell extends HTMLElement {
         .action-icon { font-size: 1.5rem; }
         .action-label { font-size: 0.9rem; font-weight: 600; color: #2d3748; }
 
-        /* ── Trainer view ── */
+
         .back-btn {
           display: inline-flex; align-items: center; gap: 0.4rem;
           background: white; border: 1px solid #e2e8f0;
@@ -206,7 +202,7 @@ class AppShell extends HTMLElement {
           color: #1a202c;
         }
 
-        /* ── Stats banner on home ── */
+
         .stats-banner {
           display: flex; gap: 0.7rem; margin-bottom: 1.5rem;
         }
@@ -218,10 +214,10 @@ class AppShell extends HTMLElement {
         .stat-value { font-size: 1.4rem; font-weight: 800; color: #2d3748; }
         .stat-label { font-size: 0.75rem; color: #a0aec0; margin-top: 0.1rem; }
 
-        /* Streak badge */
+
         #ship { font-size: 1rem; margin-left: 0.2rem; }
 
-        /* ── Profile overlay ── */
+
         #profile-overlay {
           position: fixed; inset: 0; z-index: 9998;
           background: rgba(0,0,0,0.5);
@@ -299,7 +295,7 @@ class AppShell extends HTMLElement {
         }
         #btn-profile-create:hover { background: #3182ce; }
 
-        /* ── Role overlay ── */
+
         #role-overlay {
           position: fixed; inset: 0; z-index: 9999;
           background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
@@ -327,10 +323,10 @@ class AppShell extends HTMLElement {
         .role-btn:hover { border-color: #4299e1; background: #ebf8ff; transform: translateY(-2px); }
         .role-btn .role-icon { font-size: 2.2rem; }
 
-        /* ── Hidden helpers ── */
+
         [hidden] { display: none !important; }
 
-        /* ── Streak animations (kept for PointsManager) ── */
+
         .streak-10 #ship { transform: scale(1.3); }
         .streak-15 #ship { transform: scale(1.5) rotate(15deg); }
         .streak-20 #ship { transform: scale(1.8) rotate(360deg); }
@@ -345,10 +341,9 @@ class AppShell extends HTMLElement {
         #treasure.disabled { opacity: 0.3; cursor: default; }
         #treasure:not(.disabled):hover { transform: scale(1.2); }
 
-        /* Hide points/streak spans the PointsManager targets */
-        #points, #streak, #streak-record { /* visible in topbar stats */ }
+        #points, #streak, #streak-record { }
 
-        /* ── Background overlay ── */
+
         .bg-overlay {
           display: none; position: fixed; inset: 0; z-index: 1200;
           background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
@@ -380,7 +375,7 @@ class AppShell extends HTMLElement {
           display: flex; flex-direction: column; gap: 0.3rem;
         }
 
-        /* ── Theme picker ── */
+
         .theme-section-title {
           font-size: 0.85rem; font-weight: 700; color: #718096;
           margin: 0 0 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;
@@ -408,7 +403,7 @@ class AppShell extends HTMLElement {
           background-size: 100% 100% !important;
         }
 
-        /* Custom color picker */
+
         .theme-custom {
           width: 40px; height: 40px; border-radius: 12px;
           border: 3px dashed #cbd5e0;
@@ -429,7 +424,7 @@ class AppShell extends HTMLElement {
           opacity: 0; cursor: pointer;
         }
 
-        /* ── Animated backgrounds ── */
+
         .anim-section-title {
           font-size: 0.85rem; font-weight: 700; color: #718096;
           margin: 0.8rem 0 0.6rem; text-transform: uppercase; letter-spacing: 0.5px;
@@ -450,7 +445,7 @@ class AppShell extends HTMLElement {
         :host([data-bg="dark"]) .anim-chip.active { background: #2c5282; border-color: #63b3ed; color: #bee3f8; }
         :host([data-bg="dark"]) .anim-section-title { color: #a0aec0; }
 
-        /* ── Custom gradient builder ── */
+
         .grad-builder {
           margin-top: 0.5rem; padding: 0.7rem;
           border: 2px solid #e2e8f0; border-radius: 12px;
@@ -511,7 +506,7 @@ class AppShell extends HTMLElement {
         :host([data-bg="dark"]) .grad-anim-toggle { background: #1a202c; color: #e2e8f0; border-color: #4a5568; }
         :host([data-bg="dark"]) .grad-anim-toggle.active { background: #2c5282; border-color: #63b3ed; color: #bee3f8; }
 
-        /* Animated gradient layer */
+
         #grad-anim-layer {
           position: fixed; inset: 0; z-index: -1; pointer-events: none;
           background-size: 300% 300%;
@@ -519,7 +514,7 @@ class AppShell extends HTMLElement {
         }
         #grad-anim-layer.active { opacity: 1; }
 
-        /* ── Live background animations ── */
+
         .live-bg-grid {
           display: flex; flex-wrap: wrap; gap: 0.5rem;
         }
@@ -585,14 +580,14 @@ class AppShell extends HTMLElement {
           100% { background-position: 0% 0%; }
         }
 
-        /* Animation canvas */
+
         #anim-canvas {
           position: fixed; inset: 0; z-index: 0; pointer-events: none;
         }
         .topbar { position: relative; z-index: 100; }
         #home-screen, #trainer-screen { position: relative; z-index: 1; }
 
-        /* ── Background themes ── */
+
         :host([data-bg="light"])   { background: #f0f4f8; }
         :host([data-bg="blue"])    { background: #dbeafe; }
         :host([data-bg="green"])   { background: #d1fae5; }
@@ -622,7 +617,7 @@ class AppShell extends HTMLElement {
         :host([data-bg="dark"]) .theme-section-title { color: #a0aec0; }
       </style>
 
-      <!-- Profile overlay -->
+
       <div id="profile-overlay" class="hidden">
         <div id="profile-box">
           <div id="profile-pick-view">
@@ -662,7 +657,7 @@ class AppShell extends HTMLElement {
         </div>
       </div>
 
-      <!-- Role overlay -->
+
       <div id="role-overlay" class="hidden">
         <div id="role-box">
           <h2>Wer bist du?</h2>
@@ -681,7 +676,7 @@ class AppShell extends HTMLElement {
         </div>
       </div>
 
-      <!-- Top bar -->
+
       <div class="topbar">
         <div class="topbar-left">
           <span class="topbar-name" id="profile-switcher" title="Profil wechseln">
@@ -713,7 +708,7 @@ class AppShell extends HTMLElement {
       <teacher-controls></teacher-controls>
       <cloud-login></cloud-login>
 
-      <!-- Home / Dashboard -->
+
       <div id="home-screen">
         <div class="stats-banner">
           <div class="stat-box">
@@ -791,7 +786,7 @@ class AppShell extends HTMLElement {
           </button>
         </div>
 
-        <!-- Settings dropdown (hidden) -->
+
         <div class="settings-menu" id="settings-menu">
           <button class="settings-item" id="home-bg">\uD83C\uDFA8 Hintergrund</button>
           <button class="settings-item" id="home-vocab-edit">\u270F\uFE0F Vokabeln bearbeiten</button>
@@ -804,7 +799,7 @@ class AppShell extends HTMLElement {
 
       </div>
 
-      <!-- Age & Grade settings overlay -->
+
       <div class="bg-overlay" id="age-grade-overlay">
         <div class="bg-panel" style="max-width:400px">
           <div class="bg-header">
@@ -841,7 +836,7 @@ class AppShell extends HTMLElement {
         </div>
       </div>
 
-      <!-- Background settings overlay -->
+
       <div class="bg-overlay" id="bg-overlay">
         <div class="bg-panel">
           <div class="bg-header">
@@ -970,7 +965,7 @@ class AppShell extends HTMLElement {
       <div id="grad-anim-layer"></div>
       <canvas id="anim-canvas"></canvas>
 
-      <!-- Trainer view (shown when subject is selected) -->
+
       <div id="trainer-screen">
         <button class="back-btn" id="back-btn">← Zurück</button>
         <h2 class="trainer-title" id="trainer-title"></h2>
@@ -978,15 +973,11 @@ class AppShell extends HTMLElement {
       </div>
     `;
 
-        // Trainers are created lazily when needed
         this._trainers = {};
         this._startup();
     }
 
-    // ── Startup ──────────────────────────────────────────────────────────────
-
     _startup() {
-        // Assign random avatars to any new profiles that need them
         assignRandomAvatarIfNeeded(generateRandomAvatar);
 
         const profiles = getProfiles();
@@ -1034,7 +1025,6 @@ class AppShell extends HTMLElement {
         this.shadowRoot.getElementById("btn-new-profile").onclick = () => showNew();
         this.shadowRoot.getElementById("btn-profile-cancel").onclick = () => showPick();
 
-        // Age selection
         let selectedAge = "8";
         for (const btn of this.shadowRoot.querySelectorAll(".age-btn")) {
             btn.onclick = () => {
@@ -1046,7 +1036,6 @@ class AppShell extends HTMLElement {
             };
         }
 
-        // Grade selection
         let selectedGrade = "5";
         for (const btn of this.shadowRoot.querySelectorAll(".grade-btn")) {
             btn.onclick = () => {
@@ -1063,7 +1052,6 @@ class AppShell extends HTMLElement {
             if (!name) { nameInput.focus(); return; }
             const id = createProfile(name);
             assignRandomAvatarIfNeeded(generateRandomAvatar);
-            // Save age and grade to profile and localStorage
             const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
             const p = list.find(p => p.id === id);
             if (p) { p.age = selectedAge; p.grade = selectedGrade; localStorage.setItem("allProfiles", JSON.stringify(list)); }
@@ -1105,10 +1093,7 @@ class AppShell extends HTMLElement {
         });
     }
 
-    // ── Init ─────────────────────────────────────────────────────────────────
-
     init() {
-        // Apply age-based font size and contrast
         const savedAge = localStorage.getItem("userAge");
         if (savedAge) _applyAgeSettings(this, savedAge);
 
@@ -1118,7 +1103,6 @@ class AppShell extends HTMLElement {
 
         const help = this.shadowRoot.querySelector("vocab-help");
 
-        // Role
         const roleOverlay = this.shadowRoot.getElementById("role-overlay");
         const savedRole = localStorage.getItem("userRole");
         const applyRole = (role) => {
@@ -1136,14 +1120,12 @@ class AppShell extends HTMLElement {
             btn.onclick = () => applyRole(btn.dataset.role);
         });
 
-        // Game lobby
         const gameLobby = this.shadowRoot.querySelector("game-lobby");
         gameLobby.pointsManager = pointsManager;
         treasureEl.addEventListener("click", () => {
             if (!treasureEl.classList.contains("disabled")) gameLobby.open();
         });
 
-        // Avatar
         const avatarMini = this.shadowRoot.getElementById("avatar-mini");
         const avatarBuilder = this.shadowRoot.querySelector("avatar-builder");
         const refreshAvatar = () => {
@@ -1157,7 +1139,6 @@ class AppShell extends HTMLElement {
         this.shadowRoot.addEventListener("avatar-saved", refreshAvatar);
         this.shadowRoot.addEventListener("show-role-select", () => roleOverlay.classList.remove("hidden"));
 
-        // Profile switcher
         const profile = getActiveProfile();
         const switcherName = this.shadowRoot.getElementById("profile-switcher-name");
         if (switcherName && profile) switcherName.textContent = profile.name;
@@ -1167,23 +1148,18 @@ class AppShell extends HTMLElement {
         };
         window.addEventListener("beforeunload", () => { saveSnapshot(); syncProfileToCloud(); });
 
-        // Welcome text
         if (profile) {
             this.shadowRoot.getElementById("welcome-text").textContent = `Hallo, ${profile.name}!`;
         }
 
-        // Update home stats
         this._updateHomeStats();
 
-        // Subject cards → open trainer
         this.shadowRoot.querySelectorAll(".subject-card").forEach(card => {
             card.onclick = () => this._openSubject(card.dataset.subject);
         });
 
-        // Back button
         this.shadowRoot.getElementById("back-btn").onclick = () => this._showHome();
 
-        // Home action buttons
         this.shadowRoot.getElementById("home-games").onclick = () => gameLobby.open();
         const groupBoard = this.shadowRoot.querySelector("group-board");
         this.shadowRoot.getElementById("home-groups").onclick = () => { settingsMenu.classList.remove("open"); groupBoard.open(); };
@@ -1192,7 +1168,6 @@ class AppShell extends HTMLElement {
         const vocabEditor = this.shadowRoot.querySelector("vocab-editor");
         this.shadowRoot.getElementById("home-vocab-edit").onclick = () => { settingsMenu.classList.remove("open"); vocabEditor.open(); };
         vocabEditor.onSaved = () => {
-            // Reload all vocab trainers so custom lists appear under the right subject
             for (const key of Object.keys(this._trainers)) {
                 const t = this._trainers[key];
                 if (t?.tagName === "VOCAB-TRAINER" && typeof t.reload === "function") {
@@ -1212,7 +1187,6 @@ class AppShell extends HTMLElement {
 
 
         this.shadowRoot.getElementById("home-avatar").onclick = () => avatarBuilder.open();
-        // Settings menu toggle
         const settingsMenu = this.shadowRoot.getElementById("settings-menu");
         this.shadowRoot.getElementById("home-settings").onclick = () => settingsMenu.classList.toggle("open");
         const teacherCtrl = this.shadowRoot.querySelector("teacher-controls");
@@ -1223,11 +1197,9 @@ class AppShell extends HTMLElement {
             localStorage.setItem("appDesign", "classic");
             location.reload();
         };
-        // Age & Grade settings overlay
         const ageGradeOverlay = this.shadowRoot.getElementById("age-grade-overlay");
         this.shadowRoot.getElementById("home-age-grade").onclick = () => {
             settingsMenu.classList.remove("open");
-            // Highlight current values
             const curAge = localStorage.getItem("userAge") || "";
             const curGrade = localStorage.getItem("userGrade") || "";
             this.shadowRoot.querySelectorAll(".settings-age-btn").forEach(b => {
@@ -1277,7 +1249,6 @@ class AppShell extends HTMLElement {
         };
         this.shadowRoot.getElementById("age-grade-close").onclick = () => ageGradeOverlay.classList.remove("active");
 
-        // Background settings overlay
         const bgOverlay = this.shadowRoot.getElementById("bg-overlay");
         this.shadowRoot.getElementById("home-bg").onclick = () => { settingsMenu.classList.remove("open"); bgOverlay.classList.add("active"); };
         this.shadowRoot.getElementById("bg-close").onclick = () => bgOverlay.classList.remove("active");
@@ -1292,7 +1263,6 @@ class AppShell extends HTMLElement {
             setTimeout(() => this.startHelp(help), 500);
         }
 
-        // Theme picker
         const savedTheme = localStorage.getItem("appBg") || "light";
         const savedCustomColor = localStorage.getItem("appBgCustom") || "#f0f4f8";
         const customWrap = this.shadowRoot.getElementById("theme-custom-wrap");
@@ -1310,7 +1280,6 @@ class AppShell extends HTMLElement {
             document.body.style.background = color;
         };
 
-        // Gradient map for gradient themes
         const GRADIENTS = {
             "grad-sunset":  "linear-gradient(135deg,#f97316,#ec4899,#8b5cf6)",
             "grad-ocean":   "linear-gradient(135deg,#06b6d4,#3b82f6,#6366f1)",
@@ -1378,7 +1347,6 @@ class AppShell extends HTMLElement {
             gradAnimLayer.classList.remove("active");
         };
 
-        // ── Custom gradient builder ──
         const gradAnimLayer = this.shadowRoot.getElementById("grad-anim-layer");
         const gradColorsWrap = this.shadowRoot.getElementById("grad-colors");
         const gradDirection = this.shadowRoot.getElementById("grad-direction");
@@ -1386,7 +1354,6 @@ class AppShell extends HTMLElement {
         const gradApply = this.shadowRoot.getElementById("grad-apply");
         const gradAnimToggle = this.shadowRoot.getElementById("grad-anim-toggle");
 
-        // Load saved custom gradient
         let gradColors = JSON.parse(localStorage.getItem("gradColors") || '["#4299e1","#9f7aea","#ed64a6"]');
         let gradDir = localStorage.getItem("gradDir") || "135deg";
         let gradAnimated = localStorage.getItem("gradAnimated") === "true";
@@ -1456,7 +1423,6 @@ class AppShell extends HTMLElement {
             localStorage.setItem("gradAnimated", String(gradAnimated));
 
             if (gradAnimated) {
-                // Apply to animated layer with flowing effect
                 gradAnimLayer.style.background = css;
                 gradAnimLayer.style.backgroundSize = "300% 300%";
                 gradAnimLayer.style.animation = "gradientFlow 8s ease infinite";
@@ -1468,7 +1434,6 @@ class AppShell extends HTMLElement {
                 applyBg(css);
             }
 
-            // Detect dark gradients
             const darkColors = gradColors.every(c => {
                 const d = document.createElement("div");
                 d.style.color = c; document.body.appendChild(d);
@@ -1481,7 +1446,6 @@ class AppShell extends HTMLElement {
 
         gradApply.onclick = applyCustomGrad;
 
-        // ── Live animated backgrounds ──
         const LIVE_BGS = {
             lava: {
                 bg: "linear-gradient(135deg,#dc2626,#f97316,#fbbf24,#dc2626)",
@@ -1551,7 +1515,6 @@ class AppShell extends HTMLElement {
             chip.onclick = () => applyLiveBg(chip.dataset.livebg);
         });
 
-        // Restore custom gradient on load
         if (savedTheme === "customGrad") {
             applyCustomGrad();
         } else if (savedTheme === "livebg") {
@@ -1559,7 +1522,6 @@ class AppShell extends HTMLElement {
             if (LIVE_BGS[key]) applyLiveBg(key);
         }
 
-        // Animation picker
         const canvas = this.shadowRoot.getElementById("anim-canvas");
         const ctx = canvas.getContext("2d");
         let animId = null;
@@ -1882,7 +1844,6 @@ class AppShell extends HTMLElement {
         });
         startAnim(savedAnim);
 
-        // Observe points changes to update home stats
         const observer = new MutationObserver(() => this._updateHomeStats());
         const pointsEl = this.shadowRoot.getElementById("points");
         if (pointsEl) observer.observe(pointsEl, { childList: true, characterData: true, subtree: true });
@@ -1896,8 +1857,6 @@ class AppShell extends HTMLElement {
         if (hp) hp.textContent = pts;
         if (hs) hs.textContent = sr;
     }
-
-    // ── Navigation ───────────────────────────────────────────────────────────
 
     _openSubject(subject) {
         const home = this.shadowRoot.getElementById("home-screen");
@@ -1918,7 +1877,6 @@ class AppShell extends HTMLElement {
         const s = subjects[subject];
         title.textContent = s.title;
 
-        // Lazy create trainer or reuse
         if (!this._trainers[subject]) {
             const el = document.createElement(s.tag);
             el.points = this._pointsManager;
@@ -1938,10 +1896,7 @@ class AppShell extends HTMLElement {
         this._updateHomeStats();
     }
 
-    // ── Help ─────────────────────────────────────────────────────────────────
-
     async startHelp(help) {
-        // Open English trainer first so elements exist
         this._openSubject("englisch");
 
         const trainer = await this.waitFor(() => this._trainers.englisch);

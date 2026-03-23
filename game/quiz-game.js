@@ -1,13 +1,10 @@
-// game/quiz-game.js
-// "Vokabel-Millionär" — Who Wants to Be a Millionaire style vocab quiz.
-// Fires CustomEvent("game-over", { bubbles:true, detail:{ score, pointsEarned } })
 
 const LADDER = [
-    50, 100, 200, 300, 500,          // Stufe 1-5
-    1000, 2000, 4000, 8000, 16000,   // Stufe 6-10
-    32000, 64000, 125000, 500000, 1000000 // Stufe 11-15
+    50, 100, 200, 300, 500,
+    1000, 2000, 4000, 8000, 16000,
+    32000, 64000, 125000, 500000, 1000000
 ];
-const SAFE_NETS = [4, 9]; // indices (question 5 and 10 are safe)
+const SAFE_NETS = [4, 9];
 
 class QuizGame extends HTMLElement {
     constructor() {
@@ -24,7 +21,6 @@ class QuizGame extends HTMLElement {
     }
 
     async _start() {
-        // Load vocabulary
         try {
             const resp = await fetch("vocab/vocab.json");
             const lessons = await resp.json();
@@ -59,7 +55,6 @@ class QuizGame extends HTMLElement {
             const key = w.de + "|" + w.en;
             if (used.has(key)) continue;
             used.add(key);
-            // Generate 3 wrong answers
             const others = this._allWords.filter(o => o.en !== w.en && o.de !== w.de);
             const wrongPool = [...others].sort(() => Math.random() - 0.5).slice(0, 3);
             if (wrongPool.length < 3) continue;
@@ -89,7 +84,6 @@ class QuizGame extends HTMLElement {
           padding: 0.8rem; position: relative;
         }
 
-        /* Top bar */
         .topbar {
           display: flex; justify-content: space-between; align-items: center;
           margin-bottom: 0.6rem;
@@ -106,7 +100,6 @@ class QuizGame extends HTMLElement {
           text-shadow: 0 0 15px rgba(251,191,36,0.5);
         }
 
-        /* Jokers */
         .jokers {
           display: flex; gap: 0.5rem; justify-content: center;
           margin-bottom: 0.8rem;
@@ -132,7 +125,6 @@ class QuizGame extends HTMLElement {
           white-space: nowrap; opacity: 0.6;
         }
 
-        /* Question */
         .question-box {
           background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3));
           border: 1px solid rgba(139,92,246,0.4);
@@ -156,7 +148,6 @@ class QuizGame extends HTMLElement {
           font-size: 0.82rem; opacity: 0.6; margin-top: 0.3rem;
         }
 
-        /* Answers */
         .answers {
           display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
           flex: 1;
@@ -212,7 +203,6 @@ class QuizGame extends HTMLElement {
           80% { transform: translateX(5px); }
         }
 
-        /* Money ladder (side panel) */
         .ladder-btn {
           position: absolute; top: 0.5rem; right: 0.5rem;
           background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
@@ -252,7 +242,6 @@ class QuizGame extends HTMLElement {
         .ladder-step.safe .amount { color: #34d399; }
         .ladder-step.done { opacity: 0.4; }
 
-        /* Audience overlay */
         .audience-overlay {
           display: none; position: absolute; inset: 0;
           background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
@@ -275,7 +264,6 @@ class QuizGame extends HTMLElement {
         .audience-bar .pct { font-size: 0.8rem; font-weight: 700; }
         .audience-bar .lbl { font-size: 0.85rem; font-weight: 700; opacity: 0.6; }
 
-        /* Phone overlay */
         .phone-overlay {
           display: none; position: absolute; inset: 0;
           background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
@@ -291,7 +279,6 @@ class QuizGame extends HTMLElement {
         .phone-name { font-weight: 800; color: #c084fc; margin-bottom: 0.3rem; }
         .phone-answer { font-size: 1.2rem; font-weight: 800; color: #fbbf24; margin-top: 0.5rem; }
 
-        /* Result screen */
         .result {
           display: none; position: absolute; inset: 0;
           background: radial-gradient(ellipse at center, #1a1a3e, #0a0a1a);
@@ -313,7 +300,6 @@ class QuizGame extends HTMLElement {
         .result-sub { opacity: 0.6; font-size: 0.9rem; }
         .result-detail { font-size: 0.85rem; opacity: 0.5; margin-top: 0.5rem; }
 
-        /* Confetti */
         .confetti-container {
           position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 25;
         }
@@ -326,7 +312,6 @@ class QuizGame extends HTMLElement {
           100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
         }
 
-        /* Spotlight sweep */
         .spotlight {
           position: absolute; inset: 0; pointer-events: none;
           background: radial-gradient(circle 200px at var(--sx, 50%) var(--sy, 30%),
@@ -334,7 +319,6 @@ class QuizGame extends HTMLElement {
           transition: --sx 3s, --sy 3s;
         }
 
-        /* Particles */
         .particles {
           position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1;
         }
@@ -411,10 +395,8 @@ class QuizGame extends HTMLElement {
         <div class="confetti-container" id="confetti"></div>
       </div>`;
 
-        // Ambient particles
         this._spawnParticles();
 
-        // Ladder toggle
         const ladderOverlay = this.shadowRoot.getElementById("ladder-overlay");
         this.shadowRoot.getElementById("ladder-btn").onclick = () => {
             this._renderLadder();
@@ -422,7 +404,6 @@ class QuizGame extends HTMLElement {
         };
         this.shadowRoot.getElementById("ladder-close").onclick = () => ladderOverlay.classList.remove("open");
 
-        // Jokers
         this.shadowRoot.getElementById("joker-fifty").onclick = () => this._useFifty();
         this.shadowRoot.getElementById("joker-audience").onclick = () => this._useAudience();
         this.shadowRoot.getElementById("joker-phone").onclick = () => this._usePhone();
@@ -472,13 +453,11 @@ class QuizGame extends HTMLElement {
             answersEl.appendChild(btn);
         });
 
-        // Reset joker overlays
         this.shadowRoot.getElementById("audience-overlay").classList.remove("open");
         this.shadowRoot.getElementById("phone-overlay").classList.remove("open");
     }
 
     _selectAnswer(btn, opt) {
-        // Prevent double-click
         const btns = this.shadowRoot.querySelectorAll(".answer-btn");
         btns.forEach(b => b.style.pointerEvents = "none");
 
@@ -496,12 +475,10 @@ class QuizGame extends HTMLElement {
             }, 1200);
         } else {
             btn.classList.add("wrong");
-            // Reveal correct answer
             btns.forEach(b => {
                 if (b.dataset.correct === "true") b.classList.add("correct");
             });
 
-            // Fall back to last safety net
             let safeAmount = 0;
             for (const s of SAFE_NETS) {
                 if (s < this._level) safeAmount = LADDER[s];
@@ -520,7 +497,6 @@ class QuizGame extends HTMLElement {
         const q = this._questions[this._level];
         const btns = [...this.shadowRoot.querySelectorAll(".answer-btn")];
         const wrongBtns = btns.filter(b => b.dataset.correct === "false" && !b.classList.contains("dimmed"));
-        // Remove 2 wrong answers
         const toRemove = wrongBtns.sort(() => Math.random() - 0.5).slice(0, 2);
         toRemove.forEach(b => b.classList.add("dimmed"));
     }
@@ -534,9 +510,8 @@ class QuizGame extends HTMLElement {
         const letters = ["A", "B", "C", "D"];
         const correctIdx = q.options.findIndex(o => o.correct);
 
-        // Generate biased percentages
         const pcts = [0, 0, 0, 0];
-        pcts[correctIdx] = 45 + Math.floor(Math.random() * 30); // 45-74%
+        pcts[correctIdx] = 45 + Math.floor(Math.random() * 30);
         let remaining = 100 - pcts[correctIdx];
         for (let i = 0; i < 4; i++) {
             if (i === correctIdx) continue;
@@ -546,7 +521,6 @@ class QuizGame extends HTMLElement {
             pcts[i] = share;
             remaining -= share;
         }
-        // Give leftover to a random wrong answer
         if (remaining > 0) {
             const wrongVisible = [0,1,2,3].filter(i => i !== correctIdx &&
                 !this.shadowRoot.querySelectorAll(".answer-btn")[i]?.classList.contains("dimmed"));
@@ -588,7 +562,6 @@ class QuizGame extends HTMLElement {
         const names = ["Oma Helga", "Onkel Tom", "Tante Lisa", "Prof. Schmidt", "Nachbar Klaus"];
         const name = names[Math.floor(Math.random() * names.length)];
 
-        // 85% chance of correct answer
         const isRight = Math.random() < 0.85;
         let answerIdx = correctIdx;
         if (!isRight) {
@@ -612,7 +585,6 @@ class QuizGame extends HTMLElement {
 
         overlay.classList.add("open");
 
-        // Also highlight the suggested answer
         const btns = this.shadowRoot.querySelectorAll(".answer-btn");
         btns[answerIdx]?.classList.add("highlighted");
 
@@ -670,7 +642,6 @@ class QuizGame extends HTMLElement {
 
         result.classList.add("open");
 
-        // Map the quiz score to a game score (0-10 range for pointsEarned calc)
         const gameScore = this._level;
 
         setTimeout(() => {

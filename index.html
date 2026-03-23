@@ -32,11 +32,9 @@
 <body>
 <app-shell></app-shell>
 
-<!-- preload audio for instant playback -->
 <audio src="assets/audio/ding.mp3" preload="auto"></audio>
 <audio src="assets/audio/buzz.mp3" preload="auto"></audio>
 
-<!-- main entrypoint — cache-busting via timestamp, design switcher -->
 <script>
     const design = localStorage.getItem("appDesign") || "modern";
     const file = design === "classic" ? "app-shell-classic.js" : "app-shell.js";

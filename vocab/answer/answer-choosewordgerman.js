@@ -1,8 +1,3 @@
-// vocab/answer/answer-choosewordgerman.js
-//
-// Reverse-mode answer component: choose the correct German word
-// for a given English question.
-
 import "./elements/next-button.js";
 import {playVoice} from "../../core/audio.js";
 

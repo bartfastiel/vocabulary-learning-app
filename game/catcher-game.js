@@ -1,6 +1,3 @@
-// game/catcher-game.js
-// Catch falling stars ⭐ with a basket, avoid bombs 💣. 30 seconds, 3 lives.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 const CW = 400, CH = 500;
 const BASKET_W = 70, BASKET_H = 40;
@@ -58,20 +55,17 @@ class CatcherGame extends HTMLElement {
 
     _bindInput() {
         const sig = { signal: this._controller.signal };
-        // mouse
         this._cv.addEventListener("mousemove", e => {
             const r  = this._cv.getBoundingClientRect();
             const mx = (e.clientX - r.left) * (CW / r.width);
             this._basketX = Math.max(0, Math.min(CW - BASKET_W, mx - BASKET_W / 2));
         }, sig);
-        // touch
         this._cv.addEventListener("touchmove", e => {
             e.preventDefault();
             const r  = this._cv.getBoundingClientRect();
             const mx = (e.touches[0].clientX - r.left) * (CW / r.width);
             this._basketX = Math.max(0, Math.min(CW - BASKET_W, mx - BASKET_W / 2));
         }, { ...sig, passive: false });
-        // arrow keys
         document.addEventListener("keydown", e => {
             if (e.key === "ArrowLeft")  this._basketX = Math.max(0, this._basketX - 24);
             if (e.key === "ArrowRight") this._basketX = Math.min(CW - BASKET_W, this._basketX + 24);
@@ -100,7 +94,6 @@ class CatcherGame extends HTMLElement {
             const it = this._items[i];
             it.y += it.vy;
 
-            // catch check
             if (it.y + ITEM_R >= basketY &&
                 it.x >= this._basketX - ITEM_R &&
                 it.x <= this._basketX + BASKET_W + ITEM_R) {
@@ -115,7 +108,6 @@ class CatcherGame extends HTMLElement {
                 }
                 continue;
             }
-            // fell off
             if (it.y - ITEM_R > CH) {
                 this._items.splice(i, 1);
                 if (it.good) {
@@ -125,7 +117,6 @@ class CatcherGame extends HTMLElement {
             }
         }
 
-        // particles
         for (let i = this._particles.length - 1; i >= 0; i--) {
             const p = this._particles[i];
             p.x += p.vx; p.y += p.vy; p.life--;
@@ -161,19 +152,16 @@ class CatcherGame extends HTMLElement {
 
     _draw() {
         const ctx = this._ctx;
-        // bg gradient — night sky
         const bg = ctx.createLinearGradient(0, 0, 0, CH);
         bg.addColorStop(0, "#0a0a2e"); bg.addColorStop(1, "#1a1060");
         ctx.fillStyle = bg; ctx.fillRect(0, 0, CW, CH);
 
-        // twinkling stars background
         ctx.fillStyle = "rgba(255,255,255,0.5)";
         [[30,40],[80,80],[150,20],[220,60],[300,35],[360,90],[50,140],[180,110]].forEach(([x,y]) => {
             const r = 0.5 + ((this._frame * 0.07 + x) % 1) * 1;
             ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
         });
 
-        // particles
         for (const p of this._particles) {
             ctx.globalAlpha = p.life / 20;
             ctx.fillStyle = p.color;
@@ -181,12 +169,10 @@ class CatcherGame extends HTMLElement {
         }
         ctx.globalAlpha = 1;
 
-        // items
         ctx.font = `${ITEM_R * 2}px sans-serif`;
         ctx.textAlign = "center"; ctx.textBaseline = "middle";
         for (const it of this._items) ctx.fillText(it.emoji, it.x, it.y);
 
-        // basket
         const basketY = CH - BASKET_H - 14;
         const bx = this._basketX;
         ctx.fillStyle = "#8D6E63";
@@ -199,7 +185,6 @@ class CatcherGame extends HTMLElement {
         ctx.fillStyle = "#A1887F";
         ctx.beginPath(); ctx.roundRect(bx - 4, basketY - 6, BASKET_W + 8, 12, 4); ctx.fill();
 
-        // HUD
         ctx.fillStyle = "white"; ctx.font = "bold 18px 'Segoe UI',sans-serif";
         ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
         ctx.fillText(`⭐ ${this._score}`, 10, 30);

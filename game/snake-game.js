@@ -1,6 +1,3 @@
-// game/snake-game.js
-// Classic Snake. Arrow keys / WASD / swipe to steer. Eat apples, avoid walls and yourself.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 const COLS = 20, ROWS = 20, CELL = 18;
 const CW = COLS * CELL, CH = ROWS * CELL;
@@ -29,7 +26,7 @@ class SnakeGame extends HTMLElement {
         this._ctx = this._cv.getContext("2d");
         this._init();
         this._bindInput();
-        this._draw();   // show board before start
+        this._draw();
     }
 
     disconnectedCallback() {
@@ -43,7 +40,7 @@ class SnakeGame extends HTMLElement {
         this._nextDir = { x: 1, y: 0 };
         this._apple   = this._spawnApple();
         this._score   = 0;
-        this._alive   = false;   // wait for first input
+        this._alive   = false;
         this._dead    = false;
         this._bonusApple = null;
         this._bonusTimer  = 0;
@@ -74,7 +71,6 @@ class SnakeGame extends HTMLElement {
             }
         }, sig);
 
-        // swipe
         let tx, ty;
         this._cv.addEventListener("touchstart", e => {
             tx = e.touches[0].clientX; ty = e.touches[0].clientY;
@@ -103,9 +99,7 @@ class SnakeGame extends HTMLElement {
         this._dir = this._nextDir;
         const head = { x: this._snake[0].x + this._dir.x, y: this._snake[0].y + this._dir.y };
 
-        // wall collision
         if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) { this._die(); return; }
-        // self collision
         if (this._snake.some(s => s.x === head.x && s.y === head.y)) { this._die(); return; }
 
         this._snake.unshift(head);
@@ -115,10 +109,9 @@ class SnakeGame extends HTMLElement {
             this._score++;
             this._apple = this._spawnApple();
             ate = true;
-            // spawn bonus apple every 5
             if (this._score % 5 === 0) {
                 this._bonusApple = this._spawnApple();
-                this._bonusTimer = 20; // lasts 20 ticks
+                this._bonusTimer = 20;
             }
         }
         if (this._bonusApple && head.x === this._bonusApple.x && head.y === this._bonusApple.y) {
@@ -147,7 +140,6 @@ class SnakeGame extends HTMLElement {
 
     _draw() {
         const ctx = this._ctx;
-        // background grid
         ctx.fillStyle = "#0a1628";
         ctx.fillRect(0, 0, CW, CH);
         ctx.strokeStyle = "rgba(255,255,255,0.04)";
@@ -155,7 +147,6 @@ class SnakeGame extends HTMLElement {
         for (let x = 0; x <= COLS; x++) { ctx.beginPath(); ctx.moveTo(x*CELL,0); ctx.lineTo(x*CELL,CH); ctx.stroke(); }
         for (let y = 0; y <= ROWS; y++) { ctx.beginPath(); ctx.moveTo(0,y*CELL); ctx.lineTo(CW,y*CELL); ctx.stroke(); }
 
-        // snake
         this._snake.forEach((seg, i) => {
             const t = i / this._snake.length;
             const r = Math.round(50  + (1 - t) * 75);
@@ -166,7 +157,6 @@ class SnakeGame extends HTMLElement {
             ctx.roundRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2, i === 0 ? 5 : 3);
             ctx.fill();
         });
-        // head eyes
         if (this._snake.length) {
             const h = this._snake[0];
             ctx.fillStyle = "white";
@@ -179,24 +169,20 @@ class SnakeGame extends HTMLElement {
             ctx.beginPath(); ctx.arc(ex + 3.5, ey - 2, 1, 0, Math.PI*2); ctx.fill();
         }
 
-        // apple
         ctx.font = `${CELL + 2}px sans-serif`;
         ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText("🍎", this._apple.x * CELL + CELL/2, this._apple.y * CELL + CELL/2 + 1);
 
-        // bonus apple
         if (this._bonusApple) {
             ctx.fillText("⭐", this._bonusApple.x * CELL + CELL/2, this._bonusApple.y * CELL + CELL/2 + 1);
         }
 
-        // score
         ctx.fillStyle = "rgba(0,0,0,0.55)";
         ctx.beginPath(); ctx.roundRect(4, 4, 110, 26, 6); ctx.fill();
         ctx.fillStyle = "white"; ctx.font = "bold 14px 'Segoe UI',sans-serif";
         ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
         ctx.fillText(`🍎 ${this._score}`, 12, 22);
 
-        // "press key to start"
         if (!this._alive && !this._dead) {
             ctx.fillStyle = "rgba(0,0,0,0.6)";
             ctx.beginPath(); ctx.roundRect(CW/2-120, CH/2-22, 240, 44, 10); ctx.fill();
@@ -205,7 +191,6 @@ class SnakeGame extends HTMLElement {
             ctx.fillText("Taste drücken / Wischen ✋", CW/2, CH/2);
         }
 
-        // death
         if (this._dead) {
             ctx.fillStyle = "rgba(0,0,0,0.55)"; ctx.fillRect(0,0,CW,CH);
             ctx.fillStyle = "white"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
