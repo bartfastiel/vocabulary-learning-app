@@ -60,6 +60,16 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
         const nextBtn = this.shadowRoot.querySelector("next-button");
         let wasCorrect = false;
 
+        let timer = null;
+        const advance = (correct) => {
+            if (timer) { clearTimeout(timer); timer = null; }
+            this.dispatchEvent(new CustomEvent("answered", {
+                bubbles: true, detail: { correct }
+            }));
+        };
+
+        nextBtn.addEventListener("next", () => advance(wasCorrect));
+
         options.forEach(opt => {
             const b = document.createElement("button");
             b.className = "option-btn";
@@ -83,17 +93,11 @@ class VocabAnswerChooseWordEnglish extends HTMLElement {
                 }
 
                 this.dispatchEvent(new CustomEvent("checked", {
-                    bubbles: true,
-                    detail: { correct: isCorrect }
+                    bubbles: true, detail: { correct: isCorrect }
                 }));
 
-                const delay = isCorrect ? 2000 : 3500;
-                setTimeout(() => {
-                    this.dispatchEvent(new CustomEvent("answered", {
-                        bubbles: true,
-                        detail: { correct: isCorrect }
-                    }));
-                }, delay);
+                nextBtn.show();
+                timer = setTimeout(() => advance(isCorrect), isCorrect ? 2000 : 3500);
             };
             optionsDiv.appendChild(b);
         });

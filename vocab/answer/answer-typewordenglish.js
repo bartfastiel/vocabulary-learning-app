@@ -96,8 +96,19 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
         input.style.color = textColor;
 
         let answered = false;
+        let timer = null;
+        const advance = (correct) => {
+            if (timer) { clearTimeout(timer); timer = null; }
+            this.dispatchEvent(new CustomEvent("answered", {
+                bubbles: true, detail: { correct }
+            }));
+        };
+
         button.onclick = () => {
-            if (answered) return;
+            if (answered) {
+                advance(input.style.backgroundColor === "rgb(129, 199, 132)");
+                return;
+            }
             answered = true;
             const user = input.value.trim().toLowerCase();
             const isCorrect = user === correct;
@@ -107,24 +118,17 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
             this.updatePoints(isCorrect ? +1 : -1);
             this.updateStreak(isCorrect);
             input.disabled = true;
-            button.disabled = true;
 
             if (!isCorrect) {
                 feedback.innerHTML = `<div class="correct-answer">Richtig wäre: <b>${this.word.en}</b></div>`;
             }
 
             this.dispatchEvent(new CustomEvent("checked", {
-                bubbles: true,
-                detail: { correct: isCorrect }
+                bubbles: true, detail: { correct: isCorrect }
             }));
 
-            const delay = isCorrect ? 2000 : 3500;
-            setTimeout(() => {
-                this.dispatchEvent(new CustomEvent("answered", {
-                    bubbles: true,
-                    detail: { correct: isCorrect }
-                }));
-            }, delay);
+            button.textContent = "N\u00e4chste Frage";
+            timer = setTimeout(() => advance(isCorrect), isCorrect ? 2000 : 3500);
         };
     }
 }

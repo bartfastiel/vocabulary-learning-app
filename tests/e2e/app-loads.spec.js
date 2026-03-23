@@ -64,8 +64,8 @@ test.describe("App Loading", () => {
     expect(jsErrors).toEqual([]);
   });
 
-  test("page title is Lerntrainer", async ({ page }) => {
+  test("page title is Vokabeltrainer + Raketen-Spiel", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle("Lerntrainer");
+    await expect(page).toHaveTitle("Vokabeltrainer + Raketen-Spiel");
   });
 });
