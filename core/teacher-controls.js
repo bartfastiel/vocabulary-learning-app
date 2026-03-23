@@ -1,34 +1,24 @@
-// core/teacher-controls.js
-// Teacher dashboard — create a class, manage students, control game access.
-// Everything synced via Supabase so restrictions apply on student devices.
-
 import { supabaseGet, supabaseUpsert, supabaseInsert, supabaseUpdate } from "./supabase.js";
 import { getActiveProfile, getActiveId } from "./profiles.js";
 
-// ─── Cloud-based class restrictions ─────────────────────────────────────────
-
-/** Get the class settings for the current student (if they're in a class) */
 export async function getMyClassSettings() {
     try {
         const id = getActiveId();
         if (!id) return null;
-        // Check if this profile is in a group
         const members = await supabaseGet("group_members", `profile_id=eq.${encodeURIComponent(id)}&select=group_id`);
         if (!members || members.length === 0) return null;
         const gid = members[0].group_id;
         const groups = await supabaseGet("groups", `id=eq.${encodeURIComponent(gid)}&select=settings,teacher_id`);
         if (!groups || groups.length === 0) return null;
         const group = groups[0];
-        // Only apply restrictions if I'm NOT the teacher
         if (group.teacher_id === id) return null;
         return group.settings || {};
     } catch { return null; }
 }
 
-/** Check if a specific game is allowed for this student */
 export async function isGameAllowedCloud(gameId) {
     const settings = await getMyClassSettings();
-    if (!settings) return true; // no class or is teacher
+    if (!settings) return true;
     if (settings.gamesEnabled === false) return false;
     if (settings.allowedGames && settings.allowedGames[gameId] === false) return false;
     if (settings.scheduleEnabled) {
@@ -41,7 +31,6 @@ export async function isGameAllowedCloud(gameId) {
     return true;
 }
 
-/** Check if playing is generally allowed */
 export async function isPlayAllowedCloud() {
     const settings = await getMyClassSettings();
     if (!settings) return { allowed: true };
@@ -58,13 +47,10 @@ export async function isPlayAllowedCloud() {
     return { allowed: true };
 }
 
-// For backwards compatibility (game-lobby imports these)
 export function isPlayAllowed() { return { allowed: true }; }
 export function isGameAllowed() { return true; }
 export function trackPlayStart() {}
 export function trackPlayEnd() {}
-
-// ─── Teacher Dashboard Component ────────────────────────────────────────────
 
 const GAME_LIST = [
     { id: "reaction", label: "Reaktion", emoji: "\u26A1" },
@@ -105,13 +91,11 @@ class TeacherControls extends HTMLElement {
         const profile = getActiveProfile();
         const profileId = getActiveId();
 
-        // Find groups where I'm the teacher
         let myClasses = [];
         try {
             myClasses = await supabaseGet("groups", `teacher_id=eq.${encodeURIComponent(profileId)}`) || [];
         } catch {}
 
-        // If no class yet, show create screen
         if (myClasses.length === 0) {
             this._renderCreate(profile);
         } else {
@@ -147,7 +131,6 @@ class TeacherControls extends HTMLElement {
     }
 
     async _renderDashboard(profile, cls) {
-        // Load students in this class
         const members = await supabaseGet("group_members", `group_id=eq.${encodeURIComponent(cls.id)}&select=profile_id`) || [];
         const studentIds = members.map(m => m.profile_id).filter(id => id !== getActiveId());
         let students = [];
@@ -242,7 +225,6 @@ class TeacherControls extends HTMLElement {
             </div>
         </div>`;
 
-        // Events
         this.shadowRoot.getElementById("close").onclick = () => this.close();
 
         const save = async (newSettings) => {
@@ -250,19 +232,16 @@ class TeacherControls extends HTMLElement {
             await supabaseUpdate("groups", { id: cls.id }, { settings });
         };
 
-        // Toggle: games enabled
         this.shadowRoot.getElementById("sw-games").onclick = async () => {
             await save({ gamesEnabled: settings.gamesEnabled === false ? true : false });
             this._loadAndRender();
         };
 
-        // Toggle: schedule
         this.shadowRoot.getElementById("sw-schedule").onclick = async () => {
             await save({ scheduleEnabled: !settings.scheduleEnabled });
             this._loadAndRender();
         };
 
-        // Weekend toggle
         const swWeekend = this.shadowRoot.getElementById("sw-weekend");
         if (swWeekend) {
             swWeekend.onclick = async () => {
@@ -271,13 +250,11 @@ class TeacherControls extends HTMLElement {
             };
         }
 
-        // Schedule times
         const sf = this.shadowRoot.getElementById("sched-from");
         const st = this.shadowRoot.getElementById("sched-to");
         if (sf) sf.onchange = () => save({ scheduleFrom: sf.value });
         if (st) st.onchange = () => save({ scheduleTo: st.value });
 
-        // Game chips
         this.shadowRoot.querySelectorAll(".game-chip").forEach(chip => {
             chip.onclick = async () => {
                 const gid = chip.dataset.gid;

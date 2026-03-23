@@ -1,5 +1,3 @@
-// vocab/shared/next-button.js
-
 class NextButton extends HTMLElement {
     constructor() {
         super();
@@ -29,7 +27,6 @@ class NextButton extends HTMLElement {
 
         const btn = this.shadowRoot.querySelector("button");
 
-        // Allow external show/hide
         this.show = () => (btn.style.display = "inline-block");
         this.hide = () => (btn.style.display = "none");
 

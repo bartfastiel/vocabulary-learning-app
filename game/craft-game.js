@@ -1,6 +1,3 @@
-// game/craft-game.js
-// 2D block-building sandbox — mine, build, explore, survive.
-// Fires CustomEvent("game-over", { bubbles:true, detail:{ score, pointsEarned } })
 
 const W = 400, H = 300;
 const TILE = 16;
@@ -8,9 +5,8 @@ const WORLD_W = 80, WORLD_H = 50;
 const GRAVITY = 600;
 const JUMP = -280;
 const SPEED = 120;
-const SKY_TOP = 15; // rows of sky above ground
+const SKY_TOP = 15;
 
-// Block types
 const B = {
     AIR: 0, DIRT: 1, GRASS: 2, STONE: 3, WOOD: 4, LEAVES: 5,
     SAND: 6, WATER: 7, COAL: 8, IRON: 9, GOLD: 10, DIAMOND: 11,
@@ -84,38 +80,30 @@ class CraftGame extends HTMLElement {
     disconnectedCallback() { cancelAnimationFrame(this._raf); this._ctrl?.abort(); }
 
     _init() {
-        // Generate world
         this._world = Array.from({ length: WORLD_H }, () => new Uint8Array(WORLD_W));
         this._generateWorld();
 
-        // Player
         this._px = WORLD_W / 2 * TILE;
         this._py = (SKY_TOP - 3) * TILE;
         this._pvx = 0; this._pvy = 0;
         this._onGround = false;
         this._facingRight = true;
 
-        // Inventory
         this._inventory = {};
         this._selectedBlock = B.DIRT;
         this._hotbar = [B.DIRT, B.STONE, B.WOOD, B.PLANK, B.BRICK, B.GLASS, B.SAND, B.LEAVES];
 
-        // Mining
         this._mining = null; this._mineProgress = 0;
 
-        // Camera
         this._camX = 0; this._camY = 0;
 
-        // Time
-        this._dayTime = 0.3; // 0-1, 0.25=noon, 0.75=midnight
+        this._dayTime = 0.3;
         this._score = 0;
         this._gameTimer = 120;
         this._gameOver = false;
 
-        // Particles
         this._particles = [];
 
-        // Place player on ground
         for (let y = 0; y < WORLD_H; y++) {
             if (this._world[y][Math.floor(WORLD_W / 2)] !== B.AIR) {
                 this._py = (y - 2) * TILE;
@@ -127,7 +115,6 @@ class CraftGame extends HTMLElement {
     _generateWorld() {
         const w = this._world;
 
-        // Terrain heights using simple noise
         const heights = [];
         let h = SKY_TOP + 2;
         for (let x = 0; x < WORLD_W; x++) {
@@ -142,7 +129,6 @@ class CraftGame extends HTMLElement {
                 if (y >= WORLD_H - 1) w[y][x] = B.BEDROCK;
                 else if (y >= WORLD_H - 3) w[y][x] = Math.random() < 0.5 ? B.BEDROCK : B.LAVA;
                 else if (y > surfY + 15) {
-                    // Deep underground
                     w[y][x] = B.STONE;
                     if (Math.random() < 0.02) w[y][x] = B.DIAMOND;
                     else if (Math.random() < 0.04) w[y][x] = B.GOLD;
@@ -152,7 +138,6 @@ class CraftGame extends HTMLElement {
                     w[y][x] = B.STONE;
                     if (Math.random() < 0.05) w[y][x] = B.COAL;
                     else if (Math.random() < 0.02) w[y][x] = B.IRON;
-                    // Caves
                     if (Math.sin(x * 0.3 + y * 0.5) + Math.sin(x * 0.1 - y * 0.3) > 1.2) w[y][x] = B.AIR;
                 } else if (y > surfY) {
                     w[y][x] = B.DIRT;
@@ -161,13 +146,11 @@ class CraftGame extends HTMLElement {
                 }
             }
 
-            // Trees
             if (heights[x] === surfY && Math.random() < 0.1 && x > 3 && x < WORLD_W - 3) {
                 const treeH = 4 + Math.floor(Math.random() * 3);
                 for (let ty = 1; ty <= treeH; ty++) {
                     if (surfY - ty >= 0) w[surfY - ty][x] = B.WOOD;
                 }
-                // Canopy
                 for (let ly = -2; ly <= 0; ly++) {
                     for (let lx = -2; lx <= 2; lx++) {
                         const tx = x + lx, ty = surfY - treeH + ly;
@@ -185,11 +168,10 @@ class CraftGame extends HTMLElement {
     _bind() {
         this._keys = { left: false, right: false, jump: false };
         this._mouse = { x: 0, y: 0, left: false, right: false };
-        this._touchMode = "mine"; // "mine" or "build"
+        this._touchMode = "mine";
         this._ctrl = new AbortController();
         const o = { signal: this._ctrl.signal };
 
-        // ── Keyboard ──
         document.addEventListener("keydown", e => {
             if (e.key === "ArrowLeft" || e.key === "a") this._keys.left = true;
             if (e.key === "ArrowRight" || e.key === "d") this._keys.right = true;
@@ -203,7 +185,6 @@ class CraftGame extends HTMLElement {
             if (e.key === "ArrowUp" || e.key === "w" || e.key === " ") this._keys.jump = false;
         }, o);
 
-        // ── Mouse (desktop) ──
         const c = this._canvas;
         const getPos = (e) => {
             const r = c.getBoundingClientRect();
@@ -229,14 +210,12 @@ class CraftGame extends HTMLElement {
             this._selectedBlock = this._hotbar[(idx + dir + this._hotbar.length) % this._hotbar.length];
         }, o);
 
-        // ── Touch (iPad) — auto-detect: block = mine, air = build ──
         c.addEventListener("touchstart", e => {
             e.preventDefault();
             const t = e.touches[0];
             const r = c.getBoundingClientRect();
             this._mouse.x = (t.clientX - r.left) / r.width * W;
             this._mouse.y = (t.clientY - r.top) / r.height * H;
-            // Auto-detect: if there's a block → mine, if air → build
             const wx = Math.floor((this._mouse.x + this._camX) / TILE);
             const wy = Math.floor((this._mouse.y + this._camY) / TILE);
             const block = this._getBlockAt(wx, wy);
@@ -256,7 +235,6 @@ class CraftGame extends HTMLElement {
             this._mining = null;
         }, o);
 
-        // ── Touch buttons ──
         const hold = (el, key) => {
             const start = (e) => { e.preventDefault(); this._keys[key] = true; el.classList.add("active"); };
             const end = (e) => { e.preventDefault(); this._keys[key] = false; el.classList.remove("active"); };
@@ -270,7 +248,6 @@ class CraftGame extends HTMLElement {
         hold(sr.getElementById("t-right"), "right");
         hold(sr.getElementById("t-jump"), "jump");
 
-        // Touch hotbar
         this._renderTouchHotbar();
     }
 
@@ -284,7 +261,6 @@ class CraftGame extends HTMLElement {
             const count = this._inventory[b] || 0;
             const item = document.createElement("div");
             item.className = "th-item" + (b === this._selectedBlock ? " sel" : "");
-            // Mini canvas for block preview
             const mc = document.createElement("canvas");
             mc.width = 16; mc.height = 16;
             const mx = mc.getContext("2d");
@@ -327,40 +303,32 @@ class CraftGame extends HTMLElement {
     }
 
     _update(dt) {
-        // Movement
         this._pvx = 0;
         if (this._keys.left) { this._pvx = -SPEED; this._facingRight = false; }
         if (this._keys.right) { this._pvx = SPEED; this._facingRight = true; }
         if (this._keys.jump && this._onGround) { this._pvy = JUMP; this._onGround = false; }
 
-        // Water physics
         const inWater = this._getBlock(this._px + 8, this._py + 8) === B.WATER;
         const grav = inWater ? GRAVITY * 0.3 : GRAVITY;
         this._pvy += grav * dt;
         if (inWater) { this._pvy *= 0.95; if (this._keys.jump) this._pvy -= 200 * dt; }
         if (this._pvy > 400) this._pvy = 400;
 
-        // Move X
         this._px += this._pvx * dt;
         this._resolveX();
 
-        // Move Y
         this._py += this._pvy * dt;
         this._resolveY();
 
-        // World bounds
         this._px = Math.max(0, Math.min((WORLD_W - 1) * TILE, this._px));
 
-        // Camera
         this._camX += (this._px - W / 2 - this._camX) * 0.1;
         this._camY += (this._py - H / 2 - this._camY) * 0.1;
         this._camX = Math.max(0, Math.min(WORLD_W * TILE - W, this._camX));
         this._camY = Math.max(-TILE * 5, Math.min(WORLD_H * TILE - H, this._camY));
 
-        // Day/night cycle
         this._dayTime = (this._dayTime + dt * 0.01) % 1;
 
-        // Mining
         if (this._mouse.left) {
             const wx = Math.floor((this._mouse.x + this._camX) / TILE);
             const wy = Math.floor((this._mouse.y + this._camY) / TILE);
@@ -370,12 +338,10 @@ class CraftGame extends HTMLElement {
                 if (this._mining !== key) { this._mining = key; this._mineProgress = 0; }
                 this._mineProgress += dt;
                 if (this._mineProgress >= BLOCK_INFO[block].hardness * 0.3) {
-                    // Break block
                     this._world[wy][wx] = B.AIR;
                     this._inventory[block] = (this._inventory[block] || 0) + 1;
                     this._score += block >= B.COAL ? 20 : 5;
                     this._mining = null; this._mineProgress = 0;
-                    // Particles
                     const info = BLOCK_INFO[block];
                     for (let i = 0; i < 6; i++) {
                         this._particles.push({
@@ -384,7 +350,6 @@ class CraftGame extends HTMLElement {
                             life: 0.4, color: info.color, size: 2 + Math.random() * 2,
                         });
                     }
-                    // Add to hotbar if not there
                     if (!this._hotbar.includes(block) && this._hotbar.length < 12) {
                         this._hotbar.push(block);
                     }
@@ -393,14 +358,12 @@ class CraftGame extends HTMLElement {
             }
         }
 
-        // Placing blocks
         if (this._mouse.right) {
             const wx = Math.floor((this._mouse.x + this._camX) / TILE);
             const wy = Math.floor((this._mouse.y + this._camY) / TILE);
             if (this._getBlockAt(wx, wy) === B.AIR && this._selectedBlock > 0) {
                 const count = this._inventory[this._selectedBlock] || 0;
                 if (count > 0) {
-                    // Don't place on player
                     const px1 = Math.floor(this._px / TILE), py1 = Math.floor(this._py / TILE);
                     const px2 = Math.floor((this._px + 10) / TILE), py2 = Math.floor((this._py + 14) / TILE);
                     if (!(wx >= px1 && wx <= px2 && wy >= py1 && wy <= py2)) {
@@ -411,10 +374,9 @@ class CraftGame extends HTMLElement {
                     }
                 }
             }
-            this._mouse.right = false; // Single place
+            this._mouse.right = false;
         }
 
-        // Particles
         this._particles = this._particles.filter(p => {
             p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 200 * dt;
             return p.life > 0;
@@ -472,7 +434,6 @@ class CraftGame extends HTMLElement {
         const cx = Math.floor(this._camX), cy = Math.floor(this._camY);
         const now = performance.now();
 
-        // Sky gradient based on time of day
         const dayBright = Math.max(0, Math.sin(this._dayTime * Math.PI * 2));
         const skyTop = this._lerpColor("#000820", "#87CEEB", dayBright);
         const skyBot = this._lerpColor("#0a0a20", "#E0F0FF", dayBright);
@@ -482,7 +443,6 @@ class CraftGame extends HTMLElement {
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, H);
 
-        // Sun/Moon
         const sunAngle = this._dayTime * Math.PI * 2 - Math.PI / 2;
         const sunX = W / 2 + Math.cos(sunAngle) * 150;
         const sunY = H * 0.4 - Math.sin(sunAngle) * 120;
@@ -496,7 +456,6 @@ class CraftGame extends HTMLElement {
             ctx.beginPath(); ctx.arc(W - sunX + W * 0.3, sunY + 20, 10, 0, Math.PI * 2); ctx.fill();
         }
 
-        // Stars at night
         if (dayBright < 0.4) {
             ctx.fillStyle = `rgba(255,255,255,${(0.4 - dayBright) * 2})`;
             for (let i = 0; i < 30; i++) {
@@ -506,7 +465,6 @@ class CraftGame extends HTMLElement {
             }
         }
 
-        // Clouds
         ctx.fillStyle = `rgba(255,255,255,${0.3 * dayBright + 0.1})`;
         for (let i = 0; i < 6; i++) {
             const cloudX = ((i * 120 + now * 0.01) % (W + 80)) - 40;
@@ -518,7 +476,6 @@ class CraftGame extends HTMLElement {
             ctx.fill();
         }
 
-        // Blocks
         const startX = Math.floor(cx / TILE), startY = Math.floor(cy / TILE);
         const endX = startX + Math.ceil(W / TILE) + 1, endY = startY + Math.ceil(H / TILE) + 1;
 
@@ -529,21 +486,17 @@ class CraftGame extends HTMLElement {
                 const info = BLOCK_INFO[block];
                 const sx = x * TILE - cx, sy = y * TILE - cy;
 
-                // Main color
                 ctx.fillStyle = info.color;
                 ctx.fillRect(sx, sy, TILE, TILE);
 
-                // Block-specific details
                 if (info.topH && info.top) {
                     ctx.fillStyle = info.top;
                     ctx.fillRect(sx, sy, TILE, info.topH);
                 }
 
-                // Ore/accent spots
                 if (info.accent) {
                     ctx.fillStyle = info.accent;
                     if (block === B.COAL || block === B.IRON || block === B.GOLD || block === B.DIAMOND) {
-                        // Ore spots
                         for (let i = 0; i < 3; i++) {
                             const ox = (x * 7 + y * 13 + i * 5) % 12 + 2;
                             const oy = (x * 11 + y * 3 + i * 7) % 10 + 3;
@@ -576,7 +529,6 @@ class CraftGame extends HTMLElement {
                     }
                 }
 
-                // Block edge (subtle 3D effect)
                 ctx.fillStyle = "rgba(255,255,255,0.08)";
                 ctx.fillRect(sx, sy, TILE, 1);
                 ctx.fillRect(sx, sy, 1, TILE);
@@ -584,7 +536,6 @@ class CraftGame extends HTMLElement {
                 ctx.fillRect(sx + TILE - 1, sy, 1, TILE);
                 ctx.fillRect(sx, sy + TILE - 1, TILE, 1);
 
-                // Night darkening
                 if (dayBright < 0.8) {
                     ctx.fillStyle = `rgba(0,0,30,${(0.8 - dayBright) * 0.5})`;
                     ctx.fillRect(sx, sy, TILE, TILE);
@@ -592,14 +543,12 @@ class CraftGame extends HTMLElement {
             }
         }
 
-        // Mining indicator
         if (this._mining && this._mineProgress > 0) {
             const [mx, my] = this._mining.split(",").map(Number);
             const sx = mx * TILE - cx, sy = my * TILE - cy;
             const block = this._getBlockAt(mx, my);
             const hardness = BLOCK_INFO[block]?.hardness || 1;
             const pct = this._mineProgress / (hardness * 0.3);
-            // Crack overlay
             ctx.strokeStyle = "rgba(0,0,0,0.6)";
             ctx.lineWidth = 1;
             const cracks = Math.floor(pct * 4);
@@ -612,7 +561,6 @@ class CraftGame extends HTMLElement {
             }
         }
 
-        // Particles
         for (const p of this._particles) {
             ctx.globalAlpha = p.life * 2;
             ctx.fillStyle = p.color;
@@ -620,10 +568,8 @@ class CraftGame extends HTMLElement {
         }
         ctx.globalAlpha = 1;
 
-        // Player
         this._drawPlayer(ctx, cx, cy, now);
 
-        // Block highlight (cursor)
         const mx = Math.floor((this._mouse.x + cx) / TILE);
         const my = Math.floor((this._mouse.y + cy) / TILE);
         if (mx >= 0 && mx < WORLD_W && my >= 0 && my < WORLD_H) {
@@ -632,7 +578,6 @@ class CraftGame extends HTMLElement {
             ctx.strokeRect(mx * TILE - cx, my * TILE - cy, TILE, TILE);
         }
 
-        // HUD
         this._drawHUD(ctx, now);
     }
 
@@ -647,19 +592,14 @@ class CraftGame extends HTMLElement {
             ctx.translate(-(px + 5), 0);
         }
 
-        // Body
         ctx.fillStyle = "#4A90D9";
         ctx.fillRect(px + 2, py + 5, 8, 7);
-        // Head
         ctx.fillStyle = "#FFDBB4";
         ctx.fillRect(px + 2, py - 2, 8, 7);
-        // Hair
         ctx.fillStyle = "#4A3728";
         ctx.fillRect(px + 1, py - 3, 10, 3);
-        // Eyes
         ctx.fillStyle = "#333";
         ctx.fillRect(px + 7, py + 1, 2, 2);
-        // Legs (walking animation)
         ctx.fillStyle = "#2E5A88";
         const walk = this._pvx !== 0 ? Math.sin(now * 0.01) * 2 : 0;
         ctx.fillRect(px + 2, py + 12, 3, 4 + walk);
@@ -669,13 +609,11 @@ class CraftGame extends HTMLElement {
     }
 
     _drawHUD(ctx, now) {
-        // Hotbar background
         const hbW = this._hotbar.length * 22 + 6;
         const hbX = W / 2 - hbW / 2;
         ctx.fillStyle = "rgba(0,0,0,0.7)";
         ctx.beginPath(); ctx.roundRect(hbX, H - 30, hbW, 26, 6); ctx.fill();
 
-        // Hotbar items
         for (let i = 0; i < this._hotbar.length; i++) {
             const b = this._hotbar[i];
             const x = hbX + 5 + i * 22;
@@ -684,7 +622,6 @@ class CraftGame extends HTMLElement {
                 ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
                 ctx.strokeRect(x - 1, H - 29, 20, 24);
             }
-            // Mini block
             const info = BLOCK_INFO[b];
             ctx.fillStyle = info.color || "#888";
             ctx.fillRect(x + 2, H - 26, 16, 16);
@@ -696,38 +633,32 @@ class CraftGame extends HTMLElement {
                 ctx.fillStyle = info.top;
                 ctx.fillRect(x + 2, H - 26, 16, 4);
             }
-            // Count
             const count = this._inventory[b] || 0;
             if (count > 0) {
                 ctx.fillStyle = "#fff"; ctx.font = "bold 7px sans-serif";
                 ctx.textAlign = "right";
                 ctx.fillText(count > 99 ? "99+" : count, x + 18, H - 8);
             }
-            // Key number
             ctx.fillStyle = "rgba(255,255,255,0.4)"; ctx.font = "6px sans-serif";
             ctx.textAlign = "center";
             ctx.fillText(i + 1, x + 10, H - 27);
         }
 
-        // Score
         ctx.fillStyle = "rgba(0,0,0,0.6)";
         ctx.beginPath(); ctx.roundRect(5, 5, 90, 22, 6); ctx.fill();
         ctx.fillStyle = "#fff"; ctx.font = "bold 12px sans-serif"; ctx.textAlign = "left";
         ctx.fillText("\u2B50 " + this._score, 12, 20);
 
-        // Timer
         ctx.fillStyle = "rgba(0,0,0,0.6)";
         ctx.beginPath(); ctx.roundRect(W / 2 - 25, 5, 50, 22, 6); ctx.fill();
         ctx.fillStyle = this._gameTimer < 15 ? "#ff4444" : "#fff";
         ctx.font = "bold 12px monospace"; ctx.textAlign = "center";
         ctx.fillText(Math.ceil(this._gameTimer) + "s", W / 2, 20);
 
-        // Block name
         const selInfo = BLOCK_INFO[this._selectedBlock];
         ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.font = "9px sans-serif"; ctx.textAlign = "center";
         ctx.fillText(selInfo.name, W / 2, H - 34);
 
-        // Game over
         if (this._gameOver) {
             ctx.fillStyle = "rgba(0,0,0,0.7)";
             ctx.fillRect(0, 0, W, H);

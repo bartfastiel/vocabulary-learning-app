@@ -1,13 +1,3 @@
-// vocab/vocab-editor.js
-//
-// Full-screen overlay to create and edit custom vocabulary lessons.
-// Custom lessons are stored in localStorage key "customVocab" as
-// [{ name, words: [{ de, en, allowImage: false }] }]
-//
-// Fires CustomEvent("vocab-updated", { bubbles: true, composed: true }) after saving.
-// Usage (from app-shell):
-//   editor.open();
-
 const LS_KEY = "customVocab";
 
 function loadCustom() {
@@ -17,16 +7,14 @@ function saveCustom(data) {
     localStorage.setItem(LS_KEY, JSON.stringify(data));
 }
 
-// ─── component ────────────────────────────────────────────────────────────────
-
 class VocabEditor extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
         this._data      = [];
-        this._editIdx   = -1;   // -1 = new lesson
-        this._stream    = null; // active camera stream
-        this._scanPairs = [];   // OCR result pairs
+        this._editIdx   = -1;
+        this._stream    = null;
+        this._scanPairs = [];
     }
 
     connectedCallback() {
@@ -42,8 +30,6 @@ class VocabEditor extends HTMLElement {
     close() {
         this.shadowRoot.querySelector(".overlay").classList.remove("active");
     }
-
-    // ── shell ─────────────────────────────────────────────────────────────────
 
     _renderShell() {
         this.shadowRoot.innerHTML = `
@@ -66,7 +52,6 @@ class VocabEditor extends HTMLElement {
           overflow: hidden;
         }
 
-        /* header */
         .ph {
           display: flex; align-items: center; gap: 0.5rem;
           background: linear-gradient(135deg, #007ea7, #26c6da);
@@ -86,10 +71,8 @@ class VocabEditor extends HTMLElement {
         }
         .ph-close:hover { background: rgba(255,255,255,0.35); }
 
-        /* body */
         .body { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.7rem; }
 
-        /* lesson list */
         .lesson-item {
           display: flex; align-items: center; gap: 0.5rem;
           border: 2px solid #e0e0e0; border-radius: 10px; padding: 0.7rem 0.8rem;
@@ -120,7 +103,6 @@ class VocabEditor extends HTMLElement {
         }
         .btn-primary:hover { filter: brightness(1.08); }
 
-        /* edit screen */
         label { font-size: 0.85rem; font-weight: bold; color: #555; display: block; margin-bottom: 3px; }
 
         input[type=text] {
@@ -184,7 +166,6 @@ class VocabEditor extends HTMLElement {
           letter-spacing: 0.05em; color: #aaa; margin-top: 0.3rem;
         }
 
-        /* scan button in edit screen */
         .btn-scan-open {
           width: 100%; padding: 0.65rem; border: 2px solid #4dd0e1;
           background: white; color: #007ea7; border-radius: 10px;
@@ -192,8 +173,6 @@ class VocabEditor extends HTMLElement {
           transition: all 0.15s; margin-top: 0.2rem;
         }
         .btn-scan-open:hover { background: #e0f7fa; }
-
-        /* ── scan screen ─────────────────────────────────────────────────── */
 
         .scan-upload-area {
           flex: 1; display: flex; flex-direction: column;
@@ -249,7 +228,6 @@ class VocabEditor extends HTMLElement {
       <div class="overlay">
         <div class="panel">
 
-          <!-- LESSONS SCREEN -->
           <div id="screen-lessons">
             <div class="ph">
               <span class="ph-title">✏️ Meine Vokabeln</span>
@@ -258,7 +236,6 @@ class VocabEditor extends HTMLElement {
             <div class="body" id="lessons-body"></div>
           </div>
 
-          <!-- EDIT SCREEN -->
           <div id="screen-edit" hidden>
             <div class="ph">
               <button class="ph-back" id="btn-back">←</button>
@@ -295,7 +272,6 @@ class VocabEditor extends HTMLElement {
             </div>
           </div>
 
-          <!-- SCAN SCREEN -->
           <div id="screen-scan" hidden>
             <div class="ph">
               <button class="ph-back" id="btn-scan-back">←</button>
@@ -303,7 +279,6 @@ class VocabEditor extends HTMLElement {
               <button class="ph-close">✕</button>
             </div>
 
-            <!-- Phase: capture -->
             <div class="body" id="scan-phase-capture">
               <div class="scan-upload-area">
                 <div class="scan-upload-icon">📄</div>
@@ -317,13 +292,11 @@ class VocabEditor extends HTMLElement {
               </div>
             </div>
 
-            <!-- Phase: processing -->
             <div class="body scan-status-wrap" id="scan-phase-processing" hidden>
               <div class="scan-spinner"></div>
               <div class="scan-status-text" id="scan-status-text">Lade OCR-Modul...</div>
             </div>
 
-            <!-- Phase: results -->
             <div class="body" id="scan-phase-results" hidden>
               <div class="scan-result-header" id="scan-result-header"></div>
               <div class="word-list" id="scan-results-list"></div>
@@ -338,7 +311,6 @@ class VocabEditor extends HTMLElement {
         </div>
       </div>`;
 
-        // static listeners
         this.shadowRoot.querySelectorAll(".ph-close").forEach(b => b.onclick = () => this.close());
         this.shadowRoot.getElementById("btn-back").onclick          = () => this._showLessons();
         this.shadowRoot.getElementById("btn-save").onclick          = () => this._saveLesson();
@@ -351,8 +323,6 @@ class VocabEditor extends HTMLElement {
             if (e.target.files[0]) this._loadFile(e.target.files[0]);
         };
     }
-
-    // ── lesson list screen ────────────────────────────────────────────────────
 
     _showLessons() {
         this.shadowRoot.getElementById("screen-lessons").hidden = false;
@@ -405,8 +375,6 @@ class VocabEditor extends HTMLElement {
         body.appendChild(addBtn);
     }
 
-    // ── lesson edit screen ────────────────────────────────────────────────────
-
     _showEdit(idx) {
         this._editIdx = idx;
         const isNew  = idx === -1;
@@ -422,7 +390,6 @@ class VocabEditor extends HTMLElement {
         this.shadowRoot.getElementById("lesson-subject-select").value = lesson.subject || "englisch";
         this.shadowRoot.getElementById("btn-del-lesson").hidden = isNew;
 
-        // Fill textarea with existing words
         const ta = this.shadowRoot.getElementById("quick-input");
         ta.value = lesson.words.map(w => `${w.de} = ${w.en}`).join("\n");
         ta.focus();
@@ -478,13 +445,10 @@ class VocabEditor extends HTMLElement {
         this._showLessons();
     }
 
-    // ── scan screen ───────────────────────────────────────────────────────────
-
     _showScan() {
         this._scanPhase("capture");
         this.shadowRoot.getElementById("screen-edit").hidden = true;
         this.shadowRoot.getElementById("screen-scan").hidden = false;
-        // Reset file input so the same file can be re-selected
         this.shadowRoot.getElementById("scan-file").value = "";
     }
 
@@ -517,7 +481,6 @@ class VocabEditor extends HTMLElement {
         const status = this.shadowRoot.getElementById("scan-status-text");
 
         try {
-            // Load Tesseract.js on first use
             if (!window.Tesseract) {
                 status.textContent = "Lade OCR-Modul...";
                 await new Promise((resolve, reject) => {
@@ -572,7 +535,6 @@ class VocabEditor extends HTMLElement {
                 if (parts.length >= 2) { de = parts[0].trim(); en = parts[1].trim(); }
             }
 
-            // Strip leading numbers / bullets (e.g. "1. Hund = dog")
             de = de.replace(/^\d+[\.\)\s]+/, "").trim();
             en = en.replace(/^\d+[\.\)\s]+/, "").trim();
 
@@ -646,8 +608,6 @@ class VocabEditor extends HTMLElement {
 
         this._hideScan();
     }
-
-    // ── helpers ───────────────────────────────────────────────────────────────
 
     _esc(str) {
         return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");

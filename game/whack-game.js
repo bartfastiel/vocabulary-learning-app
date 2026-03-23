@@ -1,6 +1,3 @@
-// game/whack-game.js
-// Whack-a-Mole: hit moles popping out of holes. 30 seconds. Score = hits.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 class WhackGame extends HTMLElement {
     constructor() {

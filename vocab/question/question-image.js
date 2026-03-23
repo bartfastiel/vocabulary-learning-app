@@ -1,9 +1,3 @@
-// vocab/question/question-image.js
-//
-// Question mode: shows an image corresponding to the English word.
-// The answer mode decides how the user responds (e.g., chooseWordEnglish, typeWordEnglish, etc.)
-//
-
 class VocabQuestionImage extends HTMLElement {
     constructor() {
         super();

@@ -1,6 +1,3 @@
-// game/memory-game.js
-// Flip emoji cards, find all 8 matching pairs.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score (moves), pointsEarned } })
 
 const EMOJIS = ["🐶","🐱","🦊","🐸","🐧","🦋","🌸","🍕"];
 const PAIRS  = 8;

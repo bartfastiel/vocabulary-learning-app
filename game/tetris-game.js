@@ -1,23 +1,20 @@
-// game/tetris-game.js
-// Full-featured Tetris with ghost piece, hold, 7-bag randomiser, level progression
 
-const TB = 28;                        // block size in px
-const TC = 10, TR = 20;               // cols, rows
-const TBX = 6, TBY = 6;              // board offsets
-const TPX = TBX + TC * TB + 10;       // panel x = 306
-const TPW = 148;                      // panel width
-const TCW = TPX + TPW + 4;            // canvas width  = 458
-const TCH = TBY + TR * TB + TBY;      // canvas height = 572
+const TB = 28;
+const TC = 10, TR = 20;
+const TBX = 6, TBY = 6;
+const TPX = TBX + TC * TB + 10;
+const TPW = 148;
+const TCW = TPX + TPW + 4;
+const TCH = TBY + TR * TB + TBY;
 
-// Pieces: color, highlight color, 4 rotations (each rotation = array of [col,row] offsets)
 const T_PIECES = [
-  { c:'#00BCD4', h:'#80DEEA', r:[[[0,1],[1,1],[2,1],[3,1]],[[2,0],[2,1],[2,2],[2,3]],[[0,2],[1,2],[2,2],[3,2]],[[1,0],[1,1],[1,2],[1,3]]] }, // I
-  { c:'#FFD600', h:'#FFE57F', r:[[[1,0],[2,0],[1,1],[2,1]],[[1,0],[2,0],[1,1],[2,1]],[[1,0],[2,0],[1,1],[2,1]],[[1,0],[2,0],[1,1],[2,1]]] }, // O
-  { c:'#AB47BC', h:'#CE93D8', r:[[[1,0],[0,1],[1,1],[2,1]],[[1,0],[1,1],[2,1],[1,2]],[[0,1],[1,1],[2,1],[1,2]],[[1,0],[0,1],[1,1],[1,2]]] }, // T
-  { c:'#43A047', h:'#A5D6A7', r:[[[1,0],[2,0],[0,1],[1,1]],[[1,0],[1,1],[2,1],[2,2]],[[1,1],[2,1],[0,2],[1,2]],[[0,0],[0,1],[1,1],[1,2]]] }, // S
-  { c:'#EF5350', h:'#EF9A9A', r:[[[0,0],[1,0],[1,1],[2,1]],[[2,0],[1,1],[2,1],[1,2]],[[0,1],[1,1],[1,2],[2,2]],[[1,0],[0,1],[1,1],[0,2]]] }, // Z
-  { c:'#FF7043', h:'#FFCCBC', r:[[[2,0],[0,1],[1,1],[2,1]],[[1,0],[1,1],[1,2],[2,2]],[[0,1],[1,1],[2,1],[0,2]],[[0,0],[1,0],[1,1],[1,2]]] }, // L
-  { c:'#1E88E5', h:'#90CAF9', r:[[[0,0],[0,1],[1,1],[2,1]],[[1,0],[2,0],[1,1],[1,2]],[[0,1],[1,1],[2,1],[2,2]],[[1,0],[1,1],[0,2],[1,2]]] }, // J
+  { c:'#00BCD4', h:'#80DEEA', r:[[[0,1],[1,1],[2,1],[3,1]],[[2,0],[2,1],[2,2],[2,3]],[[0,2],[1,2],[2,2],[3,2]],[[1,0],[1,1],[1,2],[1,3]]] },
+  { c:'#FFD600', h:'#FFE57F', r:[[[1,0],[2,0],[1,1],[2,1]],[[1,0],[2,0],[1,1],[2,1]],[[1,0],[2,0],[1,1],[2,1]],[[1,0],[2,0],[1,1],[2,1]]] },
+  { c:'#AB47BC', h:'#CE93D8', r:[[[1,0],[0,1],[1,1],[2,1]],[[1,0],[1,1],[2,1],[1,2]],[[0,1],[1,1],[2,1],[1,2]],[[1,0],[0,1],[1,1],[1,2]]] },
+  { c:'#43A047', h:'#A5D6A7', r:[[[1,0],[2,0],[0,1],[1,1]],[[1,0],[1,1],[2,1],[2,2]],[[1,1],[2,1],[0,2],[1,2]],[[0,0],[0,1],[1,1],[1,2]]] },
+  { c:'#EF5350', h:'#EF9A9A', r:[[[0,0],[1,0],[1,1],[2,1]],[[2,0],[1,1],[2,1],[1,2]],[[0,1],[1,1],[1,2],[2,2]],[[1,0],[0,1],[1,1],[0,2]]] },
+  { c:'#FF7043', h:'#FFCCBC', r:[[[2,0],[0,1],[1,1],[2,1]],[[1,0],[1,1],[1,2],[2,2]],[[0,1],[1,1],[2,1],[0,2]],[[0,0],[1,0],[1,1],[1,2]]] },
+  { c:'#1E88E5', h:'#90CAF9', r:[[[0,0],[0,1],[1,1],[2,1]],[[1,0],[2,0],[1,1],[1,2]],[[0,1],[1,1],[2,1],[2,2]],[[1,0],[1,1],[0,2],[1,2]]] },
 ];
 
 function t_randomBag() {
@@ -69,7 +66,7 @@ class TetrisGame extends HTMLElement {
         this._score = 0;
         this._lines = 0;
         this._level = 1;
-        this._state = 'start'; // start | running | lineclear | over
+        this._state = 'start';
         this._clearingRows = [];
         this._clearFrame   = 0;
         this._spawnPiece();
@@ -81,7 +78,7 @@ class TetrisGame extends HTMLElement {
         this._type = this._next;
         this._next = this._bag.pop();
         this._rot  = 0;
-        this._px   = 3; // col offset (center of 10-col board)
+        this._px   = 3;
         this._py   = -1;
         if (!this._canPlace(this._px, this._py, this._rot)) {
             this._state = 'over';
@@ -180,8 +177,6 @@ class TetrisGame extends HTMLElement {
         }
     }
 
-    // ── input ──────────────────────────────────────────────────────────────────
-
     _bindInput() {
         this._ac = new AbortController();
         const sig = { signal: this._ac.signal };
@@ -201,7 +196,6 @@ class TetrisGame extends HTMLElement {
             }
         }, sig);
 
-        // touch swipe
         let tx0 = 0, ty0 = 0, ttime = 0;
         this._canvas.addEventListener('touchstart', e => {
             const t = e.touches[0];
@@ -215,7 +209,7 @@ class TetrisGame extends HTMLElement {
             if (this._state === 'over')  { this._init(); return; }
             if (this._state !== 'running') return;
             if (Math.abs(dx) < 12 && Math.abs(dy) < 12 && dt < 300) {
-                this._tryRotate(1); return; // tap = rotate
+                this._tryRotate(1); return;
             }
             if (Math.abs(dx) > Math.abs(dy)) {
                 if (dx < -20 && this._canPlace(this._px-1,this._py,this._rot)) this._px--;
@@ -226,8 +220,6 @@ class TetrisGame extends HTMLElement {
             }
         }, sig);
     }
-
-    // ── game loop ──────────────────────────────────────────────────────────────
 
     _loop(ts) {
         this._raf = requestAnimationFrame(this._loop.bind(this));
@@ -249,22 +241,17 @@ class TetrisGame extends HTMLElement {
         this._draw();
     }
 
-    // ── rendering ─────────────────────────────────────────────────────────────
-
     _drawBlock(ctx, col, row, color, hi, alpha = 1) {
         const x = TBX + col * TB, y = TBY + row * TB;
         ctx.globalAlpha = alpha;
         ctx.fillStyle = color;
         ctx.fillRect(x, y, TB, TB);
-        // highlight (top-left)
         ctx.fillStyle = hi;
         ctx.fillRect(x+1, y+1, TB-2, 5);
         ctx.fillRect(x+1, y+1, 5, TB-2);
-        // shadow (bottom-right)
         ctx.fillStyle = 'rgba(0,0,0,0.35)';
         ctx.fillRect(x+1, y+TB-6, TB-2, 5);
         ctx.fillRect(x+TB-6, y+1, 5, TB-2);
-        // gap
         ctx.strokeStyle = 'rgba(0,0,0,0.5)';
         ctx.lineWidth = 1;
         ctx.strokeRect(x+.5, y+.5, TB-1, TB-1);
@@ -286,7 +273,6 @@ class TetrisGame extends HTMLElement {
         if (type === null) return;
         const p = T_PIECES[type];
         const cells = p.r[0];
-        // bounding box
         const minC = Math.min(...cells.map(([c])=>c));
         const minR = Math.min(...cells.map(([,r])=>r));
         const maxC = Math.max(...cells.map(([c])=>c));
@@ -302,16 +288,13 @@ class TetrisGame extends HTMLElement {
         const ctx = this._ctx;
         ctx.clearRect(0, 0, TCW, TCH);
 
-        // background
         const bg = ctx.createLinearGradient(0,0,0,TCH);
         bg.addColorStop(0,'#0d1117'); bg.addColorStop(1,'#161b22');
         ctx.fillStyle = bg; ctx.fillRect(0,0,TCW,TCH);
 
-        // board background
         ctx.fillStyle = '#010409';
         ctx.fillRect(TBX, TBY, TC*TB, TR*TB);
 
-        // grid lines
         ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 1;
         for (let c = 1; c < TC; c++) {
             ctx.beginPath(); ctx.moveTo(TBX+c*TB, TBY); ctx.lineTo(TBX+c*TB, TBY+TR*TB); ctx.stroke();
@@ -320,7 +303,6 @@ class TetrisGame extends HTMLElement {
             ctx.beginPath(); ctx.moveTo(TBX, TBY+r*TB); ctx.lineTo(TBX+TC*TB, TBY+r*TB); ctx.stroke();
         }
 
-        // board pieces
         for (let r = 0; r < TR; r++) {
             const flash = this._clearingRows.includes(r) && this._clearFrame % 4 < 2;
             for (let c = 0; c < TC; c++) {
@@ -335,7 +317,6 @@ class TetrisGame extends HTMLElement {
             }
         }
 
-        // ghost piece
         if (this._state === 'running' || this._state === 'lineclear') {
             const gy = this._ghostY();
             if (gy !== this._py) {
@@ -354,7 +335,6 @@ class TetrisGame extends HTMLElement {
             }
         }
 
-        // current piece
         if (this._state !== 'over' && this._state !== 'start') {
             const p = T_PIECES[this._type];
             for (const [dc, dr] of this._cells(this._type, this._rot)) {
@@ -363,11 +343,9 @@ class TetrisGame extends HTMLElement {
             }
         }
 
-        // board border
         ctx.strokeStyle = 'rgba(56,189,248,0.4)'; ctx.lineWidth = 2;
         ctx.strokeRect(TBX-.5, TBY-.5, TC*TB+1, TR*TB+1);
 
-        // ── side panel ──────────────────────────────────────────────────────────
         const px = TPX, pw = TPW;
         ctx.font = 'bold 11px monospace';
         ctx.fillStyle = 'rgba(56,189,248,0.6)';
@@ -385,7 +363,6 @@ class TetrisGame extends HTMLElement {
             ctx.fillText(label, px+8, y+13);
         };
 
-        // HOLD box
         panelBox('HALTEN (C)', 6, 76);
         if (this._hold !== null) {
             ctx.globalAlpha = this._holdUsed ? 0.4 : 1;
@@ -393,7 +370,6 @@ class TetrisGame extends HTMLElement {
             ctx.globalAlpha = 1;
         }
 
-        // SCORE / LEVEL / LINES
         panelBox('PUNKTE', 90, 44);
         ctx.fillStyle = '#fff'; ctx.font = 'bold 16px monospace';
         ctx.fillText(String(this._score), px+8, 90+30);
@@ -406,11 +382,9 @@ class TetrisGame extends HTMLElement {
         ctx.fillStyle = '#fff'; ctx.font = 'bold 16px monospace';
         ctx.fillText(String(this._lines), px+8, 186+24);
 
-        // NEXT box
         panelBox('NÄCHSTES', 232, 76);
         this._drawPiecePreview(ctx, this._next, px + pw/2, 232+44, 16);
 
-        // speed bar
         panelBox('TEMPO', 316, 24);
         const speedPct = Math.min(1, (this._level-1)/9);
         const barW = (pw-16) * speedPct;
@@ -419,7 +393,6 @@ class TetrisGame extends HTMLElement {
         ctx.fillStyle = barGrad;
         ctx.fillRect(px+8, 316+12, barW, 8);
 
-        // ── overlay messages ─────────────────────────────────────────────────────
         if (this._state === 'start') {
             this._overlay(ctx, '🎮 TETRIS', 'Tippe oder Taste zum Starten');
         } else if (this._state === 'over') {
