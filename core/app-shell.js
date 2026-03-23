@@ -17,23 +17,11 @@ import { getAvatarSVG, generateRandomAvatar } from "./avatar-builder.js";
 import { getProfiles, getActiveId, getActiveProfile, createProfile, deleteProfile,
          activateProfile, saveSnapshot, setAvatarSvg, assignRandomAvatarIfNeeded } from "./profiles.js";
 
-function _applyAgeSettings(host, age) {
-    const a = parseInt(age) || 10;
-    // Scale font size based on age — younger = bigger, older = can handle smaller
-    let size;
-    if (a <= 5)       size = "150%";
-    else if (a <= 6)  size = "140%";
-    else if (a <= 7)  size = "130%";
-    else if (a <= 8)  size = "120%";
-    else if (a <= 9)  size = "110%";
-    else if (a <= 11) size = "100%";
-    else if (a <= 14) size = "95%";
-    else if (a >= 60) size = "130%";
-    else if (a >= 50) size = "115%";
-    else              size = "100%";
-    document.documentElement.style.fontSize = size;
-    if (a <= 8 || a >= 60) host.setAttribute("data-age", "young");
-    else                   host.removeAttribute("data-age");
+function _applyFontSize(host, pct) {
+    const v = Math.min(150, Math.max(80, parseInt(pct) || 100));
+    document.documentElement.style.fontSize = v + "%";
+    if (v >= 120) host.setAttribute("data-age", "young");
+    else          host.removeAttribute("data-age");
 }
 
 class AppShell extends HTMLElement {
@@ -640,8 +628,13 @@ class AppShell extends HTMLElement {
             <h2>Neues Profil</h2>
             <input id="input-profile-name" type="text" placeholder="Dein Name..."
                    autocomplete="off" autocorrect="off" spellcheck="false"/>
-            <p style="font-size:0.85rem;color:#718096;margin:0.3rem 0 0.2rem;font-weight:600">Wie alt bist du?</p>
-            <input id="input-profile-age" type="number" min="1" max="90" value="8" style="width:5rem;padding:0.5rem;border:2px solid #e2e8f0;border-radius:10px;font-size:1.2rem;font-weight:700;text-align:center;outline:none" /><span style="font-size:0.85rem;color:#718096;margin-left:0.4rem">Jahre</span>
+            <p style="font-size:0.85rem;color:#718096;margin:0.3rem 0 0.2rem;font-weight:600">Schriftgröße</p>
+            <div style="display:flex;align-items:center;gap:0.5rem;justify-content:center">
+              <span style="font-size:0.75rem;color:#718096">A</span>
+              <input id="input-profile-fontsize" type="range" min="80" max="150" value="100" style="flex:1;max-width:200px;accent-color:#4299e1" />
+              <span style="font-size:1.1rem;color:#718096;font-weight:700">A</span>
+              <span id="fontsize-label" style="font-size:0.85rem;color:#718096;font-weight:600;min-width:3rem;text-align:center">100%</span>
+            </div>
             <p style="font-size:0.85rem;color:#718096;margin:0.5rem 0 0.2rem;font-weight:600">Welche Klasse bist du?</p>
             <div style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap" id="grade-select">
               <button class="grade-btn" data-grade="1" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">1</button>
@@ -794,24 +787,29 @@ class AppShell extends HTMLElement {
           <button class="settings-item" id="home-vocab-edit">\u270F\uFE0F Vokabeln bearbeiten</button>
           <button class="settings-item" id="home-teacher">\uD83C\uDF93 Lehrer-Bereich</button>
           <button class="settings-item" id="home-groups">\uD83D\uDC65 Gruppen</button>
-          <button class="settings-item" id="home-age-grade">\uD83C\uDF82 Alter &amp; Klasse</button>
+          <button class="settings-item" id="home-age-grade">\uD83D\uDD24 Schrift &amp; Klasse</button>
           <button class="settings-item" id="home-profile">\uD83D\uDD04 Profil wechseln</button>
           <button class="settings-item" id="home-design">\uD83D\uDE80 Klassisches Design</button>
         </div>
 
       </div>
 
-      <!-- Age & Grade settings overlay -->
+      <!-- Font size & Grade settings overlay -->
       <div class="bg-overlay" id="age-grade-overlay">
         <div class="bg-panel" style="max-width:400px">
           <div class="bg-header">
-            <span class="bg-header-title">\uD83C\uDF82 Alter &amp; Klasse</span>
+            <span class="bg-header-title">\uD83D\uDD24 Schrift &amp; Klasse</span>
             <button class="bg-close" id="age-grade-close">\u2715</button>
           </div>
           <div style="padding:1rem;display:flex;flex-direction:column;gap:1rem">
             <div>
-              <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Wie alt bist du?</p>
-              <input id="settings-age-input" type="number" min="1" max="90" style="width:5rem;padding:0.5rem;border:2px solid #e2e8f0;border-radius:10px;font-size:1.2rem;font-weight:700;text-align:center;outline:none" /><span style="font-size:0.85rem;color:#718096;margin-left:0.4rem">Jahre</span>
+              <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Schriftgr\u00f6\u00dfe</p>
+              <div style="display:flex;align-items:center;gap:0.5rem;justify-content:center">
+                <span style="font-size:0.75rem;color:#718096">A</span>
+                <input id="settings-fontsize-input" type="range" min="80" max="150" value="100" style="flex:1;max-width:200px;accent-color:#4299e1" />
+                <span style="font-size:1.1rem;color:#718096;font-weight:700">A</span>
+                <span id="settings-fontsize-label" style="font-size:0.85rem;color:#718096;font-weight:600;min-width:3rem;text-align:center">100%</span>
+              </div>
             </div>
             <div>
               <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Welche Klasse bist du?</p>
@@ -1022,8 +1020,10 @@ class AppShell extends HTMLElement {
         this.shadowRoot.getElementById("btn-new-profile").onclick = () => showNew();
         this.shadowRoot.getElementById("btn-profile-cancel").onclick = () => showPick();
 
-        // Age input
-        const ageInput = this.shadowRoot.getElementById("input-profile-age");
+        // Font size slider
+        const fontSizeInput = this.shadowRoot.getElementById("input-profile-fontsize");
+        const fontSizeLabel = this.shadowRoot.getElementById("fontsize-label");
+        fontSizeInput.oninput = () => { fontSizeLabel.textContent = fontSizeInput.value + "%"; };
 
         // Grade selection
         let selectedGrade = "5";
@@ -1045,11 +1045,11 @@ class AppShell extends HTMLElement {
             // Save age and grade to profile and localStorage
             const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
             const p = list.find(p => p.id === id);
-            const age = String(Math.min(90, Math.max(1, parseInt(ageInput.value) || 8)));
-            if (p) { p.age = age; p.grade = selectedGrade; localStorage.setItem("allProfiles", JSON.stringify(list)); }
-            localStorage.setItem("userAge", age);
+            const fontSize = String(Math.min(150, Math.max(80, parseInt(fontSizeInput.value) || 100)));
+            if (p) { p.fontSize = fontSize; p.grade = selectedGrade; localStorage.setItem("allProfiles", JSON.stringify(list)); }
+            localStorage.setItem("fontSize", fontSize);
             localStorage.setItem("userGrade", selectedGrade);
-            _applyAgeSettings(this, age);
+            _applyFontSize(this, fontSize);
             finish(id);
         };
         this.shadowRoot.getElementById("btn-profile-create").onclick = doCreate;
@@ -1088,9 +1088,9 @@ class AppShell extends HTMLElement {
     // ── Init ─────────────────────────────────────────────────────────────────
 
     init() {
-        // Apply age-based font size and contrast
-        const savedAge = localStorage.getItem("userAge");
-        if (savedAge) _applyAgeSettings(this, savedAge);
+        // Apply saved font size
+        const savedFontSize = localStorage.getItem("fontSize") || localStorage.getItem("userAge");
+        if (savedFontSize) _applyFontSize(this, savedFontSize);
 
         const treasureEl = this.shadowRoot.getElementById("treasure");
         const pointsManager = new PointsManager(this.shadowRoot);
@@ -1203,12 +1203,19 @@ class AppShell extends HTMLElement {
             localStorage.setItem("appDesign", "classic");
             location.reload();
         };
-        // Age & Grade settings overlay
+        // Font size & Grade settings overlay
         const ageGradeOverlay = this.shadowRoot.getElementById("age-grade-overlay");
-        const settingsAgeInput = this.shadowRoot.getElementById("settings-age-input");
+        const settingsFontInput = this.shadowRoot.getElementById("settings-fontsize-input");
+        const settingsFontLabel = this.shadowRoot.getElementById("settings-fontsize-label");
+        settingsFontInput.oninput = () => {
+            settingsFontLabel.textContent = settingsFontInput.value + "%";
+            _applyFontSize(this, settingsFontInput.value);
+        };
         this.shadowRoot.getElementById("home-age-grade").onclick = () => {
             settingsMenu.classList.remove("open");
-            settingsAgeInput.value = localStorage.getItem("userAge") || "8";
+            const cur = localStorage.getItem("fontSize") || "100";
+            settingsFontInput.value = cur;
+            settingsFontLabel.textContent = cur + "%";
             const curGrade = localStorage.getItem("userGrade") || "";
             this.shadowRoot.querySelectorAll(".settings-grade-btn").forEach(b => {
                 const match = b.dataset.grade === curGrade;
@@ -1229,9 +1236,9 @@ class AppShell extends HTMLElement {
             };
         }
         this.shadowRoot.getElementById("age-grade-save").onclick = () => {
-            const age = String(Math.min(90, Math.max(1, parseInt(settingsAgeInput.value) || 8)));
-            localStorage.setItem("userAge", age);
-            _applyAgeSettings(this, age);
+            const fs = String(Math.min(150, Math.max(80, parseInt(settingsFontInput.value) || 100)));
+            localStorage.setItem("fontSize", fs);
+            _applyFontSize(this, fs);
             if (ageGradeOverlay._selGrade) {
                 localStorage.setItem("userGrade", ageGradeOverlay._selGrade);
             }

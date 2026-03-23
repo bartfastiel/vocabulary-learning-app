@@ -74,7 +74,7 @@ export function saveSnapshot() {
     p.streakRecord = parseInt(localStorage.getItem("streakRecord") || "0");
     p.role         = localStorage.getItem("userRole") || null;
     p.appBg        = localStorage.getItem("appBg") || "dark";
-    p.age          = localStorage.getItem("userAge") || null;
+    p.fontSize     = localStorage.getItem("fontSize") || null;
     try { p.avatarSelection = JSON.parse(localStorage.getItem("avatarSelection")); } catch {}
     try { p.avatarUnlocked  = JSON.parse(localStorage.getItem("avatarUnlocked") || "[]"); } catch {}
     _save(list);
@@ -94,8 +94,8 @@ export function activateProfile(id) {
                       : localStorage.removeItem("avatarSelection");
     localStorage.setItem("avatarUnlocked", JSON.stringify(p.avatarUnlocked || []));
     localStorage.setItem("appBg", p.appBg || "dark");
-    p.age ? localStorage.setItem("userAge", p.age)
-          : localStorage.removeItem("userAge");
+    p.fontSize ? localStorage.setItem("fontSize", p.fontSize)
+               : localStorage.removeItem("fontSize");
 }
 
 export function setAvatarSvg(svgStr) {
