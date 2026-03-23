@@ -1,6 +1,3 @@
-// core/invite-qr.js
-// Simple QR code invite overlay — shows a static QR code that links to the app.
-
 import { getActiveProfile, saveSnapshot } from "./profiles.js";
 import { getAvatarSVG } from "./avatar-builder.js";
 
@@ -110,7 +107,6 @@ class InviteQR extends HTMLElement {
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* QR Card */
         .qr-card {
           background: linear-gradient(135deg, #667eea, #764ba2);
           border-radius: 18px; padding: 1.4rem; margin: 0.5rem 0;
@@ -178,7 +174,6 @@ class InviteQR extends HTMLElement {
         .share-btn.secondary:hover { background: #e2e8f0; }
         .copied { background: #48bb78 !important; color: white !important; }
 
-        /* Add friend */
         .add-section { text-align: center; }
         .code-input {
           width: 100%; padding: 0.7rem; border: 2px solid #e2e8f0;
@@ -197,7 +192,6 @@ class InviteQR extends HTMLElement {
         .add-msg.ok { color: #38a169; }
         .add-msg.err { color: #e53e3e; }
 
-        /* Friends list */
         .no-friends { text-align: center; color: #888; font-size: 0.9rem; padding: 1.5rem 0; }
         .friend-card {
           display: flex; align-items: center; gap: 0.7rem;
@@ -235,7 +229,6 @@ class InviteQR extends HTMLElement {
           <button class="tab" data-tab="list">Freunde (${friends.length})</button>
         </div>
 
-        <!-- Tab: QR Code -->
         <div class="tab-content active" id="tab-qr">
           <div class="qr-card" id="qr-card">
             ${avatar ? `<div class="avatar-mini">${avatar}</div>` : ""}
@@ -272,7 +265,6 @@ class InviteQR extends HTMLElement {
           </div>
         </div>
 
-        <!-- Tab: Add friend -->
         <div class="tab-content" id="tab-add">
           <div class="add-section">
             <p class="hint">Gib den Freundes-Code ein:</p>
@@ -282,16 +274,13 @@ class InviteQR extends HTMLElement {
           </div>
         </div>
 
-        <!-- Tab: Friends list -->
         <div class="tab-content" id="tab-list">
           <div class="friends-section" id="friends-list"></div>
         </div>
       </div>`;
 
-        // Events
         this.shadowRoot.getElementById("close-btn").onclick = () => this.close();
 
-        // Tabs
         for (const tab of this.shadowRoot.querySelectorAll(".tab")) {
             tab.onclick = () => {
                 this.shadowRoot.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -301,7 +290,6 @@ class InviteQR extends HTMLElement {
             };
         }
 
-        // Image upload
         const imgInput = this.shadowRoot.getElementById("img-input");
         const qrImg = this.shadowRoot.getElementById("qr-img");
         imgInput.onchange = (e) => {
@@ -312,7 +300,7 @@ class InviteQR extends HTMLElement {
                 const dataURL = reader.result;
                 localStorage.setItem("inviteCardImage", dataURL);
                 qrImg.src = dataURL;
-                this._render(); // re-render to show reset button
+                this._render();
             };
             reader.readAsDataURL(file);
         };
@@ -324,7 +312,6 @@ class InviteQR extends HTMLElement {
             };
         }
 
-        // QR card color
         const qrCard = this.shadowRoot.getElementById("qr-card");
         for (const dot of this.shadowRoot.querySelectorAll(".color-dot")) {
             dot.onclick = () => {
@@ -335,7 +322,6 @@ class InviteQR extends HTMLElement {
             };
         }
 
-        // Copy link
         const copyBtn = this.shadowRoot.getElementById("btn-copy-link");
         copyBtn.onclick = async () => {
             try {
@@ -353,7 +339,6 @@ class InviteQR extends HTMLElement {
             }
         };
 
-        // Share API
         const shareBtn = this.shadowRoot.getElementById("btn-share");
         if (navigator.share) {
             shareBtn.onclick = () => {
@@ -367,7 +352,6 @@ class InviteQR extends HTMLElement {
             shareBtn.style.display = "none";
         }
 
-        // Add friend by code
         const codeInput = this.shadowRoot.getElementById("code-input");
         const addBtn = this.shadowRoot.getElementById("btn-add");
         const addMsg = this.shadowRoot.getElementById("add-msg");

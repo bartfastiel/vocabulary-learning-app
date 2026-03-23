@@ -1,6 +1,3 @@
-// game/numbertap-game.js
-// Zahlen Tippen: Tap numbers 1–25 in order as fast as possible.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 class NumberTapGame extends HTMLElement {
     constructor() {
@@ -80,7 +77,6 @@ class NumberTapGame extends HTMLElement {
 
     _buildBoard() {
         const nums = Array.from({ length: this._max }, (_, i) => i + 1);
-        // shuffle
         for (let i = nums.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [nums[i], nums[j]] = [nums[j], nums[i]];
@@ -105,7 +101,6 @@ class NumberTapGame extends HTMLElement {
             return;
         }
 
-        // start timer on first tap
         if (this._next === 1) {
             this._startTime = performance.now();
             this._timerId = setInterval(() => {

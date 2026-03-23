@@ -1,7 +1,3 @@
-// core/group-board.js
-// Gruppen-Rangliste: Erstelle Gruppen, füge Profile hinzu, sieh wer der Beste ist.
-// Alle Daten in localStorage.
-
 import { getProfiles, getActiveId, saveSnapshot } from "./profiles.js";
 
 const LS_GROUPS = "groups";
@@ -62,7 +58,6 @@ class GroupBoard extends HTMLElement {
         }
         .close-btn:hover { background: rgba(255,255,255,0.25); }
 
-        /* ── New group form ── */
         .new-group {
           display: flex; gap: 0.5rem; width: min(520px, 95vw); margin-bottom: 1rem;
         }
@@ -82,7 +77,6 @@ class GroupBoard extends HTMLElement {
         }
         .new-group button:hover { filter: brightness(1.15); }
 
-        /* ── Group cards ── */
         .group-card {
           width: min(520px, 95vw);
           background: rgba(4,20,45,0.8);
@@ -108,7 +102,6 @@ class GroupBoard extends HTMLElement {
         .group-actions button:hover { background: rgba(255,255,255,0.25); }
         .group-actions .del-btn:hover { background: rgba(220,50,50,0.6); }
 
-        /* ── Member list / leaderboard ── */
         .members { padding: 0.5rem 0; }
         .member-row {
           display: flex; align-items: center; gap: 0.7rem;
@@ -148,7 +141,6 @@ class GroupBoard extends HTMLElement {
           text-align: right; white-space: nowrap;
         }
 
-        /* ── Add member popup ── */
         .add-popup {
           padding: 0.8rem 1.1rem;
           border-top: 1px solid rgba(56,189,248,0.15);
@@ -206,10 +198,8 @@ class GroupBoard extends HTMLElement {
       </div>
     `;
 
-        // Close button
         this.shadowRoot.querySelector(".close-btn").onclick = () => this.close();
 
-        // Create group
         const input = this.shadowRoot.getElementById("group-name-input");
         this.shadowRoot.getElementById("create-group-btn").onclick = () => {
             const name = input.value.trim();
@@ -244,13 +234,11 @@ class GroupBoard extends HTMLElement {
             const card = document.createElement("div");
             card.className = "group-card";
 
-            // Get member profiles sorted by points (descending)
             const memberProfiles = group.members
                 .map(id => profiles.find(p => p.id === id))
                 .filter(Boolean)
                 .sort((a, b) => (b.points || 0) - (a.points || 0));
 
-            // Non-member profiles for adding
             const nonMembers = profiles.filter(p => !group.members.includes(p.id));
 
             card.innerHTML = `
@@ -278,13 +266,11 @@ class GroupBoard extends HTMLElement {
               </div>
             `;
 
-            // Toggle add popup
             const addPopup = card.querySelector(".add-popup");
             card.querySelector(".add-btn").onclick = () => {
                 addPopup.style.display = addPopup.style.display === "none" ? "flex" : "none";
             };
 
-            // Add member chips
             card.querySelectorAll(".profile-chip").forEach(chip => {
                 chip.onclick = () => {
                     const pid = chip.dataset.pid;
@@ -298,7 +284,6 @@ class GroupBoard extends HTMLElement {
                 };
             });
 
-            // Delete group
             card.querySelector(".del-btn").onclick = () => {
                 if (confirm(`Gruppe "${group.name}" löschen?`)) {
                     saveGroups(getGroups().filter(g => g.id !== group.id));
@@ -306,7 +291,6 @@ class GroupBoard extends HTMLElement {
                 }
             };
 
-            // Remove member on long-click on member row
             card.querySelectorAll(".member-row").forEach(row => {
                 let timer;
                 row.addEventListener("touchstart", () => {

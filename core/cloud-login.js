@@ -1,6 +1,3 @@
-// core/cloud-login.js
-// Simple cloud login — get a code, login on any device with that code.
-
 import { syncProfileToCloud, loginWithCode, createLoginCode,
          getMyLoginCode, createGroup, joinGroup, getGroupMembers } from "./cloud-sync.js";
 import { getActiveProfile, getActiveId, activateProfile, getProfiles } from "./profiles.js";
@@ -124,7 +121,6 @@ class CloudLogin extends HTMLElement {
 
             <hr class="divider">
 
-            <!-- Login on this device -->
             <div class="section-title">Auf diesem Ger\u00e4t einloggen</div>
             <p class="hint">Hast du schon einen Code? Gib ihn hier ein:</p>
             <input class="input" id="login-code" maxlength="10" placeholder="CODE" />
@@ -133,7 +129,6 @@ class CloudLogin extends HTMLElement {
 
             <hr class="divider">
 
-            <!-- Groups -->
             <div class="section-title">Gruppen</div>
             <div id="groups-list">
                 ${myGroups.length === 0 ? '<div class="no-groups">Noch keine Gruppen</div>' :
@@ -148,7 +143,6 @@ class CloudLogin extends HTMLElement {
             <button class="btn btn-blue" id="btn-create">Gruppe erstellen</button>
             <div class="msg" id="create-msg"></div>
 
-            <!-- Member detail (hidden) -->
             <div id="member-detail" style="display:none">
                 <hr class="divider">
                 <div class="section-title" id="member-title"></div>
@@ -157,10 +151,8 @@ class CloudLogin extends HTMLElement {
             </div>
         </div>`;
 
-        // Events
         this.shadowRoot.getElementById("close").onclick = () => this.close();
 
-        // Create login code
         const btnCreate = this.shadowRoot.getElementById("btn-create-code");
         if (btnCreate) {
             btnCreate.onclick = async () => {
@@ -171,18 +163,16 @@ class CloudLogin extends HTMLElement {
             };
         }
 
-        // Copy code
         const btnCopy = this.shadowRoot.getElementById("btn-copy");
         if (btnCopy) {
             btnCopy.onclick = async () => {
                 try { await navigator.clipboard.writeText(loginCode); }
-                catch { /* fallback */ const t = document.createElement("textarea"); t.value = loginCode; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
+                catch { const t = document.createElement("textarea"); t.value = loginCode; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
                 btnCopy.textContent = "Kopiert!";
                 setTimeout(() => btnCopy.textContent = "Code kopieren", 1500);
             };
         }
 
-        // New code button (replace existing code)
         const btnNewCode = this.shadowRoot.getElementById("btn-new-code");
         if (btnNewCode) {
             btnNewCode.onclick = async () => {
@@ -192,7 +182,6 @@ class CloudLogin extends HTMLElement {
             };
         }
 
-        // Login
         this.shadowRoot.getElementById("btn-login").onclick = async () => {
             const rawCode = this.shadowRoot.getElementById("login-code").value;
             const code = rawCode.toUpperCase().trim().replace(/\s/g, "");
@@ -201,7 +190,6 @@ class CloudLogin extends HTMLElement {
             msg.textContent = "Suche " + code + "..."; msg.className = "msg";
             const cloud = await loginWithCode(code);
             if (!cloud) { msg.textContent = "Code \"" + code + "\" nicht gefunden!"; msg.className = "msg err"; return; }
-            // Create/update local profile with ALL cloud data
             const list = JSON.parse(localStorage.getItem("allProfiles") || "[]");
             const idx = list.findIndex(p => p.id === cloud.id);
             const localProfile = {
@@ -215,14 +203,12 @@ class CloudLogin extends HTMLElement {
             localStorage.setItem("allProfiles", JSON.stringify(list));
             localStorage.setItem("myLoginCode", code);
 
-            // Set ALL data directly in localStorage so the app picks it up
             localStorage.setItem("points", String(cloud.points || 0));
             localStorage.setItem("streakRecord", String(cloud.streakRecord || 0));
             localStorage.setItem("appBg", cloud.appBg || "light");
             if (cloud.avatarSelection) localStorage.setItem("avatarSelection", JSON.stringify(cloud.avatarSelection));
             if (cloud.avatarUnlocked) localStorage.setItem("avatarUnlocked", JSON.stringify(cloud.avatarUnlocked));
             if (cloud.role) localStorage.setItem("userRole", cloud.role);
-            // Restore background extras (gradients, animations, particles, custom colors)
             const bgEx = cloud.bgExtra || {};
             if (bgEx.gradColors) localStorage.setItem("gradColors", JSON.stringify(bgEx.gradColors));
             if (bgEx.gradDir) localStorage.setItem("gradDir", bgEx.gradDir);
@@ -236,7 +222,6 @@ class CloudLogin extends HTMLElement {
             setTimeout(() => location.reload(), 800);
         };
 
-        // Join group
         this.shadowRoot.getElementById("btn-join").onclick = async () => {
             const code = this.shadowRoot.getElementById("join-code").value.toUpperCase().trim();
             const msg = this.shadowRoot.getElementById("join-msg");
@@ -247,7 +232,6 @@ class CloudLogin extends HTMLElement {
             else { msg.textContent = "Gruppe nicht gefunden!"; msg.className = "msg err"; }
         };
 
-        // Create group
         this.shadowRoot.getElementById("btn-create").onclick = async () => {
             const name = this.shadowRoot.getElementById("group-name").value.trim();
             const msg = this.shadowRoot.getElementById("create-msg");
@@ -258,7 +242,6 @@ class CloudLogin extends HTMLElement {
             else { msg.textContent = "Fehler!"; msg.className = "msg err"; }
         };
 
-        // Show group members
         for (const card of this.shadowRoot.querySelectorAll(".group-card")) {
             card.onclick = async () => {
                 const gid = card.dataset.gid;

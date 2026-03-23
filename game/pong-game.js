@@ -1,6 +1,3 @@
-// game/pong-game.js
-// Classic Pong against CPU. Score points by getting the ball past the CPU paddle.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 class PongGame extends HTMLElement {
     constructor() {
@@ -89,26 +86,21 @@ class PongGame extends HTMLElement {
     }
 
     _update() {
-        // player paddle follows mouse
         this._py += (this._mouseY - this._py - this._ph / 2) * 0.15;
         this._py = Math.max(0, Math.min(400 - this._ph, this._py));
 
-        // CPU paddle
         const cpuSpeed = 2.8;
         const cpuCenter = this._cy + this._ph / 2;
         if (this._by > cpuCenter + 10) this._cy += cpuSpeed;
         else if (this._by < cpuCenter - 10) this._cy -= cpuSpeed;
         this._cy = Math.max(0, Math.min(400 - this._ph, this._cy));
 
-        // ball
         this._bx += this._bvx;
         this._by += this._bvy;
 
-        // top/bottom bounce
         if (this._by - this._br < 0) { this._by = this._br; this._bvy = Math.abs(this._bvy); }
         if (this._by + this._br > 400) { this._by = 400 - this._br; this._bvy = -Math.abs(this._bvy); }
 
-        // player paddle (left)
         if (this._bx - this._br < 30 && this._bx - this._br > 18 &&
             this._by > this._py && this._by < this._py + this._ph) {
             this._bvx = Math.abs(this._bvx) * 1.05;
@@ -116,7 +108,6 @@ class PongGame extends HTMLElement {
             this._bvy = rel * 5;
         }
 
-        // CPU paddle (right)
         if (this._bx + this._br > 570 && this._bx + this._br < 582 &&
             this._by > this._cy && this._by < this._cy + this._ph) {
             this._bvx = -Math.abs(this._bvx) * 1.05;
@@ -124,12 +115,10 @@ class PongGame extends HTMLElement {
             this._bvy = rel * 5;
         }
 
-        // cap speed
         const maxV = 10;
         this._bvx = Math.max(-maxV, Math.min(maxV, this._bvx));
         this._bvy = Math.max(-maxV, Math.min(maxV, this._bvy));
 
-        // scoring
         if (this._bx < 0) {
             this._cpuScore++;
             this.shadowRoot.getElementById("c-score").textContent = this._cpuScore;
@@ -157,20 +146,17 @@ class PongGame extends HTMLElement {
         ctx.fillStyle = "#0a1628";
         ctx.fillRect(0, 0, 600, 400);
 
-        // center line
         ctx.setLineDash([8, 8]);
         ctx.strokeStyle = "rgba(255,255,255,0.2)";
         ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(300, 0); ctx.lineTo(300, 400); ctx.stroke();
         ctx.setLineDash([]);
 
-        // paddles
         ctx.fillStyle = "#4dd0e1";
         ctx.beginPath(); ctx.roundRect(18, this._py, this._pw, this._ph, 4); ctx.fill();
         ctx.fillStyle = "#ff6b6b";
         ctx.beginPath(); ctx.roundRect(570, this._cy, this._pw, this._ph, 4); ctx.fill();
 
-        // ball
         ctx.fillStyle = "white";
         ctx.shadowColor = "rgba(255,255,255,0.6)";
         ctx.shadowBlur = 12;

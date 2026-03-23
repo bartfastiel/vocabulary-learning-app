@@ -1,7 +1,3 @@
-// game/colormatch-game.js
-// Color Match: A color name is shown in a DIFFERENT ink color. Tap the button
-// matching the INK color (not the word). 30 seconds. Score = correct taps.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 const COLORS = [
     { name: "Rot",    hex: "#EF5350" },
@@ -136,7 +132,6 @@ class ColorMatchGame extends HTMLElement {
     }
 
     _nextRound() {
-        // pick random word and random (different) ink color
         const wordIdx = Math.floor(Math.random() * COLORS.length);
         let inkIdx;
         do { inkIdx = Math.floor(Math.random() * COLORS.length); } while (inkIdx === wordIdx);
@@ -146,7 +141,6 @@ class ColorMatchGame extends HTMLElement {
         prompt.textContent = COLORS[wordIdx].name;
         prompt.style.color = COLORS[inkIdx].hex;
 
-        // clear feedback
         this.shadowRoot.getElementById("feedback").textContent = "";
         this.shadowRoot.querySelectorAll(".color-btn").forEach(b => {
             b.classList.remove("correct", "wrong");

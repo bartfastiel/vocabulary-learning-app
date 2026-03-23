@@ -1,30 +1,17 @@
-// vocab/vocab.js
-//
-// Pure orchestration: connects question and answer components.
-// No points, streaks, or treasure logic.
-// No mode-specific behavior — just flow control.
-//
-
-// --- imports (all lowercase names and explicit paths) ---
 import "./points.js";
 
-// Question types
 import "./question/question-wordgerman.js";
 import "./question/question-wordenglish.js";
 import "./question/question-voiceenglish.js";
 import "./question/question-image.js";
 
-// Answer types
 import "./answer/answer-choosewordenglish.js";
 import "./answer/answer-choosewordgerman.js";
 import "./answer/answer-choosevoiceenglish.js";
 import "./answer/answer-typewordenglish.js";
 import "./answer/answer-chooseimage.js";
 
-// === CONSTANTS ===
-// All available question–answer combinations
 const MODES = [
-    // === Text-based (German → English) ===
     {
         question: "vocab-question-wordgerman",
         answer: "vocab-answer-choosewordenglish",
@@ -34,13 +21,11 @@ const MODES = [
         answer: "vocab-answer-typewordenglish",
     },
 
-    // === Text-based (English → German) ===
     {
         question: "vocab-question-wordenglish",
         answer: "vocab-answer-choosewordgerman",
     },
 
-    // === Audio question → English answers ===
     {
         question: "vocab-question-voiceenglish",
         answer: "vocab-answer-choosewordenglish",
@@ -54,7 +39,6 @@ const MODES = [
         answer: "vocab-answer-choosevoiceenglish",
     },
 
-    // === Image question → English answers ===
     {
         question: "vocab-question-image",
         answer: "vocab-answer-choosewordenglish",
@@ -64,29 +48,22 @@ const MODES = [
         answer: "vocab-answer-typewordenglish",
     },
 
-    // === Audio question → Image answers ===
     {
         question: "vocab-question-voiceenglish",
         answer: "vocab-answer-chooseimage",
     },
 
-    // === Text question → Image answers ===
     {
         question: "vocab-question-wordenglish",
         answer: "vocab-answer-chooseimage",
     },
 
-    // === Future slots (planned / optional) ===
-    // { question: "vocab-question-descriptionenglish", answer: "vocab-answer-choosewordenglish" },
-    // { question: "vocab-question-wordgerman", answer: "vocab-answer-fillmissinglettersenglish" },
-    // { question: "vocab-question-wordenglish", answer: "vocab-answer-chooseimage" },
 ];
 
 function shuffle(arr) {
     return arr.sort(() => Math.random() - 0.5);
 }
 
-// === MASCOT MESSAGES ===
 const MASCOT_CORRECT = [
     "Super gemacht! 🎉", "Richtig! Weiter so! 💪", "Genau! Du bist toll! ⭐",
     "Perfekt! 👏", "Klasse! Das sitzt! 🔥", "Yeah! Volltreffer! 🎯",
@@ -105,11 +82,6 @@ const MASCOT_STREAK = [
 ];
 
 function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-// === SPACED REPETITION (Leitner-Box System) ===
-// Each word has a "box" level 1–5. Box 1 = hard (repeat often), Box 5 = mastered.
-// Correct → move up one box. Wrong → reset to box 1.
-// Words in lower boxes appear more often in the shuffled order.
 
 const SR_KEY = "spacedRepetition";
 
@@ -134,8 +106,6 @@ function srSetBox(srData, word, box) {
     srSave(srData);
 }
 
-/** Sorts words so lower-box words repeat more often.
- *  Box 1 words appear ~4x, box 2 ~3x, box 3 ~2x, box 4-5 ~1x each. */
 function srWeightedShuffle(words, srData) {
     const weighted = [];
     for (const w of words) {
@@ -146,7 +116,6 @@ function srWeightedShuffle(words, srData) {
     return shuffle(weighted);
 }
 
-// === COMPONENT ===
 class VocabTrainer extends HTMLElement {
     constructor() {
         super();
@@ -154,7 +123,6 @@ class VocabTrainer extends HTMLElement {
         this.vocabSets = [];
         this.vocab = [];
         this.index = 0;
-        // lesson stats
         this._correct = 0;
         this._wrong = 0;
         this._bestStreak = 0;
@@ -222,7 +190,6 @@ class VocabTrainer extends HTMLElement {
           display: flex; flex-direction: column; justify-content: space-between;
         }
 
-        /* Mascot */
         .mascot {
           display: flex; align-items: center; gap: 0.6rem;
           background: rgba(14,165,233,0.15);
@@ -246,14 +213,12 @@ class VocabTrainer extends HTMLElement {
           to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Idle: gentle floating */
         @keyframes mascot-idle {
           0%, 100% { transform: translateY(0) rotate(0deg); }
           25% { transform: translateY(-3px) rotate(2deg); }
           75% { transform: translateY(2px) rotate(-2deg); }
         }
 
-        /* Correct: happy jump + spin */
         .mascot.correct { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.4); transform: scale(1.03); }
         .mascot.correct .mascot-face {
           animation: mascot-happy 0.7s ease, mascot-idle 2.5s ease-in-out 0.7s infinite;
@@ -267,7 +232,6 @@ class VocabTrainer extends HTMLElement {
           100% { transform: scale(1) translateY(0) rotate(0deg); }
         }
 
-        /* Wrong: shake + shrink */
         .mascot.wrong { background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); }
         .mascot.wrong .mascot-face {
           animation: mascot-sad 0.6s ease, mascot-idle 2.5s ease-in-out 0.6s infinite;
@@ -282,7 +246,6 @@ class VocabTrainer extends HTMLElement {
           90% { transform: translateX(2px) rotate(1deg) scale(1); }
         }
 
-        /* Streak: excited bounce + glow */
         .mascot.streak {
           background: rgba(251,191,36,0.25); border-color: rgba(251,191,36,0.5);
           box-shadow: 0 0 20px rgba(251,191,36,0.3);
@@ -304,7 +267,6 @@ class VocabTrainer extends HTMLElement {
           100% { transform: scale(1) rotate(0deg) translateY(0); }
         }
 
-        /* Progress bar */
         .progress-wrap {
           width: 100%; height: 6px; background: rgba(56,189,248,0.15);
           border-radius: 3px; margin-bottom: 0.6rem; overflow: hidden;
@@ -314,7 +276,6 @@ class VocabTrainer extends HTMLElement {
           border-radius: 3px; transition: width 0.4s ease;
         }
 
-        /* Summary overlay */
         .summary-overlay {
           position: fixed; inset: 0; z-index: 300;
           background: rgba(0,5,15,0.85);
@@ -381,7 +342,6 @@ class VocabTrainer extends HTMLElement {
         }
         .summary-btn:hover { filter: brightness(1.15); }
 
-        /* Popup */
         .lesson-popup {
           position: fixed; top: 50%; left: 50%;
           transform: translate(-50%, -50%);
@@ -434,13 +394,11 @@ class VocabTrainer extends HTMLElement {
         .lesson-overlay.active { display: block; }
       </style>
 
-      <!-- Lesson header -->
       <div class="lesson-header">
         <span class="title">Lektion: –</span>
         <span class="burger">☰</span>
       </div>
 
-      <!-- Main white box -->
       <div id="quiz-box">
         <div class="mascot" id="mascot">
           <span class="mascot-face" id="mascot-face">🦉</span>
@@ -453,7 +411,6 @@ class VocabTrainer extends HTMLElement {
         <div id="answer"></div>
       </div>
 
-      <!-- Summary overlay -->
       <div class="summary-overlay hidden" id="summary-overlay">
         <div class="summary-box">
           <div class="summary-trophy" id="summary-trophy">🏆</div>
@@ -481,7 +438,6 @@ class VocabTrainer extends HTMLElement {
         </div>
       </div>
 
-      <!-- Popup and overlay -->
       <div class="lesson-overlay"></div>
       <div class="lesson-popup">
         <h2>Lektion wählen</h2>
@@ -517,20 +473,17 @@ class VocabTrainer extends HTMLElement {
     async loadSets() {
         try {
             const subject = this._subject || "englisch";
-            // Load the right vocab file for this subject
             const vocabFiles = {
                 englisch: "vocab/vocab.json",
                 bio: "vocab/vocab-bio.json",
                 geo: "vocab/vocab-geo.json",
             };
-            // Filter by grade if set
             const userGrade = parseInt(localStorage.getItem("userGrade") || "0");
             const file = vocabFiles[subject];
             let data = [];
             if (file) {
                 data = await fetch(file).then(r => r.json());
             }
-            // Verify which resources actually exist for each word (only for englisch)
             if (subject === "englisch") {
                 const checks = [];
                 for (const set of data) {
@@ -554,12 +507,10 @@ class VocabTrainer extends HTMLElement {
                 }
                 await Promise.all(checks);
             } else {
-                // For other subjects, no image/audio checks
                 for (const set of data) {
                     for (const w of set.words) { w._hasImage = false; w._hasAudio = false; }
                 }
             }
-            // Filter by user's grade — only show lessons for THAT grade
             if (userGrade > 0) {
                 this._builtinSets = data.filter(lesson => {
                     if (!lesson.grade) return true;
@@ -607,7 +558,6 @@ class VocabTrainer extends HTMLElement {
         if (progress) progress.style.display = "none";
     }
 
-    /** Called when custom vocab changes — switches to the last (newly added) lesson. */
     reload() {
         const custom = this._loadCustom();
         this.vocabSets = [...(this._builtinSets ?? []), ...custom];
@@ -674,7 +624,6 @@ class VocabTrainer extends HTMLElement {
         ];
         const otherWithImage = this.vocab.filter(v => v !== word && v._hasImage).length;
         const otherWithAudio = this.vocab.filter(v => v !== word && v._hasAudio).length;
-        // For non-English subjects (bio, geo): only use simple Q&A modes
         const isQuizSubject = this._subject && this._subject !== "englisch";
         const QUIZ_MODES = [
             { question: "vocab-question-wordgerman", answer: "vocab-answer-choosewordenglish" },
@@ -714,7 +663,6 @@ class VocabTrainer extends HTMLElement {
 
         aEl.addEventListener("answered", (e) => {
             const isCorrect = e.detail?.correct;
-            // Update spaced repetition box for this word
             const curBox = srGetBox(this._srData, word);
             if (isCorrect) {
                 srSetBox(this._srData, word, curBox + 1);
@@ -742,14 +690,12 @@ class VocabTrainer extends HTMLElement {
         const mascot = this.shadowRoot.getElementById("mascot");
         const faceEl = this.shadowRoot.getElementById("mascot-face");
         const bubbleEl = this.shadowRoot.getElementById("mascot-bubble");
-        // Reset animations by removing class, forcing reflow, then re-adding
         mascot.className = "mascot";
         faceEl.style.animation = "none";
         bubbleEl.style.animation = "none";
-        faceEl.offsetHeight; // force reflow
+        faceEl.offsetHeight;
         faceEl.style.animation = "";
         bubbleEl.style.animation = "";
-        // Apply new state
         mascot.className = "mascot" + (mood ? ` ${mood}` : "");
         faceEl.textContent = face;
         bubbleEl.textContent = text;
@@ -773,7 +719,6 @@ class VocabTrainer extends HTMLElement {
         this.shadowRoot.getElementById("summary-sub").textContent =
             `„${this.currentSet.name}" — ${total} Vokabeln`;
 
-        // Trophy based on performance
         let trophy = "🏆";
         let title = "Lektion geschafft!";
         if (percent === 100) { trophy = "👑"; title = "Perfekt! Alle richtig!"; }

@@ -1,7 +1,3 @@
-// math/math-trainer.js
-// Mathe-Trainer für die 5. Klasse.
-// Aufgabentypen: Grundrechenarten, Reihenfolge, Brüche, Geometrie, Dezimalzahlen
-
 const _grade = () => parseInt(localStorage.getItem("userGrade") || "5");
 
 const ALL_MATH_CATEGORIES = [
@@ -20,11 +16,7 @@ const ALL_MATH_CATEGORIES = [
     { id: "negative",       name: "\u2796 Negative Zahlen",  generate: genNegative, grades: [6] },
 ];
 
-// Filter by user's grade
 const MATH_CATEGORIES = ALL_MATH_CATEGORIES.filter(c => c.grades.includes(_grade()));
-
-// ── Generators ─────────────────────────────────────────────────────────────────
-// Each returns { question: string, answer: number|string, choices: string[] }
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
@@ -115,17 +107,14 @@ function genReihenfolge() {
 
 function genBrueche() {
     const types = [
-        // Bruch erkennen
         () => {
             const n = randInt(1, 7), d = randInt(n + 1, 12);
             return { question: `Welcher Bruch ist größer: ${n}/${d} oder ${n+1}/${d}?`, answer: `${n+1}/${d}`, choices: [`${n}/${d}`, `${n+1}/${d}`] };
         },
-        // Addition gleicher Nenner
         () => {
             const d = randInt(3, 10), a = randInt(1, d - 2), b = randInt(1, d - a);
             return { question: `${a}/${d} + ${b}/${d} = ?`, answer: `${a + b}/${d}`, choices: makeChoicesFrac(a + b, d) };
         },
-        // Bruch kürzen
         () => {
             const f = randInt(2, 5), n = randInt(1, 5), d = randInt(n + 1, 8);
             return { question: `Kürze: ${n * f}/${d * f}`, answer: `${n}/${d}`, choices: makeChoicesFrac(n, d) };
@@ -170,28 +159,23 @@ function genDezimal() {
 
 function genGeometrie() {
     const types = [
-        // Rechteck Fläche
         () => {
             const a = randInt(3, 15), b = randInt(3, 15);
             return { question: `Fläche eines Rechtecks:\n${a} cm × ${b} cm = ? cm²`, answer: String(a * b), choices: makeChoices(a * b) };
         },
-        // Rechteck Umfang
         () => {
             const a = randInt(3, 20), b = randInt(3, 20);
             const u = 2 * (a + b);
             return { question: `Umfang eines Rechtecks:\na = ${a} cm, b = ${b} cm\nU = ? cm`, answer: String(u), choices: makeChoices(u) };
         },
-        // Quadrat Fläche
         () => {
             const a = randInt(2, 15);
             return { question: `Fläche eines Quadrats:\nSeite = ${a} cm\nA = ? cm²`, answer: String(a * a), choices: makeChoices(a * a) };
         },
-        // Dreieck Fläche
         () => {
             const g = randInt(4, 16), h = randInt(2, 12);
-            // ensure integer result
             const area = (g * h) / 2;
-            if (area !== Math.floor(area)) return genGeometrie(); // retry
+            if (area !== Math.floor(area)) return genGeometrie();
             return { question: `Fläche eines Dreiecks:\ng = ${g} cm, h = ${h} cm\nA = ? cm²`, answer: String(area), choices: makeChoices(area) };
         },
     ];
@@ -236,8 +220,6 @@ function genTextaufgaben() {
     ];
     return types[randInt(0, types.length - 1)]();
 }
-
-// ── Component ──────────────────────────────────────────────────────────────────
 
 class MathTrainer extends HTMLElement {
     constructor() {
@@ -315,7 +297,6 @@ class MathTrainer extends HTMLElement {
         #feedback {
           font-size: 1.3rem; min-height: 2rem;
         }
-        /* popup */
         .lesson-overlay {
           position: fixed; inset: 0; background: rgba(0,5,15,0.75);
           backdrop-filter: blur(6px); z-index: 150; display: none;
@@ -362,7 +343,6 @@ class MathTrainer extends HTMLElement {
 
         this._setupPopup();
         this._renderCategories();
-        // auto-select first
         this._selectCategory(0);
     }
 
@@ -432,7 +412,6 @@ class MathTrainer extends HTMLElement {
             this._pm?.updateStreak(true);
         } else {
             btn.classList.add("wrong");
-            // highlight correct
             container.querySelectorAll(".choice-btn").forEach(b => {
                 if (b.textContent === this._currentAnswer) b.classList.add("correct");
             });

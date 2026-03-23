@@ -1,6 +1,3 @@
-// game/asteroids-game.js
-// Weltraum Pilot: Asteroids-style. Rotate and thrust your ship, shoot asteroids.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 const AS_W = 400, AS_H = 400;
 
@@ -69,7 +66,6 @@ class AsteroidsGame extends HTMLElement {
         this._keys = { left: false, right: false, up: false, fire: false };
         this._fireCooldown = 0;
 
-        // initial asteroids
         for (let i = 0; i < 5; i++) {
             this._spawnAsteroid(3);
         }
@@ -85,7 +81,6 @@ class AsteroidsGame extends HTMLElement {
         }
         const speed = (1.5 + Math.random() * 1.5) * (4 - size);
         const angle = Math.random() * Math.PI * 2;
-        // random polygon
         const verts = [];
         const n = 7 + Math.floor(Math.random() * 4);
         for (let i = 0; i < n; i++) {
@@ -115,7 +110,6 @@ class AsteroidsGame extends HTMLElement {
             if (e.key === " " || e.key === "Enter") this._keys.fire = false;
         }, sig);
 
-        // mobile
         const wire = (id, key) => {
             const btn = this.shadowRoot.getElementById(id);
             btn.addEventListener("touchstart", e => { e.preventDefault(); this._keys[key] = true; }, { ...sig, passive: false });
@@ -138,25 +132,20 @@ class AsteroidsGame extends HTMLElement {
         const s = this._ship;
         this._invincible -= dt;
 
-        // rotate
         if (this._keys.left) s.angle -= 4 * dt;
         if (this._keys.right) s.angle += 4 * dt;
 
-        // thrust
         if (this._keys.up) {
             s.vx += Math.cos(s.angle) * 200 * dt;
             s.vy += Math.sin(s.angle) * 200 * dt;
         }
 
-        // drag
         s.vx *= 0.995; s.vy *= 0.995;
         s.x += s.vx * dt; s.y += s.vy * dt;
 
-        // wrap
         if (s.x < 0) s.x = AS_W; if (s.x > AS_W) s.x = 0;
         if (s.y < 0) s.y = AS_H; if (s.y > AS_H) s.y = 0;
 
-        // fire
         this._fireCooldown -= dt;
         if (this._keys.fire && this._fireCooldown <= 0) {
             this._fireCooldown = 0.2;
@@ -169,7 +158,6 @@ class AsteroidsGame extends HTMLElement {
             });
         }
 
-        // bullets
         for (let i = this._bullets.length - 1; i >= 0; i--) {
             const b = this._bullets[i];
             b.x += b.vx * dt; b.y += b.vy * dt;
@@ -178,7 +166,6 @@ class AsteroidsGame extends HTMLElement {
             if (b.y < 0) b.y = AS_H; if (b.y > AS_H) b.y = 0;
             if (b.life <= 0) { this._bullets.splice(i, 1); continue; }
 
-            // hit asteroid
             for (let j = this._asteroids.length - 1; j >= 0; j--) {
                 const a = this._asteroids[j];
                 if (Math.hypot(b.x - a.x, b.y - a.y) < a.r) {
@@ -194,14 +181,12 @@ class AsteroidsGame extends HTMLElement {
             }
         }
 
-        // asteroids movement
         for (const a of this._asteroids) {
             a.x += a.vx * dt; a.y += a.vy * dt;
             if (a.x < -a.r) a.x = AS_W + a.r; if (a.x > AS_W + a.r) a.x = -a.r;
             if (a.y < -a.r) a.y = AS_H + a.r; if (a.y > AS_H + a.r) a.y = -a.r;
         }
 
-        // ship-asteroid collision
         if (this._invincible <= 0) {
             for (const a of this._asteroids) {
                 if (Math.hypot(s.x - a.x, s.y - a.y) < a.r + 10) {
@@ -218,7 +203,6 @@ class AsteroidsGame extends HTMLElement {
             }
         }
 
-        // spawn more if empty
         if (this._asteroids.length === 0) {
             for (let i = 0; i < 5 + Math.floor(this._score / 100); i++) {
                 this._spawnAsteroid(3);
@@ -231,13 +215,11 @@ class AsteroidsGame extends HTMLElement {
         ctx.fillStyle = "#0a0a1a";
         ctx.fillRect(0, 0, AS_W, AS_H);
 
-        // stars
         ctx.fillStyle = "rgba(255,255,255,0.3)";
         for (let i = 0; i < 50; i++) {
             ctx.fillRect((i * 97 + 13) % AS_W, (i * 53 + 7) % AS_H, 1.5, 1.5);
         }
 
-        // asteroids
         ctx.strokeStyle = "#aaa";
         ctx.lineWidth = 1.5;
         for (const a of this._asteroids) {
@@ -250,13 +232,11 @@ class AsteroidsGame extends HTMLElement {
             ctx.stroke();
         }
 
-        // bullets
         ctx.fillStyle = "#FFD600";
         for (const b of this._bullets) {
             ctx.beginPath(); ctx.arc(b.x, b.y, 2, 0, Math.PI * 2); ctx.fill();
         }
 
-        // ship
         if (this._alive) {
             const blink = this._invincible > 0 && Math.floor(performance.now() / 100) % 2;
             if (!blink) {
@@ -272,7 +252,6 @@ class AsteroidsGame extends HTMLElement {
                 ctx.lineTo(-10, 8);
                 ctx.closePath();
                 ctx.stroke();
-                // thrust flame
                 if (this._keys.up) {
                     ctx.strokeStyle = "#FF6D00";
                     ctx.beginPath();
@@ -285,7 +264,6 @@ class AsteroidsGame extends HTMLElement {
             }
         }
 
-        // HUD
         ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.beginPath(); ctx.roundRect(4, 4, 160, 26, 6); ctx.fill();
         ctx.fillStyle = "white"; ctx.font = "bold 13px 'Segoe UI',sans-serif";

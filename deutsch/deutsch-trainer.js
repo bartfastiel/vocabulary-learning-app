@@ -1,7 +1,3 @@
-// deutsch/deutsch-trainer.js
-// Deutsch-Trainer für die 5. Klasse.
-// Aufgabentypen: Wortarten, Rechtschreibung, Zeitformen, Satzglieder, Grammatik
-
 const _deGrade = () => parseInt(localStorage.getItem("userGrade") || "5");
 
 const ALL_DE_CATEGORIES = [
@@ -28,8 +24,6 @@ function shuffle(arr) {
     }
     return arr;
 }
-
-// ── Generators ─────────────────────────────────────────────────────────────────
 
 function genWortarten() {
     const words = [
@@ -190,7 +184,6 @@ function genEinzahlMehrzahl() {
     ];
     const item = pick(words);
     if (Math.random() < 0.5) {
-        // Einzahl → Mehrzahl
         const wrongs = words.filter(w => w.m !== item.m).map(w => w.m);
         return {
             question: `Mehrzahl von „${item.e}"?`,
@@ -198,7 +191,6 @@ function genEinzahlMehrzahl() {
             choices: shuffle([item.m, ...shuffle(wrongs).slice(0, 3)]),
         };
     } else {
-        // Mehrzahl → Einzahl
         const wrongs = words.filter(w => w.e !== item.e).map(w => w.e);
         return {
             question: `Einzahl von „${item.m}"?`,
@@ -266,8 +258,6 @@ function genSatzglieder() {
         choices: shuffle([...item.choices]),
     };
 }
-
-// ── Component ──────────────────────────────────────────────────────────────────
 
 class DeutschTrainer extends HTMLElement {
     constructor() {

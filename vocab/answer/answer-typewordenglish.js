@@ -1,8 +1,3 @@
-// vocab/answer/answer-typewordenglish.js
-//
-// Answer mode where the user types the English translation
-// for a shown German word.
-
 import "./elements/next-button.js";
 import {playVoice} from "../../core/audio.js";
 
@@ -108,7 +103,6 @@ class VocabAnswerTypeWordEnglish extends HTMLElement {
                 this.updateStreak(isCorrect);
                 input.disabled = true;
 
-                // show correct answer if user was wrong
                 if (!isCorrect) {
                     feedback.innerHTML = `<div class="correct-answer">Richtig wäre: <b>${this.word.en}</b></div>`;
                 }

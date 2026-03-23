@@ -1,9 +1,3 @@
-// vocab/answer/answer-choosevoiceenglish.js
-//
-// Answer mode: two-column layout:
-// Left: "🔈 Anhören" buttons (play audio)
-// Right: "Antwort wählen" buttons (select the correct word)
-
 import { playVoice } from "../../core/audio.js";
 import "./elements/next-button.js";
 
@@ -97,7 +91,6 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
 
                 Array.from(optionsDiv.querySelectorAll("button")).forEach(b => (b.disabled = true));
 
-                // Highlight correct answer if wrong
                 if (!isCorrect) {
                     const pairs = Array.from(optionsDiv.children);
                     for (let i = 0; i < pairs.length; i += 2) {

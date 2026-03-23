@@ -1,6 +1,3 @@
-// core/profiles.js
-// Multi-profile support for a single device.
-
 const LS_ALL    = "allProfiles";
 const LS_ACTIVE = "activeProfileId";
 
@@ -38,7 +35,6 @@ export function createProfile(name) {
     return id;
 }
 
-/** Called after avatar-builder is loaded to assign a random avatar */
 export function assignRandomAvatarIfNeeded(generateFn) {
     const list = getProfiles();
     let changed = false;
@@ -49,7 +45,6 @@ export function assignRandomAvatarIfNeeded(generateFn) {
             p.avatarSvg = svg;
             delete p._needsRandomAvatar;
             changed = true;
-            // Set in localStorage if this is the active profile
             if (p.id === getActiveId()) {
                 localStorage.setItem("avatarSelection", JSON.stringify(selection));
             }
@@ -63,7 +58,6 @@ export function deleteProfile(id) {
     if (getActiveId() === id) localStorage.removeItem(LS_ACTIVE);
 }
 
-// Snapshot current localStorage state into the active profile object
 export function saveSnapshot() {
     const id = getActiveId();
     if (!id) return;
@@ -80,7 +74,6 @@ export function saveSnapshot() {
     _save(list);
 }
 
-// Load a profile into localStorage and mark it active
 export function activateProfile(id) {
     saveSnapshot();
     localStorage.setItem(LS_ACTIVE, id);

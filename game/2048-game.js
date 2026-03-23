@@ -1,6 +1,3 @@
-// game/2048-game.js
-// Zahlen Schieben: 2048-style tile merging puzzle.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 const GRID = 4;
 const TILE_COLORS = {
@@ -118,7 +115,6 @@ class Game2048 extends HTMLElement {
             }
             if (reversed) line.reverse();
 
-            // compress
             line = line.filter(v => v !== 0);
             for (let k = 0; k < line.length - 1; k++) {
                 if (line[k] === line[k + 1]) {

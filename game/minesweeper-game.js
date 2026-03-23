@@ -1,6 +1,3 @@
-// game/minesweeper-game.js
-// Minenfeld: Classic Minesweeper. Uncover all safe cells without hitting a mine.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 const MS_ROWS = 9, MS_COLS = 9, MS_MINES = 10;
 
@@ -96,7 +93,6 @@ class MinesweeperGame extends HTMLElement {
             this._board[r][c] = -1;
             placed++;
         }
-        // compute numbers
         for (let r = 0; r < MS_ROWS; r++)
             for (let c = 0; c < MS_COLS; c++) {
                 if (this._board[r][c] === -1) continue;
@@ -163,7 +159,6 @@ class MinesweeperGame extends HTMLElement {
                         e.preventDefault();
                         this._toggleFlag(r, c);
                     });
-                    // long press for mobile
                     let pressTimer;
                     cell.addEventListener("touchstart", () => {
                         pressTimer = setTimeout(() => {
@@ -195,10 +190,8 @@ class MinesweeperGame extends HTMLElement {
         }
 
         if (this._board[r][c] === -1) {
-            // boom
             this._revealed[r][c] = true;
             this._gameOver = true;
-            // reveal all mines
             for (let rr = 0; rr < MS_ROWS; rr++)
                 for (let cc = 0; cc < MS_COLS; cc++)
                     if (this._board[rr][cc] === -1) this._revealed[rr][cc] = true;

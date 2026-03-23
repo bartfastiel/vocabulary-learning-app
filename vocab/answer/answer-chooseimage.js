@@ -1,11 +1,3 @@
-// vocab/answer/answer-chooseimage.js
-//
-// Answer mode: shows four images.
-// User clicks on one image as the answer.
-//
-// Uses the same "next-button" pattern and point/streak logic.
-//
-
 import "./elements/next-button.js";
 import {playVoice} from "../../core/audio.js";
 
@@ -96,7 +88,7 @@ class VocabAnswerChooseImage extends HTMLElement {
                 .toLowerCase()
                 .replaceAll(/[^a-z0-9]/g, "_");
             img.src = `assets/img/${fileSafe}.png`
-            img.alt = ""; // no visible text, per your rule
+            img.alt = "";
             btn.appendChild(img);
 
             btn.onclick = () => {
@@ -108,10 +100,8 @@ class VocabAnswerChooseImage extends HTMLElement {
                 this.updatePoints(isCorrect ? +1 : -1);
                 this.updateStreak(isCorrect);
 
-                // Disable all buttons
                 Array.from(optionsDiv.querySelectorAll("button")).forEach(b => (b.disabled = true));
 
-                // Highlight the correct one if wrong
                 if (!isCorrect) {
                     if (correctElement) {
                         correctElement.classList.add("would-have-been-correct");

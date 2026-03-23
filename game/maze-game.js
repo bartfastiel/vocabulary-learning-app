@@ -1,6 +1,3 @@
-// game/maze-game.js
-// Labyrinth: navigate a ball through a randomly generated maze using arrow keys / WASD / swipe.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 const MZ_COLS = 11, MZ_ROWS = 11, MZ_CELL = 28;
 const MZ_W = MZ_COLS * MZ_CELL, MZ_H = MZ_ROWS * MZ_CELL;
@@ -56,7 +53,6 @@ class MazeGame extends HTMLElement {
     }
 
     _generateMaze() {
-        // simple recursive backtracker
         const cols = MZ_COLS, rows = MZ_ROWS;
         this._walls = Array.from({ length: rows }, () =>
             Array.from({ length: cols }, () => ({ top: true, right: true, bottom: true, left: true }))
@@ -77,7 +73,6 @@ class MazeGame extends HTMLElement {
                 stack.pop();
             } else {
                 const next = neighbors[Math.floor(Math.random() * neighbors.length)];
-                // remove walls
                 if (next.dir === "top")    { this._walls[y][x].top = false; this._walls[next.y][next.x].bottom = false; }
                 if (next.dir === "right")  { this._walls[y][x].right = false; this._walls[next.y][next.x].left = false; }
                 if (next.dir === "bottom") { this._walls[y][x].bottom = false; this._walls[next.y][next.x].top = false; }
@@ -111,7 +106,6 @@ class MazeGame extends HTMLElement {
             if (dirMap[e.key]) { e.preventDefault(); move(...dirMap[e.key]); }
         }, sig);
 
-        // swipe
         let tx, ty;
         this._cv.addEventListener("touchstart", e => {
             tx = e.touches[0].clientX; ty = e.touches[0].clientY;
@@ -142,7 +136,6 @@ class MazeGame extends HTMLElement {
         ctx.fillStyle = "#1a1a3e";
         ctx.fillRect(0, 0, MZ_W, MZ_H);
 
-        // walls
         ctx.strokeStyle = "#4dd0e1";
         ctx.lineWidth = 2;
         for (let y = 0; y < MZ_ROWS; y++) {
@@ -156,7 +149,6 @@ class MazeGame extends HTMLElement {
             }
         }
 
-        // goal
         ctx.fillStyle = "#66BB6A";
         ctx.beginPath();
         ctx.arc((MZ_COLS - 1) * c + c / 2, (MZ_ROWS - 1) * c + c / 2, c / 3, 0, Math.PI * 2);
@@ -165,7 +157,6 @@ class MazeGame extends HTMLElement {
         ctx.textAlign = "center"; ctx.textBaseline = "middle";
         ctx.fillText("⭐", (MZ_COLS - 1) * c + c / 2, (MZ_ROWS - 1) * c + c / 2 + 1);
 
-        // player
         ctx.fillStyle = "#FF6B6B";
         ctx.beginPath();
         ctx.arc(this._px * c + c / 2, this._py * c + c / 2, c / 3, 0, Math.PI * 2);

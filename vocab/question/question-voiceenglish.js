@@ -1,9 +1,3 @@
-// vocab/question/question-voiceenglish.js
-//
-// Question mode that plays an English word aloud and
-// offers a "Replay" button. Mirrors the original audio question behavior.
-//
-
 import { playVoice } from "../../core/audio.js";
 
 class VocabQuestionVoiceEnglish extends HTMLElement {
@@ -44,10 +38,8 @@ class VocabQuestionVoiceEnglish extends HTMLElement {
 
         const replayBtn = this.shadowRoot.getElementById("replay-btn");
 
-        // Play once automatically after render
         this.currentAudio = playVoice(this.vocab.en);
 
-        // Allow replay on demand
         replayBtn.onclick = () => {
             if (this.currentAudio) this.currentAudio.pause();
             this.currentAudio = playVoice(this.vocab.en);

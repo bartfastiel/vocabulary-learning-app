@@ -1,6 +1,3 @@
-// game/bubble-game.js
-// Bubble Pop: tap rising bubbles before they escape. 30 seconds.
-// Fires CustomEvent("game-over", { bubbles: true, detail: { score, pointsEarned } })
 
 class BubbleGame extends HTMLElement {
     constructor() {
