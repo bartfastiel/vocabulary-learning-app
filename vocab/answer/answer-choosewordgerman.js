@@ -63,13 +63,6 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
         const nextBtn = this.shadowRoot.querySelector("next-button");
         let wasCorrect = false;
 
-        nextBtn.addEventListener("next", () => {
-            this.dispatchEvent(new CustomEvent("answered", {
-                bubbles: true,
-                detail: { correct: wasCorrect }
-            }));
-        });
-
         options.forEach(opt => {
             const btn = document.createElement("button");
             btn.className = "option-btn";
@@ -90,7 +83,18 @@ class VocabAnswerChooseWordGerman extends HTMLElement {
                     if (correctBtn) correctBtn.classList.add("correct");
                 }
 
-                nextBtn.show();
+                this.dispatchEvent(new CustomEvent("checked", {
+                    bubbles: true,
+                    detail: { correct: isCorrect }
+                }));
+
+                const delay = isCorrect ? 2000 : 3500;
+                setTimeout(() => {
+                    this.dispatchEvent(new CustomEvent("answered", {
+                        bubbles: true,
+                        detail: { correct: isCorrect }
+                    }));
+                }, delay);
             };
             optionsDiv.appendChild(btn);
         });

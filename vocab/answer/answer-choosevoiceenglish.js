@@ -69,13 +69,6 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
         const nextBtn = this.shadowRoot.querySelector("next-button");
         let wasCorrect = false;
 
-        nextBtn.addEventListener("next", () => {
-            this.dispatchEvent(new CustomEvent("answered", {
-                bubbles: true,
-                detail: { correct: wasCorrect }
-            }));
-        });
-
         options.forEach(opt => {
             const listenBtn = document.createElement("button");
             listenBtn.className = "listen-btn";
@@ -97,7 +90,6 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
 
                 Array.from(optionsDiv.querySelectorAll("button")).forEach(b => (b.disabled = true));
 
-                // Highlight correct answer if wrong
                 if (!isCorrect) {
                     const pairs = Array.from(optionsDiv.children);
                     for (let i = 0; i < pairs.length; i += 2) {
@@ -109,7 +101,18 @@ class VocabAnswerChooseVoiceEnglish extends HTMLElement {
                     }
                 }
 
-                nextBtn.show();
+                this.dispatchEvent(new CustomEvent("checked", {
+                    bubbles: true,
+                    detail: { correct: isCorrect }
+                }));
+
+                const delay = isCorrect ? 2000 : 3500;
+                setTimeout(() => {
+                    this.dispatchEvent(new CustomEvent("answered", {
+                        bubbles: true,
+                        detail: { correct: isCorrect }
+                    }));
+                }, delay);
             };
 
             optionsDiv.appendChild(listenBtn);

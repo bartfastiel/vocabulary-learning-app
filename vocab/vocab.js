@@ -504,6 +504,8 @@ class VocabTrainer extends HTMLElement {
         };
 
         header.addEventListener("click", () => {
+            // Invalidate any pending auto-advance timer
+            this._roundId = (this._roundId || 0) + 1;
             const custom = this._loadCustom();
             this.vocabSets = [...(this._builtinSets ?? []), ...custom];
             this.renderPopupButtons();
@@ -658,6 +660,9 @@ class VocabTrainer extends HTMLElement {
     }
 
     nextRound() {
+        // Increment round ID to invalidate any pending auto-advance timers
+        this._roundId = (this._roundId || 0) + 1;
+
         if (this.index >= this.vocab.length) {
             this._showSummary();
             return;
@@ -712,9 +717,9 @@ class VocabTrainer extends HTMLElement {
         questionHost.append(qEl);
         answerHost.append(aEl);
 
-        aEl.addEventListener("answered", (e) => {
+        // Show mascot feedback immediately when answer is checked
+        aEl.addEventListener("checked", (e) => {
             const isCorrect = e.detail?.correct;
-            // Update spaced repetition box for this word
             const curBox = srGetBox(this._srData, word);
             if (isCorrect) {
                 srSetBox(this._srData, word, curBox + 1);
@@ -723,17 +728,24 @@ class VocabTrainer extends HTMLElement {
                 if (this._currentStreak > this._bestStreak) this._bestStreak = this._currentStreak;
                 const streakMsg = [...MASCOT_STREAK].reverse().find(s => this._currentStreak === s.min);
                 if (streakMsg) {
-                    this._setMascot("🔥", streakMsg.msg, "streak");
+                    this._setMascot("\uD83D\uDD25", streakMsg.msg, "streak");
                 } else {
-                    this._setMascot("😄", randomFrom(MASCOT_CORRECT), "correct");
+                    this._setMascot("\uD83D\uDE04", randomFrom(MASCOT_CORRECT), "correct");
                 }
             } else {
                 srSetBox(this._srData, word, 1);
                 this._wrong++;
                 this._currentStreak = 0;
-                this._setMascot("🤗", randomFrom(MASCOT_WRONG), "wrong");
+                this._setMascot("\uD83E\uDD17", randomFrom(MASCOT_WRONG), "wrong");
             }
+        });
+
+        // Auto-advance to next round (guarded by roundId to prevent stale timers)
+        const roundId = this._roundId;
+        aEl.addEventListener("answered", () => {
+            if (this._roundId !== roundId) return; // stale timer, ignore
             this.index++;
+            this._setMascot("\uD83E\uDD89", "");
             this.nextRound();
         });
     }
