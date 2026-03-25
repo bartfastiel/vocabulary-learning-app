@@ -530,7 +530,9 @@ class VocabTrainer extends HTMLElement {
             const file = vocabFiles[subject];
             let data = [];
             if (file) {
-                data = await fetch(file).then(r => r.json());
+                const res = await fetch(file + "?v=" + Date.now());
+                if (!res.ok) throw new Error(`HTTP ${res.status} loading ${file}`);
+                data = await res.json();
             }
             // Verify which resources actually exist for each word (only for englisch)
             if (subject === "englisch") {
