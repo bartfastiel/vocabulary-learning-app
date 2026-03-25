@@ -67,6 +67,12 @@ test.describe("Navigation", () => {
       return trainerScreen && trainerScreen.style.display !== "none";
     }, { timeout: 5000 });
 
+    // Wait for back button to be present before clicking
+    await page.waitForFunction(() => {
+      const shell = document.querySelector("app-shell");
+      return shell?.shadowRoot?.querySelector(".back-btn") !== null;
+    }, { timeout: 5000 });
+
     await clickBack(page);
 
     await page.waitForFunction(() => {
