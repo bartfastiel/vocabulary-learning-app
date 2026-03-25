@@ -89,10 +89,10 @@ const GAMES = [
         scoreLabel: "Gefangen",
     },
     {
-        id: "rocket",   label: "Rakete",            emoji: "🚀",
-        cost: 1,  maxEarn: 0,
+        id: "rocket",   label: "Weltraumpilot",     emoji: "🚀",
+        cost: 0,  maxEarn: 0,
         component: "rocket-game",
-        desc: "Schieße Münzen ab!",
+        desc: "Shop & Upgrades für dein Raumschiff!",
         scoreLabel: null,
     },
     {
@@ -540,7 +540,7 @@ class GameLobby extends HTMLElement {
           <span class="card-emoji">${g.emoji}</span>
           <span class="card-label">${g.label}</span>
           <span class="card-desc">${g.desc}</span>
-          <span class="card-cost">\uD83D\uDCB0 ${g.cost} Punkte</span>
+          ${g.cost > 0 ? `<span class="card-cost">\uD83D\uDCB0 ${g.cost} Punkte</span>` : `<span class="card-cost" style="color:#00e676">Kostenlos</span>`}
           ${g.maxEarn > 0 ? `<span class="card-hs">\u25B2 bis +${g.maxEarn} Pkt.</span>` : ""}
           <span class="card-hs">${hsText}</span>
         </div>`;
