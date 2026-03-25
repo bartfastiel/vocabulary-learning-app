@@ -89,10 +89,10 @@ const GAMES = [
         scoreLabel: "Gefangen",
     },
     {
-        id: "rocket",   label: "Weltraumpilot",     emoji: "🚀",
-        cost: 0,  maxEarn: 0,
+        id: "rocket",   label: "Rakete",             emoji: "🚀",
+        cost: 1,  maxEarn: 0,
         component: "rocket-game",
-        desc: "Shop & Upgrades für dein Raumschiff!",
+        desc: "Schieße Münzen ab!",
         scoreLabel: null,
     },
     {
@@ -195,10 +195,10 @@ const GAMES = [
     },
     {
         id: "asteroids", label: "Weltraum Pilot",    emoji: "☄️",
-        cost: 2,  maxEarn: 0,
+        cost: 0,  maxEarn: 0,
         component: "asteroids-game",
-        desc: "Zerstöre Asteroiden mit deinem Raumschiff!",
-        scoreLabel: "Punkte",
+        desc: "Shop, Upgrades & Asteroiden zerstören!",
+        scoreLabel: null,
     },
     {
         id: "quiz", label: "Vokabel-Million\u00e4r",   emoji: "\uD83C\uDFC6",
