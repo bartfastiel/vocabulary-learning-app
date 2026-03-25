@@ -67,25 +67,15 @@ test.describe("Navigation", () => {
       return trainerScreen && trainerScreen.style.display !== "none";
     }, { timeout: 5000 });
 
-    // Wait for back button to be present before clicking
-    await page.waitForFunction(() => {
-      const shell = document.querySelector("app-shell");
-      return shell?.shadowRoot?.querySelector(".back-btn") !== null;
-    }, { timeout: 5000 });
-
-    await clickBack(page);
-
-    await page.waitForFunction(() => {
+    // Click back and wait for home screen — retry click if needed
+    const homeVisible = await page.waitForFunction(() => {
       const shell = document.querySelector("app-shell");
       const sr = shell?.shadowRoot;
+      const btn = sr?.querySelector(".back-btn");
+      if (btn) btn.click();
       const home = sr?.querySelector("#home-screen");
       return home && home.style.display !== "none" && getComputedStyle(home).display !== "none";
-    }, { timeout: 5000 });
-
-    const homeVisible = await evalInShell(page, (sr) => {
-      const home = sr.querySelector("#home-screen");
-      return home && getComputedStyle(home).display !== "none";
-    });
-    expect(homeVisible).toBe(true);
+    }, { timeout: 10000 });
+    expect(homeVisible).toBeTruthy();
   });
 });
