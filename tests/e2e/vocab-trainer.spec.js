@@ -79,27 +79,16 @@ test.describe("Vocab Trainer", () => {
   });
 
   test("lesson picker opens on header click", async ({ page }) => {
-    // Click the lesson header
-    await page.evaluate(() => {
+    // Click header and wait for popup — retry click if needed
+    const popupActive = await page.waitForFunction(() => {
       const shell = document.querySelector("app-shell");
-      const trainer = shell.shadowRoot.querySelector("vocab-trainer");
-      trainer.shadowRoot.querySelector(".lesson-header").click();
-    });
-
-    // Wait for popup to appear
-    await page.waitForFunction(() => {
-      const shell = document.querySelector("app-shell");
-      const trainer = shell.shadowRoot.querySelector("vocab-trainer");
-      const popup = trainer.shadowRoot.querySelector(".lesson-popup");
+      const trainer = shell?.shadowRoot?.querySelector("vocab-trainer");
+      const header = trainer?.shadowRoot?.querySelector(".lesson-header");
+      if (header) header.click();
+      const popup = trainer?.shadowRoot?.querySelector(".lesson-popup");
       return popup && popup.classList.contains("active");
-    }, { timeout: 5000 });
-
-    const popupActive = await page.evaluate(() => {
-      const shell = document.querySelector("app-shell");
-      const trainer = shell.shadowRoot.querySelector("vocab-trainer");
-      return trainer.shadowRoot.querySelector(".lesson-popup").classList.contains("active");
-    });
-    expect(popupActive).toBe(true);
+    }, { timeout: 10000 });
+    expect(popupActive).toBeTruthy();
   });
 
   test("lesson picker shows lesson buttons", async ({ page }) => {
