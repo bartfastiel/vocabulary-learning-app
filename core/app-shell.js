@@ -147,7 +147,7 @@ class AppShell extends HTMLElement {
 
         /* ── Action buttons on home ── */
         .home-actions {
-          display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.5rem;
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 0.5rem;
           margin-bottom: 1rem;
         }
         .settings-menu {
@@ -775,33 +775,35 @@ class AppShell extends HTMLElement {
             <span class="action-icon">\uD83D\uDE0A</span>
             <span class="action-label">Avatar</span>
           </button>
-          <button class="action-card" id="home-settings">
+          <button class="action-card" id="home-einstellungen">
             <span class="action-icon">\u2699\uFE0F</span>
+            <span class="action-label">Einstellen</span>
+          </button>
+          <button class="action-card" id="home-settings">
+            <span class="action-icon">\u2022\u2022\u2022</span>
             <span class="action-label">Mehr</span>
           </button>
         </div>
 
         <!-- Settings dropdown (hidden) -->
         <div class="settings-menu" id="settings-menu">
-          <button class="settings-item" id="home-bg">\uD83C\uDFA8 Hintergrund</button>
           <button class="settings-item" id="home-vocab-edit">\u270F\uFE0F Vokabeln bearbeiten</button>
           <button class="settings-item" id="home-teacher">\uD83C\uDF93 Lehrer-Bereich</button>
           <button class="settings-item" id="home-groups">\uD83D\uDC65 Gruppen</button>
-          <button class="settings-item" id="home-age-grade">\uD83D\uDD24 Schrift &amp; Klasse</button>
           <button class="settings-item" id="home-profile">\uD83D\uDD04 Profil wechseln</button>
-          <button class="settings-item" id="home-design">\uD83D\uDE80 Klassisches Design</button>
         </div>
 
       </div>
 
-      <!-- Font size & Grade settings overlay -->
-      <div class="bg-overlay" id="age-grade-overlay">
-        <div class="bg-panel" style="max-width:400px">
+      <!-- Unified settings overlay -->
+      <div class="bg-overlay" id="unified-settings-overlay">
+        <div class="bg-panel" style="max-width:500px">
           <div class="bg-header">
-            <span class="bg-header-title">\uD83D\uDD24 Schrift &amp; Klasse</span>
-            <button class="bg-close" id="age-grade-close">\u2715</button>
+            <span class="bg-header-title">\u2699\uFE0F Einstellungen</span>
+            <button class="bg-close" id="unified-settings-close">\u2715</button>
           </div>
-          <div style="padding:1rem;display:flex;flex-direction:column;gap:1rem">
+          <div class="bg-body">
+            <p class="theme-section-title">\uD83D\uDD24 Schrift &amp; Klasse</p>
             <div>
               <p style="font-size:0.85rem;color:#718096;margin:0 0 0.4rem;font-weight:600">Schriftgr\u00f6\u00dfe</p>
               <div style="display:flex;align-items:center;gap:0.5rem;justify-content:center">
@@ -833,21 +835,10 @@ class AppShell extends HTMLElement {
                 <button class="settings-grade-btn" data-grade="6" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:1rem;font-weight:700;cursor:pointer">6</button>
               </div>
             </div>
-            <button id="age-grade-save" style="padding:0.7rem;border:none;border-radius:10px;background:#4299e1;color:white;font-size:1rem;font-weight:bold;cursor:pointer;margin-top:0.3rem">Speichern</button>
-          </div>
-        </div>
-      </div>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:0.8rem 0">
 
-      <!-- Background settings overlay -->
-      <div class="bg-overlay" id="bg-overlay">
-        <div class="bg-panel">
-          <div class="bg-header">
-            <span class="bg-header-title">🎨 Hintergrund</span>
-            <button class="bg-close" id="bg-close">✕</button>
-          </div>
-          <div class="bg-body">
-
-            <p class="theme-section-title">Farben</p>
+            <p class="theme-section-title">\uD83C\uDFA8 Hintergrund</p>
+            <p class="theme-section-title" style="font-size:0.85rem;margin-top:0">Farben</p>
             <div class="theme-grid">
               <div class="theme-dot" data-theme="light" style="background:#f0f4f8" title="Hell"></div>
               <div class="theme-dot" data-theme="blue" style="background:#dbeafe" title="Blau"></div>
@@ -959,6 +950,11 @@ class AppShell extends HTMLElement {
               <div class="anim-chip" data-anim="coins">Münzen</div>
               <div class="anim-chip" data-anim="emojis">Emojis</div>
             </div>
+
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:0.8rem 0">
+
+            <p class="theme-section-title">\uD83D\uDE80 Design</p>
+            <button id="home-design" style="width:100%;padding:0.7rem;border:2px solid #e2e8f0;border-radius:10px;background:white;font-size:0.95rem;font-weight:600;cursor:pointer;color:#4a5568">Klassisches Design aktivieren</button>
 
           </div>
         </div>
@@ -1214,8 +1210,8 @@ class AppShell extends HTMLElement {
             localStorage.setItem("appDesign", "classic");
             location.reload();
         };
-        // Font size & Grade settings overlay
-        const ageGradeOverlay = this.shadowRoot.getElementById("age-grade-overlay");
+        // Unified settings overlay
+        const unifiedOverlay = this.shadowRoot.getElementById("unified-settings-overlay");
         const settingsFontInput = this.shadowRoot.getElementById("settings-fontsize-input");
         const settingsFontLabel = this.shadowRoot.getElementById("settings-fontsize-label");
         settingsFontInput.oninput = () => {
@@ -1224,7 +1220,7 @@ class AppShell extends HTMLElement {
         };
         // Text color buttons
         const colorBtns = this.shadowRoot.querySelectorAll(".settings-color-btn");
-        ageGradeOverlay._selColor = localStorage.getItem("textColor") || "#ffffff";
+        unifiedOverlay._selColor = localStorage.getItem("textColor") || "#ffffff";
         const highlightColorBtn = (color) => {
             colorBtns.forEach(b => {
                 const match = b.dataset.color === color;
@@ -1234,18 +1230,18 @@ class AppShell extends HTMLElement {
         };
         for (const cb of colorBtns) {
             cb.onclick = () => {
-                ageGradeOverlay._selColor = cb.dataset.color;
+                unifiedOverlay._selColor = cb.dataset.color;
                 highlightColorBtn(cb.dataset.color);
+                localStorage.setItem("textColor", cb.dataset.color);
             };
         }
 
-        this.shadowRoot.getElementById("home-age-grade").onclick = () => {
-            settingsMenu.classList.remove("open");
+        this.shadowRoot.getElementById("home-einstellungen").onclick = () => {
             const cur = localStorage.getItem("fontSize") || "100";
             settingsFontInput.value = cur;
             settingsFontLabel.textContent = cur + "%";
-            ageGradeOverlay._selColor = localStorage.getItem("textColor") || "#ffffff";
-            highlightColorBtn(ageGradeOverlay._selColor);
+            unifiedOverlay._selColor = localStorage.getItem("textColor") || "#ffffff";
+            highlightColorBtn(unifiedOverlay._selColor);
             const curGrade = localStorage.getItem("userGrade") || "";
             this.shadowRoot.querySelectorAll(".settings-grade-btn").forEach(b => {
                 const match = b.dataset.grade === curGrade;
@@ -1253,8 +1249,8 @@ class AppShell extends HTMLElement {
                 b.style.background = match ? "#ebf8ff" : "white";
                 b.style.color = match ? "#2b6cb0" : "#2d3748";
             });
-            ageGradeOverlay._selGrade = curGrade;
-            ageGradeOverlay.classList.add("active");
+            unifiedOverlay._selGrade = curGrade;
+            unifiedOverlay.classList.add("active");
         };
         for (const btn of this.shadowRoot.querySelectorAll(".settings-grade-btn")) {
             btn.onclick = () => {
@@ -1262,28 +1258,17 @@ class AppShell extends HTMLElement {
                     b.style.borderColor = "#e2e8f0"; b.style.background = "white"; b.style.color = "#2d3748";
                 });
                 btn.style.borderColor = "#4299e1"; btn.style.background = "#ebf8ff"; btn.style.color = "#2b6cb0";
-                ageGradeOverlay._selGrade = btn.dataset.grade;
+                unifiedOverlay._selGrade = btn.dataset.grade;
+                localStorage.setItem("userGrade", btn.dataset.grade);
             };
         }
-        this.shadowRoot.getElementById("age-grade-save").onclick = () => {
+        this.shadowRoot.getElementById("unified-settings-close").onclick = () => {
             const fs = String(Math.min(150, Math.max(80, parseInt(settingsFontInput.value) || 100)));
             localStorage.setItem("fontSize", fs);
             _applyFontSize(this, fs);
-            if (ageGradeOverlay._selColor) {
-                localStorage.setItem("textColor", ageGradeOverlay._selColor);
-            }
-            if (ageGradeOverlay._selGrade) {
-                localStorage.setItem("userGrade", ageGradeOverlay._selGrade);
-            }
             saveSnapshot();
-            ageGradeOverlay.classList.remove("active");
+            unifiedOverlay.classList.remove("active");
         };
-        this.shadowRoot.getElementById("age-grade-close").onclick = () => ageGradeOverlay.classList.remove("active");
-
-        // Background settings overlay
-        const bgOverlay = this.shadowRoot.getElementById("bg-overlay");
-        this.shadowRoot.getElementById("home-bg").onclick = () => { settingsMenu.classList.remove("open"); bgOverlay.classList.add("active"); };
-        this.shadowRoot.getElementById("bg-close").onclick = () => bgOverlay.classList.remove("active");
         this.shadowRoot.getElementById("home-profile").onclick = () => {
             settingsMenu.classList.remove("open");
             saveSnapshot();
