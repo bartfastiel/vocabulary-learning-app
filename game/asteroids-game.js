@@ -164,7 +164,7 @@ class AsteroidsGame extends HTMLElement {
     _showShop() {
         if (this._cleanup) { this._cleanup(); this._cleanup = null; }
         const shop = this._shop, coins = this._coins, effects = getEffects(shop);
-        const canPlay = coins >= PLAY_COST;
+        const canPlay = true; // always free to play
         const custom = shop.customShip || { hull: "#4dd0e1", accent: "#00838f", flame: "#FF6D00" };
 
         this.shadowRoot.innerHTML = `<style>${SHOP_CSS}</style>
@@ -177,7 +177,7 @@ class AsteroidsGame extends HTMLElement {
         <div class="body">
           <div>
             <button class="play-btn" id="play" ${canPlay ? "" : "disabled"}>▶ Spielen</button>
-            <div class="play-cost">${canPlay ? `Kostet 💰 ${PLAY_COST} Coins` : `Nicht genug Coins (${PLAY_COST} nötig)`}</div>
+            <div class="play-cost">Immer kostenlos spielen!</div>
           </div>
           <div>
             <div class="section">📊 Dein Setup</div>
@@ -215,11 +215,7 @@ class AsteroidsGame extends HTMLElement {
 
         const sr = this.shadowRoot;
         sr.getElementById("close").onclick = () => this.dispatchEvent(new CustomEvent("close-game", { bubbles: true }));
-        sr.getElementById("play").onclick = () => {
-            if (this._coins < PLAY_COST) return;
-            this._coins -= PLAY_COST; setCoins(this._coins);
-            this._startGame();
-        };
+        sr.getElementById("play").onclick = () => this._startGame();
 
         // Ship grid
         const grid = sr.getElementById("ship-grid");
@@ -574,7 +570,7 @@ canvas { display: block; max-height: 80vh; max-width: 95vw; touch-action: none;
 
             // HUD
             ctx.fillStyle = "rgba(0,0,0,0.5)";
-            ctx.beginPath(); ctx.roundRect(4, 4, 220, 26, 6); ctx.fill();
+            ctx.fillRect(4, 4, 220, 26);
             ctx.fillStyle = "white"; ctx.font = "bold 12px 'Segoe UI',sans-serif";
             ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
             ctx.fillText(`⭐ ${score}  ❤️ ${lives}  🌊 Welle ${wave}  💀 ${totalKills}`, 10, 22);
