@@ -469,8 +469,8 @@ class GameLobby extends HTMLElement {
         this.shadowRoot.getElementById("play-screen").hidden   = false;
         this.shadowRoot.getElementById("result-screen").hidden = true;
 
-        // hide the lobby quit button for rocket-game (has its own)
-        this.shadowRoot.getElementById("quit-btn").hidden = (game.id === "rocket");
+        // hide the lobby quit button for games that have their own close button
+        this.shadowRoot.getElementById("quit-btn").hidden = (game.id === "rocket" || game.id === "asteroids");
 
         const el = document.createElement(game.component);
         this.shadowRoot.getElementById("game-slot").appendChild(el);
@@ -557,7 +557,7 @@ class GameLobby extends HTMLElement {
         const pm = this._pm();
         if (!pm || pm.points < game.cost) return;
 
-        pm.updatePoints(-game.cost);
+        if (game.cost > 0) pm.updatePoints(-game.cost);
         this._activeGame = game;
         this._showPlay(game);
     }
