@@ -523,9 +523,9 @@ class GameLobby extends HTMLElement {
         const playCheck = _cachedPlayAllowed;
 
         grid.innerHTML = GAMES.map(g => {
-            const locked = pts < g.cost;
+            const locked = g.cost > 0 && pts < g.cost;
             const blocked = _cachedBlockedGames[g.id] || false;
-            const teacherBlocked = blocked || !playCheck.allowed;
+            const teacherBlocked = blocked || (!playCheck.allowed && g.cost > 0);
             const hsVal  = hs[g.id] != null ? hs[g.id] : null;
             const hsText = hsVal != null && g.scoreLabel
                 ? `Highscore: ${hsVal} ${g.scoreLabel}`
@@ -555,9 +555,9 @@ class GameLobby extends HTMLElement {
         const game = GAMES.find(g => g.id === id);
         if (!game) return;
         const pm = this._pm();
-        if (!pm || pm.points < game.cost) return;
+        if (game.cost > 0 && (!pm || pm.points < game.cost)) return;
 
-        if (game.cost > 0) pm.updatePoints(-game.cost);
+        if (game.cost > 0 && pm) pm.updatePoints(-game.cost);
         this._activeGame = game;
         this._showPlay(game);
     }
