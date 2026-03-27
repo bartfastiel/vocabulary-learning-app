@@ -33,11 +33,19 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: Replace version number
+      - name: Replace version number and cache-bust all JS imports
         run: |
           VERSION=$(date -u +"%Y.%m.%d-%H%M%S")
-          echo "Replacing version placeholder in index.html with actual version: $VERSION"
+          echo "Version: $VERSION"
           sed -i "s/Entwicklungsversion/$VERSION/g" index.html
+          # Add ?v=VERSION to all JS import statements so Safari fetches fresh files
+          find . -name '*.js' -not -path './node_modules/*' -not -path './.git/*' | while read f; do
+            sed -i -E "s|from \"(\./[^\"]+\.js)\"|from \"\1?v=$VERSION\"|g" "$f"
+            sed -i -E "s|import \"(\./[^\"]+\.js)\"|import \"\1?v=$VERSION\"|g" "$f"
+            sed -i -E "s|from \"(\.\./[^\"]+\.js)\"|from \"\1?v=$VERSION\"|g" "$f"
+            sed -i -E "s|import \"(\.\./[^\"]+\.js)\"|import \"\1?v=$VERSION\"|g" "$f"
+          done
+          echo "Cache-busted all JS imports with version $VERSION"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
