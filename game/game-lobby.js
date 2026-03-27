@@ -9,6 +9,24 @@
 // Deducts cost on game start, awards pointsEarned on game end.
 // All events from child game components are caught on this.shadowRoot.
 
+// Polyfill: roundRect for older Safari/iOS that lack it
+if (typeof CanvasRenderingContext2D !== "undefined" && !CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
+        const r = typeof radii === "number" ? radii : Array.isArray(radii) ? radii[0] || 0 : 0;
+        this.moveTo(x + r, y);
+        this.lineTo(x + w - r, y);
+        this.quadraticCurveTo(x + w, y, x + w, y + r);
+        this.lineTo(x + w, y + h - r);
+        this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        this.lineTo(x + r, y + h);
+        this.quadraticCurveTo(x, y + h, x, y + h - r);
+        this.lineTo(x, y + r);
+        this.quadraticCurveTo(x, y, x + r, y);
+        this.closePath();
+        return this;
+    };
+}
+
 import "./rocket-game.js";
 import "./flappy-game.js";
 import "./jump-game.js";
