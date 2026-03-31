@@ -5,14 +5,17 @@
 const _deGrade = () => parseInt(localStorage.getItem("userGrade") || "5");
 
 const ALL_DE_CATEGORIES = [
-    { id: "wortarten",       name: "\uD83D\uDCDD Wortarten",           generate: genWortarten, grades: [3,4,5,6] },
-    { id: "nomen",           name: "\uD83C\uDFF7\uFE0F Nomen & Artikel",     generate: genNomen, grades: [3,4,5,6] },
+    { id: "buchstaben",      name: "\uD83D\uDD24 Buchstaben",          generate: genBuchstaben, grades: [1] },
+    { id: "silben",          name: "\uD83D\uDCCF Silben",              generate: genSilben, grades: [1,2] },
+    { id: "reimwoerter",     name: "\uD83C\uDFB5 Reimw\u00f6rter",     generate: genReimwoerter, grades: [1,2] },
+    { id: "wortarten",       name: "\uD83D\uDCDD Wortarten",           generate: genWortarten, grades: [2,3,4,5,6] },
+    { id: "nomen",           name: "\uD83C\uDFF7\uFE0F Nomen & Artikel",     generate: genNomen, grades: [1,2,3,4,5,6] },
     { id: "verben",          name: "\uD83C\uDFC3 Verben konjugieren",  generate: genVerben, grades: [4,5,6] },
     { id: "zeitformen",      name: "\u23F0 Zeitformen",           generate: genZeitformen, grades: [5,6] },
-    { id: "rechtschreibung", name: "\u270F\uFE0F Rechtschreibung",     generate: genRechtschreibung, grades: [3,4,5,6] },
-    { id: "satzzeichen",     name: "\u2757 Satzzeichen",          generate: genSatzzeichen, grades: [3,4,5] },
-    { id: "einzahl_mehrzahl",name: "\uD83D\uDC65 Einzahl & Mehrzahl",  generate: genEinzahlMehrzahl, grades: [3,4] },
-    { id: "gegenteil",       name: "\u2194\uFE0F Gegenteile",          generate: genGegenteil, grades: [3,4,5] },
+    { id: "rechtschreibung", name: "\u270F\uFE0F Rechtschreibung",     generate: genRechtschreibung, grades: [2,3,4,5,6] },
+    { id: "satzzeichen",     name: "\u2757 Satzzeichen",          generate: genSatzzeichen, grades: [2,3,4,5] },
+    { id: "einzahl_mehrzahl",name: "\uD83D\uDC65 Einzahl & Mehrzahl",  generate: genEinzahlMehrzahl, grades: [2,3,4] },
+    { id: "gegenteil",       name: "\u2194\uFE0F Gegenteile",          generate: genGegenteil, grades: [2,3,4,5] },
     { id: "wortfamilien",    name: "\uD83C\uDF33 Wortfamilien",        generate: genWortfamilien, grades: [4,5,6] },
     { id: "satzglieder",     name: "\uD83E\uDDE9 Satzglieder",         generate: genSatzglieder, grades: [5,6] },
 ];
@@ -30,6 +33,81 @@ function shuffle(arr) {
 }
 
 // ── Generators ─────────────────────────────────────────────────────────────────
+
+function genBuchstaben() {
+    const types = [
+        () => {
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const idx = randInt(0, 23);
+            const letter = alphabet[idx];
+            const next = alphabet[idx + 1];
+            const wrongs = shuffle(alphabet.split("").filter(l => l !== next)).slice(0, 3);
+            return { question: `Welcher Buchstabe kommt nach ${letter}?`, answer: next, choices: shuffle([next, ...wrongs]) };
+        },
+        () => {
+            const pairs = [
+                { upper: "A", lower: "a" }, { upper: "B", lower: "b" }, { upper: "D", lower: "d" },
+                { upper: "E", lower: "e" }, { upper: "F", lower: "f" }, { upper: "G", lower: "g" },
+                { upper: "H", lower: "h" }, { upper: "K", lower: "k" }, { upper: "L", lower: "l" },
+                { upper: "M", lower: "m" }, { upper: "N", lower: "n" }, { upper: "R", lower: "r" },
+                { upper: "S", lower: "s" }, { upper: "T", lower: "t" }, { upper: "W", lower: "w" },
+            ];
+            const item = pick(pairs);
+            const wrongs = shuffle(pairs.filter(p => p.lower !== item.lower).map(p => p.lower)).slice(0, 3);
+            return { question: `Welcher kleine Buchstabe geh\u00f6rt zu ${item.upper}?`, answer: item.lower, choices: shuffle([item.lower, ...wrongs]) };
+        },
+        () => {
+            const words = [
+                { w: "Apfel", anfang: "A" }, { w: "Ball", anfang: "B" }, { w: "Dose", anfang: "D" },
+                { w: "Ente", anfang: "E" }, { w: "Fisch", anfang: "F" }, { w: "Gabel", anfang: "G" },
+                { w: "Hund", anfang: "H" }, { w: "Igel", anfang: "I" }, { w: "Katze", anfang: "K" },
+                { w: "L\u00f6we", anfang: "L" }, { w: "Maus", anfang: "M" }, { w: "Nase", anfang: "N" },
+                { w: "Oma", anfang: "O" }, { w: "Papa", anfang: "P" }, { w: "Rose", anfang: "R" },
+                { w: "Sonne", anfang: "S" }, { w: "Tisch", anfang: "T" }, { w: "Uhr", anfang: "U" },
+            ];
+            const item = pick(words);
+            const wrongs = shuffle("ABCDEFGHIKLMNOPRSTUW".split("").filter(l => l !== item.anfang)).slice(0, 3);
+            return { question: `Mit welchem Buchstaben f\u00e4ngt "${item.w}" an?`, answer: item.anfang, choices: shuffle([item.anfang, ...wrongs]) };
+        },
+    ];
+    return types[randInt(0, types.length - 1)]();
+}
+
+function genSilben() {
+    const words = [
+        { w: "Mama", s: 2 }, { w: "Papa", s: 2 }, { w: "Apfel", s: 2 }, { w: "Banane", s: 3 },
+        { w: "Tomate", s: 3 }, { w: "Hund", s: 1 }, { w: "Katze", s: 2 }, { w: "Schule", s: 2 },
+        { w: "Elefant", s: 3 }, { w: "Krokodil", s: 3 }, { w: "Auto", s: 2 }, { w: "Oma", s: 2 },
+        { w: "Opa", s: 2 }, { w: "Tisch", s: 1 }, { w: "Blume", s: 2 }, { w: "Schokolade", s: 4 },
+        { w: "Fisch", s: 1 }, { w: "Tafel", s: 2 }, { w: "Gurke", s: 2 }, { w: "Ball", s: 1 },
+    ];
+    const item = pick(words);
+    return {
+        question: `Wie viele Silben hat "${item.w}"?\n(Klatsche mit!)`,
+        answer: String(item.s),
+        choices: shuffle(["1", "2", "3", "4"]),
+    };
+}
+
+function genReimwoerter() {
+    const groups = [
+        ["Haus", "Maus", "Laus"], ["Hund", "Mund", "bunt"], ["Nacht", "Macht", "lacht"],
+        ["Katze", "Matze", "Tatze"], ["Baum", "Traum", "Schaum"], ["Kuh", "Schuh", "Ruh"],
+        ["Tisch", "Fisch", "frisch"], ["Hose", "Rose", "Dose"], ["Sand", "Hand", "Band"],
+        ["Tor", "Ohr", "vor"], ["Maus", "Haus", "raus"], ["Kanne", "Tanne", "Wanne"],
+        ["Hut", "Mut", "gut"], ["Nase", "Hase", "Vase"], ["Stern", "fern", "gern"],
+    ];
+    const group = pick(groups);
+    const word = group[0];
+    const correct = group[1];
+    const wrongGroups = groups.filter(g => g !== group);
+    const wrongs = shuffle(wrongGroups.map(g => g[0])).slice(0, 3);
+    return {
+        question: `Was reimt sich auf "${word}"?`,
+        answer: correct,
+        choices: shuffle([correct, ...wrongs]),
+    };
+}
 
 function genWortarten() {
     const words = [
@@ -130,6 +208,28 @@ function genZeitformen() {
 }
 
 function genRechtschreibung() {
+    const g = _deGrade();
+    if (g <= 2) {
+        const simplePairs = [
+            { correct: "Hund", wrong: ["Hunt", "Hundt", "Huhnd"] },
+            { correct: "Katze", wrong: ["Kazze", "Katse", "Katzte"] },
+            { correct: "Schule", wrong: ["Shule", "Schuhle", "Schulle"] },
+            { correct: "Blume", wrong: ["Bluhme", "Blumme", "Plume"] },
+            { correct: "Sonne", wrong: ["Sone", "Sohne", "Sonnne"] },
+            { correct: "Vogel", wrong: ["Fogel", "Vogl", "Vohgel"] },
+            { correct: "Mutter", wrong: ["Muter", "Muther", "Muhter"] },
+            { correct: "Wasser", wrong: ["Waser", "Waser", "Wassar"] },
+            { correct: "Kinder", wrong: ["Kinter", "Kiender", "Kindur"] },
+            { correct: "Baum", wrong: ["Bauhm", "Baom", "Pawm"] },
+        ];
+        const item = pick(simplePairs);
+        const wrongOne = pick(item.wrong);
+        return {
+            question: `Welches Wort ist richtig geschrieben?`,
+            answer: item.correct,
+            choices: shuffle([item.correct, wrongOne, pick(item.wrong.filter(w => w !== wrongOne)) || wrongOne + "x"].slice(0, 4)),
+        };
+    }
     const pairs = [
         { correct: "Fahrrad", wrong: ["Fahrad", "Farrad", "Fahrrat"] },
         { correct: "Schmetterling", wrong: ["Schmeteling", "Schmeterling", "Schmetalink"] },

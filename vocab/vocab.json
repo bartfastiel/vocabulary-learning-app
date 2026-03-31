@@ -2394,5 +2394,197 @@
       {"de": "Pflaster", "en": "plaster", "allowImage": false}
     ],
     "grade": "6"
+  },
+  {
+    "name": "Kl. 1: Farben",
+    "words": [
+      {"de": "rot", "en": "red", "allowImage": true},
+      {"de": "blau", "en": "blue", "allowImage": true},
+      {"de": "grün", "en": "green", "allowImage": true},
+      {"de": "gelb", "en": "yellow", "allowImage": true},
+      {"de": "schwarz", "en": "black", "allowImage": true},
+      {"de": "weiß", "en": "white", "allowImage": true},
+      {"de": "rosa", "en": "pink", "allowImage": true},
+      {"de": "orange", "en": "orange", "allowImage": true},
+      {"de": "braun", "en": "brown", "allowImage": true},
+      {"de": "lila", "en": "purple", "allowImage": true}
+    ],
+    "grade": "1"
+  },
+  {
+    "name": "Kl. 1: Zahlen 1–10",
+    "words": [
+      {"de": "eins", "en": "one", "allowImage": false},
+      {"de": "zwei", "en": "two", "allowImage": false},
+      {"de": "drei", "en": "three", "allowImage": false},
+      {"de": "vier", "en": "four", "allowImage": false},
+      {"de": "fünf", "en": "five", "allowImage": false},
+      {"de": "sechs", "en": "six", "allowImage": false},
+      {"de": "sieben", "en": "seven", "allowImage": false},
+      {"de": "acht", "en": "eight", "allowImage": false},
+      {"de": "neun", "en": "nine", "allowImage": false},
+      {"de": "zehn", "en": "ten", "allowImage": false}
+    ],
+    "grade": "1"
+  },
+  {
+    "name": "Kl. 1: Tiere",
+    "words": [
+      {"de": "Hund", "en": "dog", "allowImage": true},
+      {"de": "Katze", "en": "cat", "allowImage": true},
+      {"de": "Maus", "en": "mouse", "allowImage": true},
+      {"de": "Vogel", "en": "bird", "allowImage": true},
+      {"de": "Fisch", "en": "fish", "allowImage": true},
+      {"de": "Pferd", "en": "horse", "allowImage": true},
+      {"de": "Kuh", "en": "cow", "allowImage": true},
+      {"de": "Schwein", "en": "pig", "allowImage": true},
+      {"de": "Hase", "en": "rabbit", "allowImage": true},
+      {"de": "Bär", "en": "bear", "allowImage": true}
+    ],
+    "grade": "1"
+  },
+  {
+    "name": "Kl. 1: Familie",
+    "words": [
+      {"de": "Mama", "en": "mum", "allowImage": false},
+      {"de": "Papa", "en": "dad", "allowImage": false},
+      {"de": "Bruder", "en": "brother", "allowImage": false},
+      {"de": "Schwester", "en": "sister", "allowImage": false},
+      {"de": "Baby", "en": "baby", "allowImage": true},
+      {"de": "Oma", "en": "grandma", "allowImage": false},
+      {"de": "Opa", "en": "grandpa", "allowImage": false},
+      {"de": "Familie", "en": "family", "allowImage": false},
+      {"de": "Junge", "en": "boy", "allowImage": true},
+      {"de": "Mädchen", "en": "girl", "allowImage": true}
+    ],
+    "grade": "1"
+  },
+  {
+    "name": "Kl. 1: Mein Körper",
+    "words": [
+      {"de": "Kopf", "en": "head", "allowImage": true},
+      {"de": "Hand", "en": "hand", "allowImage": true},
+      {"de": "Fuß", "en": "foot", "allowImage": true},
+      {"de": "Auge", "en": "eye", "allowImage": true},
+      {"de": "Nase", "en": "nose", "allowImage": true},
+      {"de": "Mund", "en": "mouth", "allowImage": true},
+      {"de": "Ohr", "en": "ear", "allowImage": true},
+      {"de": "Arm", "en": "arm", "allowImage": true},
+      {"de": "Bein", "en": "leg", "allowImage": true},
+      {"de": "Finger", "en": "finger", "allowImage": true}
+    ],
+    "grade": "1"
+  },
+  {
+    "name": "Kl. 1: Begrüßung",
+    "words": [
+      {"de": "Hallo", "en": "hello", "allowImage": false},
+      {"de": "Tschüss", "en": "bye", "allowImage": false},
+      {"de": "ja", "en": "yes", "allowImage": false},
+      {"de": "nein", "en": "no", "allowImage": false},
+      {"de": "bitte", "en": "please", "allowImage": false},
+      {"de": "danke", "en": "thank you", "allowImage": false},
+      {"de": "guten Morgen", "en": "good morning", "allowImage": false},
+      {"de": "gute Nacht", "en": "good night", "allowImage": false},
+      {"de": "wie geht es dir?", "en": "how are you?", "allowImage": false},
+      {"de": "mir geht es gut", "en": "I am fine", "allowImage": false}
+    ],
+    "grade": "1"
+  },
+  {
+    "name": "Kl. 2: Obst & Gemüse",
+    "words": [
+      {"de": "Apfel", "en": "apple", "allowImage": true},
+      {"de": "Banane", "en": "banana", "allowImage": true},
+      {"de": "Erdbeere", "en": "strawberry", "allowImage": true},
+      {"de": "Tomate", "en": "tomato", "allowImage": true},
+      {"de": "Karotte", "en": "carrot", "allowImage": true},
+      {"de": "Birne", "en": "pear", "allowImage": true},
+      {"de": "Gurke", "en": "cucumber", "allowImage": true},
+      {"de": "Traube", "en": "grape", "allowImage": true},
+      {"de": "Kirsche", "en": "cherry", "allowImage": true},
+      {"de": "Kartoffel", "en": "potato", "allowImage": true}
+    ],
+    "grade": "2"
+  },
+  {
+    "name": "Kl. 2: Schulsachen",
+    "words": [
+      {"de": "Buch", "en": "book", "allowImage": true},
+      {"de": "Stift", "en": "pen", "allowImage": true},
+      {"de": "Tasche", "en": "bag", "allowImage": true},
+      {"de": "Schere", "en": "scissors", "allowImage": true},
+      {"de": "Lineal", "en": "ruler", "allowImage": true},
+      {"de": "Tisch", "en": "table", "allowImage": true},
+      {"de": "Stuhl", "en": "chair", "allowImage": true},
+      {"de": "Tafel", "en": "board", "allowImage": true},
+      {"de": "Schule", "en": "school", "allowImage": true},
+      {"de": "Lehrer", "en": "teacher", "allowImage": false}
+    ],
+    "grade": "2"
+  },
+  {
+    "name": "Kl. 2: Kleidung",
+    "words": [
+      {"de": "Hose", "en": "trousers", "allowImage": true},
+      {"de": "T-Shirt", "en": "t-shirt", "allowImage": true},
+      {"de": "Schuh", "en": "shoe", "allowImage": true},
+      {"de": "Jacke", "en": "jacket", "allowImage": true},
+      {"de": "Mütze", "en": "hat", "allowImage": true},
+      {"de": "Kleid", "en": "dress", "allowImage": true},
+      {"de": "Socke", "en": "sock", "allowImage": true},
+      {"de": "Pullover", "en": "jumper", "allowImage": true},
+      {"de": "Rock", "en": "skirt", "allowImage": true},
+      {"de": "Handschuh", "en": "glove", "allowImage": true}
+    ],
+    "grade": "2"
+  },
+  {
+    "name": "Kl. 2: Wetter",
+    "words": [
+      {"de": "Sonne", "en": "sun", "allowImage": true},
+      {"de": "Regen", "en": "rain", "allowImage": true},
+      {"de": "Schnee", "en": "snow", "allowImage": true},
+      {"de": "Wind", "en": "wind", "allowImage": false},
+      {"de": "Wolke", "en": "cloud", "allowImage": true},
+      {"de": "heiß", "en": "hot", "allowImage": false},
+      {"de": "kalt", "en": "cold", "allowImage": false},
+      {"de": "warm", "en": "warm", "allowImage": false},
+      {"de": "Regenbogen", "en": "rainbow", "allowImage": true},
+      {"de": "Eis", "en": "ice", "allowImage": true}
+    ],
+    "grade": "2"
+  },
+  {
+    "name": "Kl. 2: Zahlen 11–20",
+    "words": [
+      {"de": "elf", "en": "eleven", "allowImage": false},
+      {"de": "zwölf", "en": "twelve", "allowImage": false},
+      {"de": "dreizehn", "en": "thirteen", "allowImage": false},
+      {"de": "vierzehn", "en": "fourteen", "allowImage": false},
+      {"de": "fünfzehn", "en": "fifteen", "allowImage": false},
+      {"de": "sechzehn", "en": "sixteen", "allowImage": false},
+      {"de": "siebzehn", "en": "seventeen", "allowImage": false},
+      {"de": "achtzehn", "en": "eighteen", "allowImage": false},
+      {"de": "neunzehn", "en": "nineteen", "allowImage": false},
+      {"de": "zwanzig", "en": "twenty", "allowImage": false}
+    ],
+    "grade": "2"
+  },
+  {
+    "name": "Kl. 2: Zu Hause",
+    "words": [
+      {"de": "Haus", "en": "house", "allowImage": true},
+      {"de": "Tür", "en": "door", "allowImage": true},
+      {"de": "Fenster", "en": "window", "allowImage": true},
+      {"de": "Bett", "en": "bed", "allowImage": true},
+      {"de": "Küche", "en": "kitchen", "allowImage": true},
+      {"de": "Bad", "en": "bathroom", "allowImage": true},
+      {"de": "Garten", "en": "garden", "allowImage": true},
+      {"de": "Lampe", "en": "lamp", "allowImage": true},
+      {"de": "Sofa", "en": "sofa", "allowImage": true},
+      {"de": "Uhr", "en": "clock", "allowImage": true}
+    ],
+    "grade": "2"
   }
 ]
