@@ -313,5 +313,95 @@
       {"de": "Was ist eine Lawine?", "en": "Schneemasse die einen Berg hinunterrutscht", "allowImage": false},
       {"de": "Was ist ein Erdrutsch?", "en": "Erd- und Gesteinsmassen rutschen einen Hang hinunter", "allowImage": false}
     ]
+  },
+  {
+    "name": "Kl. 1: Wochentage & Monate",
+    "grade": "1",
+    "words": [
+      {"de": "Welcher Tag kommt nach Montag?", "en": "Dienstag", "allowImage": false},
+      {"de": "Wie viele Tage hat eine Woche?", "en": "7 Tage", "allowImage": false},
+      {"de": "Welcher Tag ist vor Samstag?", "en": "Freitag", "allowImage": false},
+      {"de": "Welche Tage sind Wochenende?", "en": "Samstag und Sonntag", "allowImage": false},
+      {"de": "Wie viele Monate hat ein Jahr?", "en": "12 Monate", "allowImage": false},
+      {"de": "Welcher Monat kommt nach Januar?", "en": "Februar", "allowImage": false},
+      {"de": "In welchem Monat ist Weihnachten?", "en": "Dezember", "allowImage": false},
+      {"de": "Welche Jahreszeit ist im Januar?", "en": "Winter", "allowImage": false},
+      {"de": "Wann beginnt das neue Schuljahr?", "en": "Im August oder September", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 1: Meine Umgebung",
+    "grade": "1",
+    "words": [
+      {"de": "Was siehst du auf dem Schulweg?", "en": "Häuser, Straßen, Bäume, Autos", "allowImage": false},
+      {"de": "Was ist eine Straße?", "en": "Ein Weg auf dem Autos fahren", "allowImage": false},
+      {"de": "Was ist ein Spielplatz?", "en": "Ein Ort wo Kinder spielen können", "allowImage": false},
+      {"de": "Was ist ein Supermarkt?", "en": "Ein Geschäft wo man Essen kauft", "allowImage": false},
+      {"de": "Wo wohnst du?", "en": "In einem Haus oder einer Wohnung", "allowImage": false},
+      {"de": "Was ist ein Zebrastreifen?", "en": "Streifen auf der Straße zum sicheren Überqueren", "allowImage": false},
+      {"de": "Was zeigt eine Ampel?", "en": "Rot (Stopp), Gelb (Achtung), Grün (Gehen)", "allowImage": false},
+      {"de": "Was ist ein Park?", "en": "Eine grüne Fläche mit Bäumen und Wiesen in der Stadt", "allowImage": false},
+      {"de": "Was macht die Feuerwehr?", "en": "Sie löscht Brände und hilft bei Unfällen", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 1: Wetter",
+    "grade": "1",
+    "words": [
+      {"de": "Was ist Regen?", "en": "Wasser das aus Wolken fällt", "allowImage": false},
+      {"de": "Was ist Schnee?", "en": "Gefrorenes Wasser das als Flocken fällt", "allowImage": false},
+      {"de": "Wann scheint die Sonne?", "en": "Wenn keine Wolken am Himmel sind", "allowImage": false},
+      {"de": "Was passiert bei Gewitter?", "en": "Blitz und Donner", "allowImage": false},
+      {"de": "Was ist ein Regenbogen?", "en": "Bunte Farben am Himmel nach dem Regen", "allowImage": false},
+      {"de": "Was ziehst du bei Regen an?", "en": "Regenjacke und Gummistiefel", "allowImage": false},
+      {"de": "Was ziehst du im Winter an?", "en": "Dicke Jacke, Mütze, Schal, Handschuhe", "allowImage": false},
+      {"de": "Was ist Wind?", "en": "Wenn die Luft sich bewegt", "allowImage": false},
+      {"de": "Was ist Nebel?", "en": "Eine Wolke die ganz tief am Boden ist", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 2: Mein Wohnort",
+    "grade": "2",
+    "words": [
+      {"de": "Was ist der Unterschied zwischen Stadt und Dorf?", "en": "Städte sind größer mit mehr Menschen und Gebäuden", "allowImage": false},
+      {"de": "Was gibt es in einer Stadt?", "en": "Geschäfte, Schulen, Krankenhäuser, Parks", "allowImage": false},
+      {"de": "Was gibt es auf dem Land?", "en": "Bauernhöfe, Felder, Wiesen, weniger Häuser", "allowImage": false},
+      {"de": "Was ist eine Adresse?", "en": "Straße und Hausnummer wo du wohnst", "allowImage": false},
+      {"de": "In welchem Land wohnen wir?", "en": "Deutschland", "allowImage": false},
+      {"de": "Was ist eine Nachbarschaft?", "en": "Die Gegend und Menschen um dein Zuhause", "allowImage": false},
+      {"de": "Wo kauft man Brot?", "en": "Beim Bäcker oder im Supermarkt", "allowImage": false},
+      {"de": "Wohin bringst du einen Brief?", "en": "Zum Briefkasten oder zur Post", "allowImage": false},
+      {"de": "Was macht ein Polizist?", "en": "Er sorgt für Ordnung und Sicherheit", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 2: Verkehr & Sicherheit",
+    "grade": "2",
+    "words": [
+      {"de": "Was bedeutet die rote Ampel?", "en": "Stehen bleiben!", "allowImage": false},
+      {"de": "Was bedeutet die grüne Ampel?", "en": "Du darfst gehen", "allowImage": false},
+      {"de": "Wo gehst du über die Straße?", "en": "Am Zebrastreifen oder bei der Ampel", "allowImage": false},
+      {"de": "Was trägst du auf dem Fahrrad?", "en": "Einen Helm", "allowImage": false},
+      {"de": "Auf welcher Seite gehst du auf dem Gehweg?", "en": "Auf der rechten Seite", "allowImage": false},
+      {"de": "Was ist ein Verkehrsschild?", "en": "Ein Schild das Regeln im Verkehr zeigt", "allowImage": false},
+      {"de": "Was bedeutet ein Stoppschild?", "en": "Anhalten und schauen", "allowImage": false},
+      {"de": "Warum ist der Schulweg wichtig zu üben?", "en": "Damit du sicher zur Schule kommst", "allowImage": false},
+      {"de": "Was machst du wenn die Ampel rot ist?", "en": "Warten bis sie grün wird", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 2: Wasser",
+    "grade": "2",
+    "words": [
+      {"de": "Wo kommt das Wasser aus dem Hahn her?", "en": "Aus dem Wasserwerk und Grundwasser", "allowImage": false},
+      {"de": "Was ist ein Fluss?", "en": "Fließendes Wasser das ins Meer mündet", "allowImage": false},
+      {"de": "Was ist ein See?", "en": "Stehendes Wasser umgeben von Land", "allowImage": false},
+      {"de": "Was ist das Meer?", "en": "Sehr großes Salzwasser", "allowImage": false},
+      {"de": "Warum brauchen wir Wasser?", "en": "Zum Trinken, Waschen, Kochen", "allowImage": false},
+      {"de": "Was passiert bei Frost mit Wasser?", "en": "Es wird zu Eis", "allowImage": false},
+      {"de": "Warum sollen wir Wasser sparen?", "en": "Sauberes Wasser ist kostbar", "allowImage": false},
+      {"de": "Wie heißt der längste Fluss in Deutschland?", "en": "Der Rhein", "allowImage": false},
+      {"de": "Was ist Regen?", "en": "Wasser das aus Wolken fällt", "allowImage": false}
+    ]
   }
 ]

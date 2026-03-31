@@ -5,9 +5,12 @@
 const _grade = () => parseInt(localStorage.getItem("userGrade") || "5");
 
 const ALL_MATH_CATEGORIES = [
-    { id: "addition",       name: "\u2795 Addition",         generate: genAddition, grades: [3,4,5,6] },
-    { id: "subtraktion",    name: "\u2796 Subtraktion",      generate: genSubtraktion, grades: [3,4,5,6] },
-    { id: "multiplikation", name: "\u2716\uFE0F Multiplikation",   generate: genMultiplikation, grades: [3,4,5,6] },
+    { id: "zaehlen",        name: "\uD83D\uDD22 Z\u00e4hlen",           generate: genZaehlen, grades: [1] },
+    { id: "addition",       name: "\u2795 Addition",         generate: genAddition, grades: [1,2,3,4,5,6] },
+    { id: "subtraktion",    name: "\u2796 Subtraktion",      generate: genSubtraktion, grades: [1,2,3,4,5,6] },
+    { id: "verdoppeln",     name: "\u270C\uFE0F Verdoppeln & Halbieren", generate: genVerdoppeln, grades: [1,2] },
+    { id: "vergleichen",    name: "\u2696\uFE0F Zahlen vergleichen", generate: genVergleichen, grades: [1,2] },
+    { id: "multiplikation", name: "\u2716\uFE0F Multiplikation",   generate: genMultiplikation, grades: [2,3,4,5,6] },
     { id: "division",       name: "\u2797 Division",          generate: genDivision, grades: [3,4,5,6] },
     { id: "einmaleins",     name: "\uD83D\uDD22 1x1 Training", generate: genEinmaleins, grades: [3,4] },
     { id: "reihenfolge",    name: "\uD83D\uDD22 Punkt vor Strich", generate: genReihenfolge, grades: [4,5,6] },
@@ -15,7 +18,7 @@ const ALL_MATH_CATEGORIES = [
     { id: "dezimal",        name: "\uD83D\uDD1F Dezimalzahlen",    generate: genDezimal, grades: [5,6] },
     { id: "geometrie",      name: "\uD83D\uDCD0 Geometrie",        generate: genGeometrie, grades: [5,6] },
     { id: "groessen",       name: "\uD83D\uDCCF Gr\u00f6\u00dfen umrechnen", generate: genGroessen, grades: [4,5,6] },
-    { id: "textaufgaben",   name: "\uD83D\uDCDD Textaufgaben",     generate: genTextaufgaben, grades: [3,4,5,6] },
+    { id: "textaufgaben",   name: "\uD83D\uDCDD Textaufgaben",     generate: genTextaufgaben, grades: [1,2,3,4,5,6] },
     { id: "prozent",        name: "% Prozentrechnung",  generate: genProzent, grades: [6] },
     { id: "negative",       name: "\u2796 Negative Zahlen",  generate: genNegative, grades: [6] },
 ];
@@ -54,24 +57,70 @@ function shuffle(arr) {
     return arr;
 }
 
+function genZaehlen() {
+    const types = [
+        () => {
+            const start = randInt(1, 15);
+            const next = start + 1;
+            return { question: `Z\u00e4hle weiter: ${start}, ___`, answer: String(next), choices: makeChoices(next) };
+        },
+        () => {
+            const n = randInt(1, 20);
+            const before = n - 1;
+            return { question: `Welche Zahl kommt vor ${n}?`, answer: String(before), choices: makeChoices(before) };
+        },
+        () => {
+            const n = randInt(1, 18);
+            const after = n + 1;
+            return { question: `Welche Zahl kommt nach ${n}?`, answer: String(after), choices: makeChoices(after) };
+        },
+        () => {
+            const a = randInt(1, 10), b = randInt(1, 10), c = randInt(1, 10);
+            const sorted = [a, b, c].sort((x, y) => x - y);
+            const biggest = sorted[2];
+            return { question: `Welche Zahl ist die gr\u00f6\u00dfte?\n${a}, ${b}, ${c}`, answer: String(biggest), choices: shuffle([String(a), String(b), String(c)]) };
+        },
+    ];
+    return types[randInt(0, types.length - 1)]();
+}
+
+function genVerdoppeln() {
+    const g = _grade();
+    const max = g <= 1 ? 10 : 20;
+    if (Math.random() < 0.5) {
+        const a = randInt(1, max);
+        return { question: `Verdopple: ${a}`, answer: String(a * 2), choices: makeChoices(a * 2) };
+    }
+    const a = randInt(1, Math.floor(max / 2)) * 2;
+    return { question: `Halbiere: ${a}`, answer: String(a / 2), choices: makeChoices(a / 2) };
+}
+
+function genVergleichen() {
+    const g = _grade();
+    const max = g <= 1 ? 20 : 100;
+    const a = randInt(1, max), b = randInt(1, max);
+    const sign = a > b ? ">" : a < b ? "<" : "=";
+    return { question: `${a} ___ ${b}\n\nWelches Zeichen passt?`, answer: sign, choices: shuffle([">", "<", "="]) };
+}
+
 function genAddition() {
     const g = _grade();
-    const max = g <= 3 ? 100 : g <= 4 ? 1000 : 9999;
-    const a = randInt(g <= 3 ? 1 : 100, max), b = randInt(1, max);
+    const max = g <= 1 ? 10 : g <= 2 ? 20 : g <= 3 ? 100 : g <= 4 ? 1000 : 9999;
+    const a = randInt(g <= 2 ? 1 : g <= 3 ? 1 : 100, max), b = randInt(1, g <= 1 ? 10 - a : max);
     return { question: `${a} + ${b} = ?`, answer: String(a + b), choices: makeChoices(a + b) };
 }
 
 function genSubtraktion() {
     const g = _grade();
-    const max = g <= 3 ? 100 : g <= 4 ? 1000 : 9999;
-    let a = randInt(g <= 3 ? 10 : 200, max), b = randInt(1, a);
+    const max = g <= 1 ? 10 : g <= 2 ? 20 : g <= 3 ? 100 : g <= 4 ? 1000 : 9999;
+    let a = randInt(g <= 2 ? 2 : g <= 3 ? 10 : 200, max), b = randInt(1, a);
     return { question: `${a} \u2212 ${b} = ?`, answer: String(a - b), choices: makeChoices(a - b) };
 }
 
 function genMultiplikation() {
     const g = _grade();
-    const maxA = g <= 3 ? 10 : g <= 4 ? 12 : 25;
-    const maxB = g <= 3 ? 10 : g <= 4 ? 12 : 25;
+    const maxA = g <= 2 ? 5 : g <= 3 ? 10 : g <= 4 ? 12 : 25;
+    const maxB = g <= 2 ? 5 : g <= 3 ? 10 : g <= 4 ? 12 : 25;
     const a = randInt(2, maxA), b = randInt(2, maxB);
     return { question: `${a} \u00d7 ${b} = ?`, answer: String(a * b), choices: makeChoices(a * b) };
 }
@@ -211,6 +260,28 @@ function genGroessen() {
 }
 
 function genTextaufgaben() {
+    const g = _grade();
+    if (g <= 2) {
+        const types = [
+            () => {
+                const a = randInt(1, g <= 1 ? 5 : 10), b = randInt(1, g <= 1 ? 5 : 10);
+                return { question: `Du hast ${a} Äpfel.\nDu bekommst ${b} dazu.\nWie viele hast du jetzt?`, answer: String(a + b), choices: makeChoices(a + b) };
+            },
+            () => {
+                const a = randInt(3, g <= 1 ? 10 : 15), b = randInt(1, a - 1);
+                return { question: `Du hast ${a} Bonbons.\nDu gibst ${b} weg.\nWie viele hast du noch?`, answer: String(a - b), choices: makeChoices(a - b) };
+            },
+            () => {
+                const a = randInt(1, g <= 1 ? 5 : 8), b = randInt(1, g <= 1 ? 5 : 8);
+                return { question: `Im Bus sitzen ${a} Kinder.\nDann steigen ${b} ein.\nWie viele sind jetzt im Bus?`, answer: String(a + b), choices: makeChoices(a + b) };
+            },
+            () => {
+                const a = randInt(2, g <= 1 ? 8 : 15), b = randInt(1, a);
+                return { question: `Auf dem Tisch liegen ${a} Stifte.\n${b} fallen runter.\nWie viele liegen noch oben?`, answer: String(a - b), choices: makeChoices(a - b) };
+            },
+        ];
+        return types[randInt(0, types.length - 1)]();
+    }
     const types = [
         () => {
             const preis = randInt(2, 15), anzahl = randInt(2, 8);

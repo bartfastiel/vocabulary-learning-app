@@ -308,5 +308,95 @@
       {"de": "Was leitet Reize ans Gehirn weiter?", "en": "Die Nerven", "allowImage": false},
       {"de": "Wie schützen wir unsere Ohren?", "en": "Laute Geräusche vermeiden, Gehörschutz tragen", "allowImage": false}
     ]
+  },
+  {
+    "name": "Kl. 1: Mein Körper",
+    "grade": "1",
+    "words": [
+      {"de": "Nenne 5 Körperteile", "en": "Kopf, Arm, Bein, Hand, Fuß", "allowImage": false},
+      {"de": "Wofür brauchst du deine Augen?", "en": "Zum Sehen", "allowImage": false},
+      {"de": "Wofür brauchst du deine Ohren?", "en": "Zum Hören", "allowImage": false},
+      {"de": "Wofür brauchst du deine Nase?", "en": "Zum Riechen", "allowImage": false},
+      {"de": "Wofür brauchst du deine Zunge?", "en": "Zum Schmecken", "allowImage": false},
+      {"de": "Wie viele Finger hast du?", "en": "10 Finger", "allowImage": false},
+      {"de": "Wie viele Zehen hast du?", "en": "10 Zehen", "allowImage": false},
+      {"de": "Wo sitzt dein Herz?", "en": "In der Brust", "allowImage": false},
+      {"de": "Was schützt deinen Kopf?", "en": "Der Schädel (Knochen)", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 1: Tiere um uns",
+    "grade": "1",
+    "words": [
+      {"de": "Was hat ein Vogel?", "en": "Federn und einen Schnabel", "allowImage": false},
+      {"de": "Was hat ein Fisch?", "en": "Schuppen und Flossen", "allowImage": false},
+      {"de": "Was frisst ein Hund?", "en": "Fleisch und Hundefutter", "allowImage": false},
+      {"de": "Was frisst eine Katze?", "en": "Mäuse und Katzenfutter", "allowImage": false},
+      {"de": "Wo lebt ein Fisch?", "en": "Im Wasser", "allowImage": false},
+      {"de": "Wo lebt ein Vogel?", "en": "In einem Nest, auf Bäumen", "allowImage": false},
+      {"de": "Welches Tier gibt Milch?", "en": "Die Kuh", "allowImage": false},
+      {"de": "Welches Tier legt Eier?", "en": "Das Huhn", "allowImage": false},
+      {"de": "Was macht ein Hund wenn er sich freut?", "en": "Er wedelt mit dem Schwanz", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 1: Jahreszeiten",
+    "grade": "1",
+    "words": [
+      {"de": "Welche 4 Jahreszeiten gibt es?", "en": "Frühling, Sommer, Herbst, Winter", "allowImage": false},
+      {"de": "Wann blühen die Blumen?", "en": "Im Frühling", "allowImage": false},
+      {"de": "Wann ist es am heißesten?", "en": "Im Sommer", "allowImage": false},
+      {"de": "Wann fallen die Blätter?", "en": "Im Herbst", "allowImage": false},
+      {"de": "Wann liegt Schnee?", "en": "Im Winter", "allowImage": false},
+      {"de": "Was machen viele Tiere im Winter?", "en": "Sie halten Winterschlaf", "allowImage": false},
+      {"de": "Was passiert im Frühling mit den Bäumen?", "en": "Sie bekommen neue Blätter", "allowImage": false},
+      {"de": "Wann können wir im See schwimmen?", "en": "Im Sommer", "allowImage": false},
+      {"de": "Welche Farben haben die Blätter im Herbst?", "en": "Gelb, Orange, Rot, Braun", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 2: Zähne & Gesundheit",
+    "grade": "2",
+    "words": [
+      {"de": "Wie oft sollst du Zähne putzen?", "en": "Morgens und abends (2 Mal am Tag)", "allowImage": false},
+      {"de": "Was sind Milchzähne?", "en": "Die ersten Zähne die wieder ausfallen", "allowImage": false},
+      {"de": "Was passiert wenn du zu viel Süßes isst?", "en": "Du kannst Karies (Löcher) bekommen", "allowImage": false},
+      {"de": "Was ist gesundes Essen?", "en": "Obst, Gemüse, Vollkornbrot", "allowImage": false},
+      {"de": "Warum ist Wasser trinken wichtig?", "en": "Der Körper braucht Wasser zum Leben", "allowImage": false},
+      {"de": "Warum ist Schlaf wichtig?", "en": "Der Körper erholt sich und wächst im Schlaf", "allowImage": false},
+      {"de": "Was macht der Zahnarzt?", "en": "Er schaut ob die Zähne gesund sind", "allowImage": false},
+      {"de": "Wie heißen die bleibenden Zähne?", "en": "Die zweiten Zähne die nach den Milchzähnen kommen", "allowImage": false},
+      {"de": "Was gehört zu einem gesunden Tag?", "en": "Essen, Trinken, Bewegen, Schlafen", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 2: Pflanzen wachsen",
+    "grade": "2",
+    "words": [
+      {"de": "Was braucht eine Pflanze?", "en": "Wasser, Licht und Erde", "allowImage": false},
+      {"de": "Was ist ein Samen?", "en": "Daraus wächst eine neue Pflanze", "allowImage": false},
+      {"de": "Aus welchem Teil trinkt die Pflanze?", "en": "Aus der Wurzel", "allowImage": false},
+      {"de": "Was macht das Blatt?", "en": "Es fängt Sonnenlicht ein", "allowImage": false},
+      {"de": "Was ist eine Blüte?", "en": "Der bunte Teil der Pflanze", "allowImage": false},
+      {"de": "Nenne 3 Blumen", "en": "Rose, Tulpe, Sonnenblume", "allowImage": false},
+      {"de": "Nenne 3 Bäume", "en": "Eiche, Buche, Tanne", "allowImage": false},
+      {"de": "Was ist Obst?", "en": "Früchte die an Bäumen oder Sträuchern wachsen", "allowImage": false},
+      {"de": "Was ist Gemüse?", "en": "Pflanzenteile die man essen kann (Karotte, Gurke)", "allowImage": false}
+    ]
+  },
+  {
+    "name": "Kl. 2: Tiere im Wald",
+    "grade": "2",
+    "words": [
+      {"de": "Welche Tiere leben im Wald?", "en": "Reh, Fuchs, Eichhörnchen, Wildschwein", "allowImage": false},
+      {"de": "Was frisst ein Eichhörnchen?", "en": "Nüsse und Samen", "allowImage": false},
+      {"de": "Was frisst ein Fuchs?", "en": "Mäuse, Beeren, Hühner", "allowImage": false},
+      {"de": "Was macht der Igel im Winter?", "en": "Er hält Winterschlaf", "allowImage": false},
+      {"de": "Was frisst ein Reh?", "en": "Gras, Blätter und Knospen", "allowImage": false},
+      {"de": "Welches Tier baut einen Damm?", "en": "Der Biber", "allowImage": false},
+      {"de": "Was hat der Hirsch auf dem Kopf?", "en": "Ein Geweih", "allowImage": false},
+      {"de": "Warum klopft der Specht?", "en": "Um Insekten im Holz zu finden", "allowImage": false},
+      {"de": "Was sammelt das Eichhörnchen für den Winter?", "en": "Nüsse und Vorräte", "allowImage": false}
+    ]
   }
 ]
