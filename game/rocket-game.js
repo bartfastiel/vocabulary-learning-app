@@ -1,9 +1,43 @@
 // game/rocket-game.js
 //
-// Rocket mini-game with shop, upgrades, and unlockable rocket skins.
+// Rocket mini-game with shop, upgrades, unlockable skins and vehicle types.
 // Coins earned in-game can be spent on upgrades and cosmetics.
 
 // ── Shop Data ─────────────────────────────────────────────────────────────────
+
+// Vehicle types with different shapes, shooting patterns, and speeds
+const VEHICLES = [
+    {
+        id: "rocket", name: "Rakete", price: 0,
+        desc: "Deine treue Rakete – schießt geradeaus",
+        icon: "🚀", speedBonus: 0, shootPattern: "forward",
+    },
+    {
+        id: "jet", name: "Düsenjet", price: 25,
+        desc: "Schneller unterwegs, schießt geradeaus",
+        icon: "✈️", speedBonus: 2, shootPattern: "forward",
+    },
+    {
+        id: "battleship", name: "Kampfschiff", price: 50,
+        desc: "Schießt nach vorne und zur Seite",
+        icon: "🛸", speedBonus: 1, shootPattern: "trident",
+    },
+    {
+        id: "starfighter", name: "Sternenjäger", price: 75,
+        desc: "Schießt nach vorne und diagonal",
+        icon: "⭐", speedBonus: 2, shootPattern: "spread",
+    },
+    {
+        id: "cruiser", name: "Kreuzer", price: 100,
+        desc: "Schießt in 5 Richtungen – stark!",
+        icon: "💎", speedBonus: 1, shootPattern: "five-way",
+    },
+    {
+        id: "ufo", name: "UFO", price: 150,
+        desc: "Schießt in ALLE Richtungen! Super schnell!",
+        icon: "👽", speedBonus: 4, shootPattern: "all-directions",
+    },
+];
 
 const ROCKETS = [
     {
@@ -83,7 +117,7 @@ function loadShopData() {
     try { return JSON.parse(localStorage.getItem("rocketShop") || "null"); } catch { return null; }
 }
 function defaultShopData() {
-    return { ownedRockets: ["default"], ownedUpgrades: [], equipped: "default" };
+    return { ownedRockets: ["default"], ownedUpgrades: [], equipped: "default", ownedVehicles: ["rocket"], equippedVehicle: "rocket" };
 }
 function saveShopData(data) {
     localStorage.setItem("rocketShop", JSON.stringify(data));
@@ -101,6 +135,12 @@ class RocketGame extends HTMLElement {
 
     connectedCallback() {
         this._shop = loadShopData() || defaultShopData();
+        // Migrate old shop data to include vehicles
+        if (!this._shop.ownedVehicles) {
+            this._shop.ownedVehicles = ["rocket"];
+            this._shop.equippedVehicle = "rocket";
+            saveShopData(this._shop);
+        }
         this._coins = getCoins();
         this._showShop();
     }
@@ -214,6 +254,30 @@ class RocketGame extends HTMLElement {
         .upgrade-price { font-size: 0.85rem; font-weight: 700; color: #ffd700; white-space: nowrap; }
         .upgrade-price.owned { color: #00e676; }
 
+        /* Vehicle list */
+        .vehicle-list { display: flex; flex-direction: column; gap: 8px; }
+        .vehicle-card {
+          display: flex; align-items: center; gap: 12px;
+          padding: 10px 14px; border-radius: 12px;
+          border: 2px solid rgba(255,255,255,0.1);
+          background: rgba(255,255,255,0.05);
+          cursor: pointer; transition: border-color 0.2s, transform 0.1s;
+        }
+        .vehicle-card:hover { transform: scale(1.01); border-color: rgba(255,255,255,0.3); }
+        .vehicle-card.equipped { border-color: #00e676; background: rgba(0,230,118,0.1); }
+        .vehicle-card.locked { opacity: 0.4; cursor: default; }
+        .vehicle-card.locked:hover { transform: none; border-color: rgba(255,255,255,0.1); }
+        .vehicle-icon { font-size: 1.8rem; min-width: 44px; text-align: center; }
+        .vehicle-info { flex: 1; }
+        .vehicle-name { font-size: 0.9rem; font-weight: 700; }
+        .vehicle-desc { font-size: 0.75rem; color: #a0a0a0; }
+        .vehicle-price { font-size: 0.85rem; font-weight: 700; color: #ffd700; white-space: nowrap; }
+        .vehicle-price.owned { color: #00e676; }
+        .vehicle-badge {
+          font-size: 0.6rem; background: #00e676; color: #1b5e20;
+          border-radius: 4px; padding: 1px 6px; font-weight: 700; margin-left: 6px;
+        }
+
         /* Stats */
         .stats-row {
           display: flex; gap: 8px; flex-wrap: wrap;
@@ -238,6 +302,7 @@ class RocketGame extends HTMLElement {
           <div>
             <div class="section-title">📊 Dein Setup</div>
             <div class="stats-row">
+              <div class="stat-chip">Fahrzeug: <span>${(VEHICLES.find(v => v.id === shop.equippedVehicle) || VEHICLES[0]).name}</span></div>
               <div class="stat-chip">Schuss: <span>${effects.maxShots}</span></div>
               <div class="stat-chip">Speed: <span>${effects.bulletSpeed}</span></div>
               <div class="stat-chip">Doppelschuss: <span>${effects.doubleShot ? "Ja" : "Nein"}</span></div>
@@ -246,7 +311,12 @@ class RocketGame extends HTMLElement {
           </div>
 
           <div>
-            <div class="section-title">🚀 Raketen</div>
+            <div class="section-title">🛸 Fahrzeuge</div>
+            <div class="vehicle-list" id="vehicle-list"></div>
+          </div>
+
+          <div>
+            <div class="section-title">🎨 Farben</div>
             <div class="rocket-grid" id="rocket-grid"></div>
           </div>
 
@@ -266,7 +336,54 @@ class RocketGame extends HTMLElement {
         };
         sr.getElementById("play-btn").onclick = () => this._startGame();
 
-        // Render rockets
+        // Render vehicles
+        const vehicleList = sr.getElementById("vehicle-list");
+        for (const v of VEHICLES) {
+            const owned = shop.ownedVehicles.includes(v.id);
+            const equipped = shop.equippedVehicle === v.id;
+            const canBuy = !owned && coins >= v.price;
+
+            const card = document.createElement("div");
+            card.className = "vehicle-card" + (equipped ? " equipped" : "") + (!owned && !canBuy ? " locked" : "");
+
+            const patternLabels = {
+                "forward": "Geradeaus",
+                "trident": "Vorne + Seiten",
+                "spread": "Vorne + Diagonal",
+                "five-way": "5 Richtungen",
+                "all-directions": "Alle Richtungen!",
+            };
+
+            card.innerHTML = `
+          <div class="vehicle-icon">${v.icon}</div>
+          <div class="vehicle-info">
+            <div class="vehicle-name">${v.name}${equipped ? '<span class="vehicle-badge">AKTIV</span>' : ""}</div>
+            <div class="vehicle-desc">${v.desc}</div>
+            <div class="vehicle-desc">Schuss: ${patternLabels[v.shootPattern]}${v.speedBonus > 0 ? " · Speed +" + v.speedBonus : ""}</div>
+          </div>
+          <div class="vehicle-price ${owned ? "owned" : ""}">${owned ? "✓ Gekauft" : "💰 " + v.price}</div>
+        `;
+
+            if (!owned && canBuy) {
+                card.onclick = () => {
+                    this._coins -= v.price;
+                    setCoins(this._coins);
+                    shop.ownedVehicles.push(v.id);
+                    shop.equippedVehicle = v.id;
+                    saveShopData(shop);
+                    this._showShop();
+                };
+            } else if (owned && !equipped) {
+                card.onclick = () => {
+                    shop.equippedVehicle = v.id;
+                    saveShopData(shop);
+                    this._showShop();
+                };
+            }
+            vehicleList.appendChild(card);
+        }
+
+        // Render rockets (color skins)
         const rocketGrid = sr.getElementById("rocket-grid");
         for (const r of ROCKETS) {
             const owned = shop.ownedRockets.includes(r.id);
@@ -366,57 +483,178 @@ class RocketGame extends HTMLElement {
         return ROCKETS.find(r => r.id === this._shop.equipped) || ROCKETS[0];
     }
 
-    _drawMiniRocket(ctx, skin, cx, cy) {
-        ctx.save();
-        ctx.translate(cx, cy);
-        const sc = 1.0;
-        ctx.scale(sc, sc);
+    _getVehicle() {
+        return VEHICLES.find(v => v.id === this._shop.equippedVehicle) || VEHICLES[0];
+    }
 
-        // Body
+    _getBodyColor(skin) {
         const t = performance.now() / 300;
         if (skin.body === "rainbow") {
             const hue = (t * 60) % 360;
-            ctx.fillStyle = `hsl(${hue}, 80%, 60%)`;
-        } else {
-            ctx.fillStyle = skin.body;
+            return `hsl(${hue}, 80%, 60%)`;
         }
-        ctx.beginPath();
-        ctx.moveTo(0, -20); ctx.lineTo(12, 12); ctx.lineTo(-12, 12);
-        ctx.closePath(); ctx.fill();
+        return skin.body;
+    }
 
-        // Fins
-        ctx.fillStyle = skin.accent;
-        ctx.beginPath(); ctx.moveTo(-12, 12); ctx.lineTo(-20, 22); ctx.lineTo(-8, 12); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(12, 12); ctx.lineTo(20, 22); ctx.lineTo(8, 12); ctx.fill();
-
-        // Flame
-        const flame = Math.random() * 5 + 6;
+    _getFlameColor(skin) {
+        const t = performance.now() / 300;
         if (skin.flame === "rainbow") {
             const hue = ((t * 80) + 180) % 360;
-            ctx.fillStyle = `hsl(${hue}, 90%, 55%)`;
-        } else {
-            ctx.fillStyle = skin.flame;
+            return `hsl(${hue}, 90%, 55%)`;
         }
-        ctx.beginPath();
-        ctx.moveTo(-5, 12); ctx.lineTo(0, 12 + flame); ctx.lineTo(5, 12);
-        ctx.closePath(); ctx.fill();
+        return skin.flame;
+    }
 
-        // Glow around flame
-        ctx.globalAlpha = 0.3;
-        ctx.beginPath();
-        ctx.moveTo(-8, 12); ctx.lineTo(0, 12 + flame + 4); ctx.lineTo(8, 12);
-        ctx.closePath(); ctx.fill();
-        ctx.globalAlpha = 1;
+    _drawMiniVehicle(ctx, skin, cx, cy, vehicleId) {
+        ctx.save();
+        ctx.translate(cx, cy);
 
-        // Window
-        ctx.fillStyle = skin.window;
-        ctx.beginPath(); ctx.arc(0, -4, 4, 0, Math.PI * 2); ctx.fill();
+        const bodyColor = this._getBodyColor(skin);
+        const flameColor = this._getFlameColor(skin);
+        const flame = Math.random() * 5 + 6;
 
-        // Window shine
-        ctx.fillStyle = "rgba(255,255,255,0.5)";
-        ctx.beginPath(); ctx.arc(-1.5, -5.5, 1.5, 0, Math.PI * 2); ctx.fill();
+        if (vehicleId === "ufo") {
+            // UFO: dome + disc + glow ring
+            ctx.fillStyle = skin.window;
+            ctx.beginPath(); ctx.ellipse(0, -8, 8, 10, 0, Math.PI, 0); ctx.fill();
+            // Window shine
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.beginPath(); ctx.arc(-2, -12, 2, 0, Math.PI * 2); ctx.fill();
+            // Disc body
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath(); ctx.ellipse(0, -2, 20, 8, 0, 0, Math.PI * 2); ctx.fill();
+            // Accent ring
+            ctx.fillStyle = skin.accent;
+            ctx.beginPath(); ctx.ellipse(0, 0, 20, 5, 0, 0, Math.PI * 2); ctx.fill();
+            // Bottom glow
+            ctx.globalAlpha = 0.5 + Math.random() * 0.3;
+            ctx.fillStyle = flameColor;
+            ctx.beginPath(); ctx.ellipse(0, 6, 12, 4, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1;
+        } else if (vehicleId === "jet") {
+            // Jet: sleek swept-wing shape
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath();
+            ctx.moveTo(0, -22); ctx.lineTo(6, -4); ctx.lineTo(6, 10); ctx.lineTo(-6, 10); ctx.lineTo(-6, -4);
+            ctx.closePath(); ctx.fill();
+            // Wings
+            ctx.fillStyle = skin.accent;
+            ctx.beginPath(); ctx.moveTo(-6, 4); ctx.lineTo(-22, 16); ctx.lineTo(-6, 10); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(6, 4); ctx.lineTo(22, 16); ctx.lineTo(6, 10); ctx.fill();
+            // Tail fin
+            ctx.beginPath(); ctx.moveTo(0, 6); ctx.lineTo(0, 14); ctx.lineTo(-3, 14); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(0, 6); ctx.lineTo(0, 14); ctx.lineTo(3, 14); ctx.fill();
+            // Flame
+            ctx.fillStyle = flameColor;
+            ctx.beginPath(); ctx.moveTo(-3, 10); ctx.lineTo(0, 10 + flame); ctx.lineTo(3, 10); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath(); ctx.moveTo(-5, 10); ctx.lineTo(0, 10 + flame + 4); ctx.lineTo(5, 10); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 1;
+            // Cockpit
+            ctx.fillStyle = skin.window;
+            ctx.beginPath(); ctx.ellipse(0, -8, 3, 5, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.beginPath(); ctx.arc(-1, -10, 1.5, 0, Math.PI * 2); ctx.fill();
+        } else if (vehicleId === "battleship") {
+            // Battleship: wider, bulkier
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath();
+            ctx.moveTo(0, -18); ctx.lineTo(14, 6); ctx.lineTo(14, 14); ctx.lineTo(-14, 14); ctx.lineTo(-14, 6);
+            ctx.closePath(); ctx.fill();
+            // Side cannons
+            ctx.fillStyle = skin.accent;
+            ctx.fillRect(-20, 2, 8, 4);
+            ctx.fillRect(12, 2, 8, 4);
+            // Fins
+            ctx.beginPath(); ctx.moveTo(-14, 14); ctx.lineTo(-18, 22); ctx.lineTo(-10, 14); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(14, 14); ctx.lineTo(18, 22); ctx.lineTo(10, 14); ctx.fill();
+            // Flame
+            ctx.fillStyle = flameColor;
+            ctx.beginPath(); ctx.moveTo(-6, 14); ctx.lineTo(0, 14 + flame); ctx.lineTo(6, 14); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath(); ctx.moveTo(-9, 14); ctx.lineTo(0, 14 + flame + 4); ctx.lineTo(9, 14); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 1;
+            // Window
+            ctx.fillStyle = skin.window;
+            ctx.beginPath(); ctx.arc(0, -4, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.beginPath(); ctx.arc(-1.5, -6, 2, 0, Math.PI * 2); ctx.fill();
+        } else if (vehicleId === "starfighter") {
+            // Star fighter: X-wing style
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath();
+            ctx.moveTo(0, -20); ctx.lineTo(8, 0); ctx.lineTo(8, 12); ctx.lineTo(-8, 12); ctx.lineTo(-8, 0);
+            ctx.closePath(); ctx.fill();
+            // X-wings
+            ctx.fillStyle = skin.accent;
+            ctx.beginPath(); ctx.moveTo(-8, -4); ctx.lineTo(-22, -14); ctx.lineTo(-20, -8); ctx.lineTo(-8, 2); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(8, -4); ctx.lineTo(22, -14); ctx.lineTo(20, -8); ctx.lineTo(8, 2); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(-8, 6); ctx.lineTo(-22, 18); ctx.lineTo(-20, 12); ctx.lineTo(-8, 8); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(8, 6); ctx.lineTo(22, 18); ctx.lineTo(20, 12); ctx.lineTo(8, 8); ctx.fill();
+            // Flame
+            ctx.fillStyle = flameColor;
+            ctx.beginPath(); ctx.moveTo(-4, 12); ctx.lineTo(0, 12 + flame); ctx.lineTo(4, 12); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath(); ctx.moveTo(-6, 12); ctx.lineTo(0, 12 + flame + 4); ctx.lineTo(6, 12); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 1;
+            // Window
+            ctx.fillStyle = skin.window;
+            ctx.beginPath(); ctx.arc(0, -6, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.beginPath(); ctx.arc(-1.5, -7.5, 1.5, 0, Math.PI * 2); ctx.fill();
+        } else if (vehicleId === "cruiser") {
+            // Cruiser: large, heavy
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath();
+            ctx.moveTo(0, -22); ctx.lineTo(16, 4); ctx.lineTo(12, 16); ctx.lineTo(-12, 16); ctx.lineTo(-16, 4);
+            ctx.closePath(); ctx.fill();
+            // Side structures
+            ctx.fillStyle = skin.accent;
+            ctx.fillRect(-20, -2, 6, 12);
+            ctx.fillRect(14, -2, 6, 12);
+            // Top cannon
+            ctx.fillRect(-2, -26, 4, 6);
+            // Flame (double)
+            ctx.fillStyle = flameColor;
+            ctx.beginPath(); ctx.moveTo(-6, 16); ctx.lineTo(-3, 16 + flame); ctx.lineTo(0, 16); ctx.closePath(); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(0, 16); ctx.lineTo(3, 16 + flame); ctx.lineTo(6, 16); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath(); ctx.moveTo(-8, 16); ctx.lineTo(0, 16 + flame + 5); ctx.lineTo(8, 16); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 1;
+            // Window
+            ctx.fillStyle = skin.window;
+            ctx.beginPath(); ctx.arc(0, -4, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.beginPath(); ctx.arc(-2, -6, 2, 0, Math.PI * 2); ctx.fill();
+        } else {
+            // Default rocket
+            ctx.fillStyle = bodyColor;
+            ctx.beginPath();
+            ctx.moveTo(0, -20); ctx.lineTo(12, 12); ctx.lineTo(-12, 12);
+            ctx.closePath(); ctx.fill();
+            // Fins
+            ctx.fillStyle = skin.accent;
+            ctx.beginPath(); ctx.moveTo(-12, 12); ctx.lineTo(-20, 22); ctx.lineTo(-8, 12); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(12, 12); ctx.lineTo(20, 22); ctx.lineTo(8, 12); ctx.fill();
+            // Flame
+            ctx.fillStyle = flameColor;
+            ctx.beginPath(); ctx.moveTo(-5, 12); ctx.lineTo(0, 12 + flame); ctx.lineTo(5, 12); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath(); ctx.moveTo(-8, 12); ctx.lineTo(0, 12 + flame + 4); ctx.lineTo(8, 12); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 1;
+            // Window
+            ctx.fillStyle = skin.window;
+            ctx.beginPath(); ctx.arc(0, -4, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.beginPath(); ctx.arc(-1.5, -5.5, 1.5, 0, Math.PI * 2); ctx.fill();
+        }
 
         ctx.restore();
+    }
+
+    // Keep for backward compatibility (used by skin previews in shop)
+    _drawMiniRocket(ctx, skin, cx, cy) {
+        this._drawMiniVehicle(ctx, skin, cx, cy, this._shop.equippedVehicle || "rocket");
     }
 
     // ── Game Screen ───────────────────────────────────────────────────────────
@@ -424,6 +662,7 @@ class RocketGame extends HTMLElement {
     _startGame() {
         const effects = this._getEffects();
         const skin = this._getRocketSkin();
+        const vehicle = this._getVehicle();
 
         this.shadowRoot.innerHTML = `
       <style>
@@ -501,10 +740,10 @@ class RocketGame extends HTMLElement {
       </div>
     `;
 
-        this._setupGame(effects, skin);
+        this._setupGame(effects, skin, vehicle);
     }
 
-    _setupGame(effects, skin) {
+    _setupGame(effects, skin, vehicle) {
         const shadow = this.shadowRoot;
         const canvas = shadow.getElementById("game-canvas");
         const ctx = canvas.getContext("2d");
@@ -531,6 +770,9 @@ class RocketGame extends HTMLElement {
         const bulletSpeed = effects.bulletSpeed;
         const doubleShot = effects.doubleShot;
         const rainbowBullets = effects.rainbowBullets;
+        const moveSpeed = 5 + (vehicle.speedBonus || 0);
+        const shootPattern = vehicle.shootPattern || "forward";
+        const vehicleId = vehicle.id;
         let shotsFired = 0, hits = 0, misses = 0;
         let bulletHue = 0;
 
@@ -598,19 +840,49 @@ class RocketGame extends HTMLElement {
             comboRemaining.style.width = `${(remaining / maxShots) * 100}%`;
         };
 
+        // Bullet directions for each shooting pattern
+        const getShootDirections = () => {
+            // Each direction is { dx, dy } normalized-ish to bulletSpeed
+            switch (shootPattern) {
+                case "trident":
+                    return [{ dx: 0, dy: -1 }, { dx: -1, dy: 0 }, { dx: 1, dy: 0 }];
+                case "spread":
+                    return [{ dx: 0, dy: -1 }, { dx: -0.5, dy: -0.87 }, { dx: 0.5, dy: -0.87 }];
+                case "five-way":
+                    return [
+                        { dx: 0, dy: -1 }, { dx: -0.5, dy: -0.87 }, { dx: 0.5, dy: -0.87 },
+                        { dx: -1, dy: 0 }, { dx: 1, dy: 0 },
+                    ];
+                case "all-directions":
+                    return [
+                        { dx: 0, dy: -1 }, { dx: 0.71, dy: -0.71 }, { dx: 1, dy: 0 }, { dx: 0.71, dy: 0.71 },
+                        { dx: 0, dy: 1 }, { dx: -0.71, dy: 0.71 }, { dx: -1, dy: 0 }, { dx: -0.71, dy: -0.71 },
+                    ];
+                default: // "forward"
+                    return [{ dx: 0, dy: -1 }];
+            }
+        };
+
         const shoot = () => {
             if (shotsFired >= maxShots) {
                 flashBar(shadow.querySelector(".bar"));
                 return;
             }
             const cx = rocket.x + rocket.w / 2;
+            const cy = rocket.y + rocket.h / 2;
+            const dirs = getShootDirections();
+
             if (doubleShot) {
-                bullets.push({ x: cx - 8, y: rocket.y - 10, hue: bulletHue });
-                bullets.push({ x: cx + 6, y: rocket.y - 10, hue: bulletHue + 30 });
-                shotsFired += 2;
+                for (const d of dirs) {
+                    bullets.push({ x: cx - 6, y: cy, dx: d.dx, dy: d.dy, hue: bulletHue });
+                    bullets.push({ x: cx + 4, y: cy, dx: d.dx, dy: d.dy, hue: bulletHue + 30 });
+                }
+                shotsFired += dirs.length * 2;
             } else {
-                bullets.push({ x: cx - 2, y: rocket.y - 10, hue: bulletHue });
-                shotsFired++;
+                for (const d of dirs) {
+                    bullets.push({ x: cx - 2, y: cy, dx: d.dx, dy: d.dy, hue: bulletHue + dirs.indexOf(d) * 20 });
+                }
+                shotsFired += dirs.length;
             }
             bulletHue = (bulletHue + 15) % 360;
             updateComboBar();
@@ -639,7 +911,7 @@ class RocketGame extends HTMLElement {
         };
 
         const drawRocket = (x, y) => {
-            this._drawMiniRocket(ctx, skin, x + rocket.w / 2, y + rocket.h / 2);
+            this._drawMiniVehicle(ctx, skin, x + rocket.w / 2, y + rocket.h / 2, vehicleId);
         };
 
         const drawBullet = (b) => {
@@ -691,8 +963,8 @@ class RocketGame extends HTMLElement {
 
             drawStars();
 
-            if (leftPressed) rocket.x -= 5;
-            if (rightPressed) rocket.x += 5;
+            if (leftPressed) rocket.x -= moveSpeed;
+            if (rightPressed) rocket.x += moveSpeed;
             rocket.x = clamp(rocket.x, 0, canvas.width - rocket.w);
 
             drawRocket(rocket.x, rocket.y);
@@ -700,9 +972,10 @@ class RocketGame extends HTMLElement {
             // Bullets
             for (let i = bullets.length - 1; i >= 0; i--) {
                 const b = bullets[i];
-                b.y -= bulletSpeed;
+                b.x += (b.dx || 0) * bulletSpeed;
+                b.y += (b.dy || -1) * bulletSpeed;
                 b.hue = (b.hue + 2) % 360;
-                if (b.y < -10) {
+                if (b.y < -10 || b.y > canvas.height + 10 || b.x < -10 || b.x > canvas.width + 10) {
                     bullets.splice(i, 1);
                     misses++;
                     updateComboBar();
