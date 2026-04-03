@@ -27,7 +27,6 @@ if (typeof CanvasRenderingContext2D !== "undefined" && !CanvasRenderingContext2D
     };
 }
 
-import "./rocket-game.js";
 import "./flappy-game.js";
 import "./jump-game.js";
 import "./reaction-game.js";
@@ -105,13 +104,6 @@ const GAMES = [
         component: "catcher-game",
         desc: "Fange Sterne, meide Bomben!",
         scoreLabel: "Gefangen",
-    },
-    {
-        id: "rocket",   label: "Rakete",             emoji: "🚀",
-        cost: 1,  maxEarn: 0,
-        component: "rocket-game",
-        desc: "Schieße Münzen ab!",
-        scoreLabel: null,
     },
     {
         id: "tetris",   label: "Blöcke Stapeln",      emoji: "🟦",
@@ -488,7 +480,7 @@ class GameLobby extends HTMLElement {
         this.shadowRoot.getElementById("result-screen").hidden = true;
 
         // hide the lobby quit button for games that have their own close button
-        this.shadowRoot.getElementById("quit-btn").hidden = (game.id === "rocket" || game.id === "asteroids");
+        this.shadowRoot.getElementById("quit-btn").hidden = (game.id === "asteroids");
 
         const el = document.createElement(game.component);
         this.shadowRoot.getElementById("game-slot").appendChild(el);
@@ -594,7 +586,7 @@ class GameLobby extends HTMLElement {
 
     _handleCloseGame() {
         if (!this._activeGame) return;
-        // rocket-game: no score, no points earned; just show a minimal result
+        // games with own close button: no score, no points earned; just show a minimal result
         this._showResult(null, 0, false);
     }
 
