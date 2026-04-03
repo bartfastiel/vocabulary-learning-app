@@ -56,7 +56,7 @@ test.describe("LocalStorage Integration", () => {
 
   test("game highscores persist correctly", async ({ page }) => {
     await page.evaluate(() => {
-      const scores = { rocket: 150, memory: 200 };
+      const scores = { asteroids: 150, memory: 200 };
       localStorage.setItem("gameHighscores", JSON.stringify(scores));
     });
 
@@ -66,7 +66,7 @@ test.describe("LocalStorage Integration", () => {
     const result = await page.evaluate(() => {
       return JSON.parse(localStorage.getItem("gameHighscores"));
     });
-    expect(result.rocket).toBe(150);
+    expect(result.asteroids).toBe(150);
     expect(result.memory).toBe(200);
   });
 
