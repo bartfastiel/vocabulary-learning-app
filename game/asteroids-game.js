@@ -368,7 +368,7 @@ canvas { display: block; max-height: 80vh; max-width: 95vw; touch-action: none;
             if (x === undefined) {
                 // Spawn around the ship but not too close, in a ring
                 const angle = Math.random() * Math.PI * 2;
-                const dist = 250 + Math.random() * 200;
+                const dist = 150 + Math.random() * 150;
                 x = ship.x + Math.cos(angle) * dist;
                 y = ship.y + Math.sin(angle) * dist;
             }
@@ -385,7 +385,7 @@ canvas { display: block; max-height: 80vh; max-width: 95vw; touch-action: none;
 
         const spawnWave = () => {
             // Number of asteroids based on kills + wave number
-            const count = Math.min(5 + Math.floor(totalKills / 3), 20);
+            const count = Math.min(10 + Math.floor(totalKills / 3), 20);
             for (let i = 0; i < count; i++) spawnAsteroid(3);
             wave++;
         };
