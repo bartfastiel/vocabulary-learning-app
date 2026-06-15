@@ -229,18 +229,19 @@ class AsteroidsGame extends HTMLElement {
         for (const s of allShips) {
             const owned = s.id === "custom" || shop.ownedShips.includes(s.id);
             const active = shop.equipped === s.id;
-            const canBuy = !owned; // Shop ist gratis
+            const canBuy = !owned && coins >= s.price;
             const card = document.createElement("div");
-            card.className = "card" + (active ? " active" : "");
+            card.className = "card" + (active ? " active" : "") + (!owned && !canBuy ? " locked" : "");
             const cvs = document.createElement("canvas"); cvs.width = 44; cvs.height = 44; cvs.className = "preview";
             this._drawPreview(cvs.getContext("2d"), s); card.appendChild(cvs);
             const nm = document.createElement("div"); nm.className = "card-name"; nm.textContent = s.name; card.appendChild(nm);
             const pr = document.createElement("div"); pr.className = "card-price" + (owned ? " owned" : "");
-            pr.textContent = owned ? "✓" : "Gratis"; card.appendChild(pr);
+            pr.textContent = owned ? "✓" : `💰 ${s.price}`; card.appendChild(pr);
             if (active) { const b = document.createElement("div"); b.className = "badge"; b.textContent = "AKTIV"; card.appendChild(b); }
             card.onclick = () => {
                 if (owned && !active) { shop.equipped = s.id; saveShop(shop); this._showShop(); }
-                else if (!owned) {
+                else if (!owned && coins >= s.price) {
+                    this._coins -= s.price; setCoins(this._coins);
                     shop.ownedShips.push(s.id); shop.equipped = s.id; saveShop(shop); this._showShop();
                 }
             };
@@ -267,18 +268,20 @@ class AsteroidsGame extends HTMLElement {
         for (const def of UPGRADE_DEFS) {
             const lvl = shop.upgradeLevels[def.id] || 0;
             const maxed = def.maxLevel && lvl >= def.maxLevel;
-            const canBuy = !maxed; // Shop ist gratis
+            const price = maxed ? Infinity : getUpgradePrice(def, lvl);
+            const canBuy = !maxed && coins >= price;
             const card = document.createElement("div");
-            card.className = "ucard" + (maxed ? " maxed" : "");
+            card.className = "ucard" + (maxed ? " maxed" : "") + (!maxed && !canBuy ? " locked" : "");
             card.innerHTML = `
               <div class="uicon">${def.icon}</div>
               <div class="uinfo">
                 <div class="uname">${def.name} ${maxed ? "" : "(Lv " + lvl + ")"}</div>
                 <div class="udesc">${maxed ? "Max erreicht!" : def.desc(lvl)}</div>
               </div>
-              <div class="uprice ${maxed?"maxed":""}">${maxed ? "✓ Max" : "Gratis"}</div>`;
-            if (!maxed) {
+              <div class="uprice ${maxed?"maxed":""}">${maxed ? "✓ Max" : "💰 " + price}</div>`;
+            if (!maxed && canBuy) {
                 card.onclick = () => {
+                    this._coins -= price; setCoins(this._coins);
                     shop.upgradeLevels[def.id] = lvl + 1; saveShop(shop); this._showShop();
                 };
             }
