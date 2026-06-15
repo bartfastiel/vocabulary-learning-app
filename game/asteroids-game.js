@@ -39,8 +39,11 @@ const COIN_KEY = "points";
 function loadShop() { try { return JSON.parse(localStorage.getItem(SHOP_KEY) || "null"); } catch { return null; } }
 function defaultShop() { return { ownedShips: ["default"], upgradeLevels: {}, equipped: "default", customShip: null }; }
 function saveShop(d) { localStorage.setItem(SHOP_KEY, JSON.stringify(d)); }
-function getCoins() { return parseInt(localStorage.getItem(COIN_KEY) || "0"); }
-function setCoins(n) { localStorage.setItem(COIN_KEY, String(n)); }
+// Entwickler-Rolle hat (wie in der App) unbegrenzte Punkte und speichert sie nicht.
+function isDev() { return localStorage.getItem("userRole") === "developer"; }
+function getCoins() { return isDev() ? Infinity : parseInt(localStorage.getItem(COIN_KEY) || "0"); }
+function setCoins(n) { if (isDev()) return; localStorage.setItem(COIN_KEY, String(n)); }
+function fmtCoins(n) { return n === Infinity ? "∞" : n; }
 
 function getUpgradePrice(def, level) {
     if (def.maxLevel && level >= def.maxLevel) return Infinity;
@@ -173,7 +176,7 @@ class AsteroidsGame extends HTMLElement {
       <div class="wrap">
         <div class="header">
           <span class="title">☄️ Weltraum Pilot</span>
-          <div class="coins-badge">💰 ${coins}</div>
+          <div class="coins-badge">💰 ${fmtCoins(coins)}</div>
           <button class="btn-sm" id="close">📚 Weiterlernen</button>
         </div>
         <div class="body">
@@ -324,7 +327,7 @@ canvas { display: block; max-height: 80vh; max-width: 95vw; touch-action: none;
 </style>
 <div class="top-bar">
   <button class="top-btn" id="back">🛒 Shop</button>
-  <div class="coins-d">💰 <span id="cd">${this._coins}</span></div>
+  <div class="coins-d">💰 <span id="cd">${fmtCoins(this._coins)}</span></div>
   <button class="top-btn" id="quit">✕</button>
 </div>
 <canvas id="c" width="400" height="400"></canvas>
