@@ -33,7 +33,9 @@ const UPGRADE_DEFS = [
 ];
 
 const SHOP_KEY = "asteroidsShop";
-const COIN_KEY = "asteroidCoins";
+// Spiel-Waehrung = die Uebungs-Punkte der App. Man verdient sie durchs Ueben,
+// gibt sie fuers Spielen aus; der Shop ist gratis.
+const COIN_KEY = "points";
 function loadShop() { try { return JSON.parse(localStorage.getItem(SHOP_KEY) || "null"); } catch { return null; } }
 function defaultShop() { return { ownedShips: ["default"], upgradeLevels: {}, equipped: "default", customShip: null }; }
 function saveShop(d) { localStorage.setItem(SHOP_KEY, JSON.stringify(d)); }
@@ -164,7 +166,7 @@ class AsteroidsGame extends HTMLElement {
     _showShop() {
         if (this._cleanup) { this._cleanup(); this._cleanup = null; }
         const shop = this._shop, coins = this._coins, effects = getEffects(shop);
-        const canPlay = true; // always free to play
+        const canPlay = this._coins >= PLAY_COST; // Spielen kostet Punkte (durchs Ueben verdient)
         const custom = shop.customShip || { hull: "#4dd0e1", accent: "#00838f", flame: "#FF6D00" };
 
         this.shadowRoot.innerHTML = `<style>${SHOP_CSS}</style>
@@ -172,12 +174,12 @@ class AsteroidsGame extends HTMLElement {
         <div class="header">
           <span class="title">☄️ Weltraum Pilot</span>
           <div class="coins-badge">💰 ${coins}</div>
-          <button class="btn-sm" id="close">Zurück</button>
+          <button class="btn-sm" id="close">📚 Weiterlernen</button>
         </div>
         <div class="body">
           <div>
             <button class="play-btn" id="play" ${canPlay ? "" : "disabled"}>▶ Spielen</button>
-            <div class="play-cost">Immer kostenlos spielen!</div>
+            <div class="play-cost">${canPlay ? `Eine Runde kostet ${PLAY_COST} 💰` : `Zu wenig Münzen – übe weiter, um welche zu verdienen!`}</div>
           </div>
           <div>
             <div class="section">📊 Dein Setup</div>
@@ -224,19 +226,18 @@ class AsteroidsGame extends HTMLElement {
         for (const s of allShips) {
             const owned = s.id === "custom" || shop.ownedShips.includes(s.id);
             const active = shop.equipped === s.id;
-            const canBuy = !owned && coins >= s.price;
+            const canBuy = !owned; // Shop ist gratis
             const card = document.createElement("div");
-            card.className = "card" + (active ? " active" : "") + (!owned && !canBuy ? " locked" : "");
+            card.className = "card" + (active ? " active" : "");
             const cvs = document.createElement("canvas"); cvs.width = 44; cvs.height = 44; cvs.className = "preview";
             this._drawPreview(cvs.getContext("2d"), s); card.appendChild(cvs);
             const nm = document.createElement("div"); nm.className = "card-name"; nm.textContent = s.name; card.appendChild(nm);
             const pr = document.createElement("div"); pr.className = "card-price" + (owned ? " owned" : "");
-            pr.textContent = owned ? "✓" : `💰 ${s.price}`; card.appendChild(pr);
+            pr.textContent = owned ? "✓" : "Gratis"; card.appendChild(pr);
             if (active) { const b = document.createElement("div"); b.className = "badge"; b.textContent = "AKTIV"; card.appendChild(b); }
             card.onclick = () => {
                 if (owned && !active) { shop.equipped = s.id; saveShop(shop); this._showShop(); }
-                else if (!owned && coins >= s.price) {
-                    this._coins -= s.price; setCoins(this._coins);
+                else if (!owned) {
                     shop.ownedShips.push(s.id); shop.equipped = s.id; saveShop(shop); this._showShop();
                 }
             };
@@ -263,20 +264,18 @@ class AsteroidsGame extends HTMLElement {
         for (const def of UPGRADE_DEFS) {
             const lvl = shop.upgradeLevels[def.id] || 0;
             const maxed = def.maxLevel && lvl >= def.maxLevel;
-            const price = maxed ? Infinity : getUpgradePrice(def, lvl);
-            const canBuy = !maxed && coins >= price;
+            const canBuy = !maxed; // Shop ist gratis
             const card = document.createElement("div");
-            card.className = "ucard" + (maxed ? " maxed" : "") + (!maxed && !canBuy ? " locked" : "");
+            card.className = "ucard" + (maxed ? " maxed" : "");
             card.innerHTML = `
               <div class="uicon">${def.icon}</div>
               <div class="uinfo">
                 <div class="uname">${def.name} ${maxed ? "" : "(Lv " + lvl + ")"}</div>
                 <div class="udesc">${maxed ? "Max erreicht!" : def.desc(lvl)}</div>
               </div>
-              <div class="uprice ${maxed?"maxed":""}">${maxed ? "✓ Max" : "💰 " + price}</div>`;
-            if (!maxed && canBuy) {
+              <div class="uprice ${maxed?"maxed":""}">${maxed ? "✓ Max" : "Gratis"}</div>`;
+            if (!maxed) {
                 card.onclick = () => {
-                    this._coins -= price; setCoins(this._coins);
                     shop.upgradeLevels[def.id] = lvl + 1; saveShop(shop); this._showShop();
                 };
             }
@@ -300,6 +299,9 @@ class AsteroidsGame extends HTMLElement {
     // ── Game ──────────────────────────────────────────────────────────────────
 
     _startGame() {
+        // Eine Runde kostet Münzen (durchs Üben verdient). Nicht genug → zurück zum Shop.
+        if (this._coins < PLAY_COST) { this._showShop(); return; }
+        this._coins -= PLAY_COST; setCoins(this._coins);
         const effects = getEffects(this._shop);
         const skin = this._getSkin();
 
@@ -462,8 +464,7 @@ canvas { display: block; max-height: 80vh; max-width: 95vw; touch-action: none;
                         bullets.splice(i, 1);
                         const pts = (4 - a.size) * 10;
                         score += pts;
-                        const earned = Math.ceil(pts / 10);
-                        this._coins += earned; setCoins(this._coins); coinEl.textContent = this._coins;
+                        // Münzen gibt es nicht durchs Spielen, sondern nur durchs Üben.
                         totalKills++;
                         spawnParticles(a.x, a.y, 6);
                         if (a.size > 1) { spawnAsteroid(a.size-1, a.x, a.y); spawnAsteroid(a.size-1, a.x, a.y); }
