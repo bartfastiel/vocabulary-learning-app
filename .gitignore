@@ -3,3 +3,6 @@ log
 node_modules
 test-results
 playwright-report
+
+# Claude Code: lokale Freigaben enthalten wörtliche Befehle inkl. Zugangsdaten
+.claude/settings.local.json
